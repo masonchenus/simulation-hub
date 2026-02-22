@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ember Field</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="mini-apps.css" />
+    <link rel="stylesheet" href="lock.css" />
+  </head>
+  <body data-app-id="ember-field" style="--accent: #fb7185; --accent-2: #f97316;">
+    <main class="app-shell layout-stack">
+      <header class="app-header">
+        <div class="eyebrow">Creative</div>
+        <h1>Ember Field</h1>
+        <p class="subhead">Sketch ember bursts and watch them scatter like sparks in the night air.</p>
+        <div class="chip-row">
+          <span class="chip">Glow</span><span class="chip">Relaxing</span><span class="chip">Touch</span>
+        </div>
+      </header>
+      <section class="app-panel">
+        <div class="app-card">
+          <div id="app" data-app="particles"></div>
+        </div>
+      </section>
+      <aside class="app-aside">
+        <strong>Tips</strong>
+        <div>- Tap around to layer sparks.</div><div>- Clear when you want a fresh field.</div>
+        <div style="margin-top:10px">Return to <a href="index.html" style="color:inherit">Simulation Hub</a></div>
+      </aside>
+    </main>
+    <script>
+      window.APP_CONFIG = {};
+    </script>
+    <script src="lock.js"></script>
+    <script src="mini-apps.js"></script>
+  </body>
+</html>

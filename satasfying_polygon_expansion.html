@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Satisfying Polygon Expansion</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #050505; color: #444; font-family: monospace; }
+        canvas { display: block; }
+        #info { position: absolute; top: 10px; left: 10px; pointer-events: none; }
+        #controls { position: absolute; top: 40px; left: 10px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 4px; border: 1px solid #333; }
+        #controls label { display: block; color: #888; margin-bottom: 5px; font-size: 12px; }
+        #controls input { vertical-align: middle; }
+        #controls { max-height: 90vh; overflow-y: auto; }
+    </style>
+    <script>
+        window.addEventListener('error', function(e) {
+            const msg = e.message || e;
+            const div = document.createElement('div');
+            div.style.position = 'fixed';
+            div.style.bottom = '10px';
+            div.style.right = '10px';
+            div.style.backgroundColor = 'rgba(50, 0, 0, 0.9)';
+            div.style.color = '#ff5555';
+            div.style.padding = '10px';
+            div.style.border = '1px solid #ff0000';
+            div.style.fontFamily = 'monospace';
+            div.style.fontSize = '12px';
+            div.style.zIndex = '9999';
+            div.style.maxWidth = '80%';
+            div.innerText = 'ERROR: ' + msg;
+            document.body.appendChild(div);
+            console.error("Runtime Error:", e);
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <div id="info">Nodes: <span id="count">0</span></div>
+    <div id="controls">
+        <label>Growth Rate: <input type="range" id="growth" min="0" max="100" value="25"></label>
+        <label>Entropy: <input type="range" id="entropy" min="0" max="20" value="1"></label>
+        <label>Expansion: <input type="range" id="expand" min="0" max="50" value="5"></label>
+        <label>Connect Dist: <input type="range" id="connDist" min="5" max="30" value="12"></label>
+        <div style="margin-top:5px; padding-top:5px; border-top:1px solid #333;">
+            <label>Gen Mode: 
+                <select id="genMode" style="background:#222; color:#aaa; border:1px solid #444; font-size:10px; padding:2px; border-radius:3px;">
+                    <option value="sphere">Sphere</option>
+                    <option value="cube">Cube</option>
+                    <option value="ring">Ring</option>
+                    <option value="spiral">Spiral</option>
+                    <option value="fountain">Fountain</option>
+                    <option value="plane">Plane</option>
+                    <option value="cone">Cone</option>
+                    <option value="cylinder">Cylinder</option>
+                    <option value="torus">Torus</option>
+                    <option value="helix">Helix</option>
+                    <option value="cross">Cross</option>
+                    <option value="grid">Grid</option>
+                    <option value="hourglass">Hourglass</option>
+                    <option value="atom">Atom</option>
+                    <option value="dna">DNA</option>
+                    <option value="pyramid">Pyramid</option>
+                    <option value="diamond">Diamond</option>
+                    <option value="star">Star</option>
+                    <option value="galaxy">Galaxy</option>
+                    <option value="snowflake">Snowflake</option>
+                    <option value="heart">Heart</option>
+                    <option value="trefoil">Trefoil</option>
+                    <option value="mobius">Mobius</option>
+                    <option value="klein">Klein</option>
+                    <option value="saddle">Saddle</option>
+                    <option value="dome">Dome</option>
+                    <option value="text">Text</option>
+                </select>
+                <div id="textControls" style="display:none; margin-top:5px;">
+                    <input type="text" id="textInput" value="I <3 You" style="width:100%; background:#222; color:#aaa; border:1px solid #444; font-size:10px; padding:2px; margin-bottom:2px;">
+                    <select id="fontSelect" style="width:100%; background:#222; color:#aaa; border:1px solid #444; font-size:10px; padding:2px; margin-top:2px;">
+                        <option value="Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'">Print</option>
+                        <option value="'Courier New', Courier, monospace, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'">Typewriter</option>
+                        <option value="'Brush Script MT', 'Comic Sans MS', cursive, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'">Cursive</option>
+                        <option value="'Zapfino', 'Chalkduster', 'Copperplate', fantasy, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'">Calligraphy</option>
+                    </select>
+                    <button id="btnUpdateText" style="cursor:pointer; font-size:10px; background:#333; color:#aaa; border:1px solid #444; border-radius:3px; margin-top:2px; width:100%;">Set</button>
+                </div>
+            </label>
+            <label>Gen Spread: <input type="range" id="genSpread" min="1" max="200" value="10"></label>
+            <label>Init Velocity: <input type="range" id="genVel" min="0" max="100" value="20"></label>
+        </div>
+        <div style="margin-top:10px; border-top:1px solid #333; padding-top:5px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                <label style="display:inline-flex; align-items:center; font-size:11px;"><input type="checkbox" id="ringRandom" checked> Random</label>
+                <label style="display:inline-flex; align-items:center; font-size:11px;"><input type="checkbox" id="ringWireframe"> Wireframe</label>
+                <select id="ringRotMode" style="background:#222; color:#aaa; border:1px solid #444; font-size:10px; padding:2px; border-radius:3px;">
+                    <option value="random">Random 3D</option>
+                    <option value="1plane">1 Plane</option>
+                    <option value="2planes">2 Planes</option>
+                </select>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:5px;">
+                <label style="font-size:10px; color:#888; cursor:pointer;"><input type="checkbox" id="ringGhost"> Trails</label>
+                <label style="font-size:10px; color:#888; cursor:pointer;"><input type="checkbox" id="ringGlitch"> Glitch</label>
+                <label style="font-size:10px; color:#888; cursor:pointer;"><input type="checkbox" id="ringWobble"> Wobble</label>
+                <label style="font-size:10px; color:#888; cursor:pointer;"><input type="checkbox" id="ringThick"> Thicc</label>
+                <label style="font-size:10px; color:#888; cursor:pointer;"><input type="checkbox" id="ringRainbow"> Rainbow</label>
+                <input type="color" id="ringColor" value="#00ffff" style="width:20px; height:15px; border:none; padding:0; background:none; cursor:pointer;" title="Ring Base Color">
+            </div>
+            <div id="ringParams" style="display:none; margin-left:10px; border-left:1px solid #555; padding-left:5px;">
+                <label>Segments: <input type="number" id="ringSegs" min="1" max="100" value="2" style="width:50px; background:#222; color:#fff; border:1px solid #444;"></label>
+                <label>Gap: <input type="range" id="ringGap" min="0.01" max="1.0" step="0.01" value="0.1"></label>
+                <label>Speed: <input type="range" id="ringSpeed" min="0" max="0.05" step="0.001" value="0.01"></label>
+            </div>
+            <div style="margin-top:5px; border-top:1px solid #444; padding-top:5px;">
+                <div style="font-size:11px; color:#aaa; cursor:pointer; font-weight:bold; margin-bottom:5px;" id="toggleRingAdv">▶ Advanced Params</div>
+                <div id="ringAdvParams" style="display:none; padding-left:5px;">
+                    <label>Tube Thick: <input type="range" id="ringParamTube" min="0.01" max="3" step="0.01" value="1"></label>
+                    <label>Opacity: <input type="range" id="ringParamOp" min="0" max="1" step="0.01" value="0.7"></label>
+                    <label>Pulse Spd: <input type="range" id="ringParamPSpd" min="0" max="10" step="0.1" value="1"></label>
+                    <label>Pulse Str: <input type="range" id="ringParamPStr" min="0" max="1" step="0.01" value="0.1"></label>
+                    <label>Color Spd: <input type="range" id="ringParamCSpd" min="0" max="5" step="0.1" value="0.2"></label>
+                    <label>Seg Spin: <input type="range" id="ringParamSSpd" min="-0.2" max="0.2" step="0.001" value="0.02"></label>
+                    <label>Rad Offset: <input type="range" id="ringParamRad" min="0.1" max="3" step="0.1" value="1"></label>
+                    <label>Tumble: <input type="range" id="ringParamTumble" min="0" max="0.2" step="0.001" value="0.01"></label>
+                    <label>Flatten: <input type="range" id="ringParamFlat" min="0.01" max="1" step="0.01" value="1"></label>
+                    <label>Res: <input type="range" id="ringParamRes" min="3" max="32" step="1" value="4"></label>
+                    <label>Segments: <input type="number" id="ringParamSegs" min="1" max="100" value="2" style="width:50px; background:#222; color:#fff; border:1px solid #444;"></label>
+                    <label>Gap: <input type="range" id="ringParamGap" min="0.01" max="1.0" step="0.01" value="0.1"></label>
+                    <label>Twist: <input type="range" id="ringParamTwist" min="0" max="10" step="0.1" value="0"></label>
+                    <label>Ring Spin: <input type="range" id="ringParamSpin" min="0" max="5" step="0.1" value="1"></label>
+                    <label>Noise: <input type="range" id="ringParamNoise" min="0" max="5" step="0.1" value="0"></label>
+                    </div>
+            </div>
+            <div style="display:flex; gap:5px; margin-top:5px;">
+                <button id="btnDuplicateRing" style="flex:1; cursor:pointer;">Duplicate Ring</button>
+                <label style="flex:1; display:flex; align-items:center; justify-content:center; background:#333; border-radius:2px; font-size:10px; cursor:pointer;"><input type="checkbox" id="chaosPhysics"> Chaos Physics</label>
+            </div>
+            <button id="btnTimelapse" style="margin-top:5px; cursor:pointer; width:100%">Timelapse (Hold)</button>
+            <button id="btnAddRings" style="margin-top:5px; cursor:pointer; width:100%">Add Rings</button>
+        </div>
+        <div style="margin-top:5px; display:flex; align-items:center; gap:5px;">
+            <button id="btnAddAura" style="flex-grow:1; cursor:pointer;">Add Aura</button>
+            <input type="color" id="auraColor" value="#ff0000" style="width:30px; height:20px; border:none; padding:0; background:none; cursor:pointer;">
+            <label style="font-size:10px; color:#888;"><input type="checkbox" id="auraRandom" checked> Rnd</label>
+        </div>
+        <div style="margin-top:2px; margin-bottom:5px;">
+             <label style="font-size:10px; color:#888;">Density: <input type="range" id="auraDensity" min="100" max="20000" value="3000"></label>
+        </div>
+        <div style="margin-top:5px; display:flex; align-items:center; justify-content:space-between;">
+            <button id="btnAddPulseSphere" style="flex-grow:1; cursor:pointer; margin-right:5px;">Add Pulsing Sphere</button>
+            <div style="text-align:right;">
+                <label style="font-size:10px; cursor:pointer; color:#888; display:block;"><input type="checkbox" id="pulseRainbow"> Rainbow</label>
+                <label style="font-size:10px; cursor:pointer; color:#888; display:block;"><input type="checkbox" id="pulseAudio"> Audio</label>
+            </div>
+        </div>
+        <label>Deform: <input type="range" id="pulseDeform" min="0" max="1000" value="10"></label>
+        <label>Node Brightness: <input type="range" id="nodeBrightness" min="0" max="200" value="100"></label>
+        <button id="btnShatter" style="margin-top:5px; cursor:pointer; width:100%">Shatter Spheres</button>
+        <div style="margin-top:5px; border-top:1px solid #333; padding-top:5px;">
+            <label style="display:inline-flex; align-items:center; font-size:11px;"><input type="checkbox" id="nodePulse"> Node Pulse</label>
+            <label style="font-size:10px; color:#888;">Speed: <input type="range" id="nodePulseSpeed" min="0.1" max="5" step="0.1" value="1"></label>
+            <label style="display:inline-flex; align-items:center; font-size:11px; margin-left:10px;"><input type="checkbox" id="heartbeatMode"> Heartbeat</label>
+        </div>
+        <div style="margin-top:5px; border-top:1px solid #333; padding-top:5px;">
+            <label style="display:inline-flex; align-items:center; font-size:11px;"><input type="checkbox" id="showTrails"> Trails</label>
+            <label style="font-size:10px; color:#888;">Fade: <input type="range" id="trailFade" min="0.01" max="0.5" step="0.01" value="0.05"></label>
+        </div>
+        <button id="btnClear" style="margin-top:5px; cursor:pointer; width:100%">Clear Effects</button>
+        <button id="btnSnapshot" style="margin-top:5px; cursor:pointer; width:100%">Take Snapshot</button>
+    </div>
+    <script>
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050505, 0.0002);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000);
+        camera.position.set(0, 30, 80);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.autoRotate = true;
+
+        // Configuration
+        const maxNodes = 50000;
+        const nodesData = []; // Array of { pos: Vector3, vel: Vector3 }
+
+        // Global state for chaos physics
+        const chaosState = {
+            active: false,
+            passes: 0,
+            merging: false,
+            lastDist: Infinity,
+            approaching: true,
+            center0: new THREE.Vector3(),
+            center1: new THREE.Vector3()
+        };
+        
+        // Parameters
+        const params = {
+            growth: 25,
+            entropy: 1,
+            expansion: 5,
+            connectDist: 12
+        };
+
+        document.getElementById('growth').addEventListener('input', e => params.growth = parseInt(e.target.value));
+        document.getElementById('entropy').addEventListener('input', e => params.entropy = parseInt(e.target.value));
+        document.getElementById('expand').addEventListener('input', e => params.expansion = parseInt(e.target.value));
+        document.getElementById('connDist').addEventListener('input', e => params.connectDist = parseInt(e.target.value));
+        document.getElementById('genMode').addEventListener('change', () => {
+            const mode = document.getElementById('genMode').value;
+            const textControls = document.getElementById('textControls');
+            if (mode === 'text') {
+                textControls.style.display = 'block';
+                generateTextPoints(document.getElementById('textInput').value);
+            } else {
+                textControls.style.display = 'none';
+            }
+            nodesData.length = 0;
+            nodesData.push({ pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0,0,0), polyId: 0, degree: 0 });
+        });
+
+        document.getElementById('btnSnapshot').addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'polygon-love.png';
+            link.href = renderer.domElement.toDataURL('image/png');
+            link.click();
+        });
+        
+        let textPoints = [];
+        let textPointIndex = 0;
+        
+        function generateTextPoints(text) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const fontSize = 100;
+            const fontSelect = document.getElementById('fontSelect');
+            const fontFamily = fontSelect ? fontSelect.value : 'Arial, sans-serif';
+            ctx.font = `bold ${fontSize}px ${fontFamily}`;
+            const measure = ctx.measureText(text);
+            const width = Math.ceil(measure.width);
+            const height = Math.ceil(fontSize * 1.2);
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            ctx.font = `bold ${fontSize}px ${fontFamily}`;
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, width / 2, height / 2);
+            
+            const data = ctx.getImageData(0, 0, width, height).data;
+            textPoints = [];
+            const step = 2;
+            for (let y = 0; y < height; y += step) {
+                for (let x = 0; x < width; x += step) {
+                    const i = (y * width + x) * 4;
+                    if (data[i + 3] > 128) {
+                        textPoints.push({ x: x - width/2, y: -(y - height/2) });
+                    }
+                }
+            }
+            // Shuffle
+            for (let i = textPoints.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [textPoints[i], textPoints[j]] = [textPoints[j], textPoints[i]];
+            }
+            textPointIndex = 0;
+        }
+        
+        document.getElementById('btnUpdateText').addEventListener('click', () => {
+            generateTextPoints(document.getElementById('textInput').value);
+            nodesData.length = 0;
+            nodesData.push({ pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0,0,0), polyId: 0, degree: 0 });
+        });
+
+        document.getElementById('fontSelect').addEventListener('change', () => {
+            document.getElementById('textInput').style.fontFamily = document.getElementById('fontSelect').value;
+            generateTextPoints(document.getElementById('textInput').value);
+            nodesData.length = 0;
+            nodesData.push({ pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0,0,0), polyId: 0, degree: 0 });
+        });
+
+        // Rings
+        const ringsGroup = new THREE.Group();
+        scene.add(ringsGroup);
+
+        const ringRandomCb = document.getElementById('ringRandom');
+        const ringParamsDiv = document.getElementById('ringParams');
+        
+        document.getElementById('ringWireframe').addEventListener('change', (e) => {
+            ringsGroup.children.forEach(g => {
+                g.children.forEach(m => {
+                    if (m.material) m.material.wireframe = e.target.checked;
+                });
+            });
+        });
+
+        ringRandomCb.addEventListener('change', () => {
+            ringParamsDiv.style.display = ringRandomCb.checked ? 'none' : 'block';
+        });
+        
+        document.getElementById('toggleRingAdv').addEventListener('click', (e) => {
+            const el = document.getElementById('ringAdvParams');
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+            e.target.innerText = el.style.display === 'none' ? '▶ Advanced Params' : '▼ Advanced Params';
+        });
+
+        document.getElementById('btnAddRings').addEventListener('click', () => {
+            const currentRadius = 10 + Math.pow(nodesData.length, 0.4) * 4;
+            const isWireframe = document.getElementById('ringWireframe').checked;
+            
+            let r, segments, gap, speed;
+            
+            if (ringRandomCb.checked) {
+                r = currentRadius + 5 + Math.random() * 30;
+                segments = Math.random() < 0.5 ? 2 : Math.floor(Math.random() * 4) + 3;
+                gap = 0.05 + Math.random() * 0.2;
+                speed = 0.005 + Math.random() * 0.015;
+            } else {
+                r = currentRadius + 10 + Math.random() * 10;
+                segments = parseInt(document.getElementById('ringSegs').value);
+                gap = parseFloat(document.getElementById('ringGap').value);
+                speed = parseFloat(document.getElementById('ringSpeed').value);
+            }
+            
+            const tube = 0.2 + Math.random() * 0.5;
+
+            const ringSet = new THREE.Group();
+            const isRainbow = document.getElementById('ringRainbow').checked;
+            const ringColorHex = document.getElementById('ringColor').value;
+            const ringBaseColor = new THREE.Color(ringColorHex);
+            const ringHSL = { h: 0, s: 0, l: 0 }; ringBaseColor.getHSL(ringHSL);
+
+            const rotMode = document.getElementById('ringRotMode').value;
+            ringSet.userData = { 
+                mode: rotMode,
+                pulseSpeed: 0.5 + Math.random(),
+                pulseAmp: 0.05 + Math.random() * 0.1,
+                colorSpeed: 0.1 + Math.random() * 0.2,
+                segSpinSpeed: (Math.random() - 0.5) * 0.02,
+                baseRadius: r,
+                baseTube: tube,
+                segments: segments,
+                gap: gap,
+                useRainbow: isRainbow,
+                baseHue: ringHSL.h,
+                baseSat: ringHSL.s,
+                baseLum: ringHSL.l
+            };
+
+            // 10. Counter-Rotation
+            const dirMult = (ringsGroup.children.length % 2 === 0) ? 1 : -1;
+
+            if (rotMode === '1plane') {
+                ringSet.userData.rotSpeedZ = (Math.random() < 0.5 ? 1 : -1) * speed * dirMult;
+            } else if (rotMode === '2planes') {
+                ringSet.userData.rotSpeedZ = (Math.random() < 0.5 ? 1 : -1) * speed * dirMult;
+                ringSet.userData.tumbleSpeed = (Math.random() - 0.5) * speed * 0.5 * dirMult;
+                ringSet.userData.tumbleAxis = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize();
+            } else {
+                ringSet.userData.rotSpeedX = (Math.random() - 0.5) * speed * dirMult;
+                ringSet.userData.rotSpeedY = (Math.random() - 0.5) * speed * dirMult;
+                ringSet.userData.rotSpeedZ = (Math.random() - 0.5) * speed * dirMult;
+            }
+
+            // Random initial orientation
+            ringSet.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+            
+            const color = new THREE.Color().setHSL(ringHSL.h, ringHSL.s, ringHSL.l);
+            
+            const segmentArc = (Math.PI * 2) / segments;
+            const drawArc = Math.max(0.1, segmentArc - gap);
+
+            for(let i=0; i<segments; i++) {
+                const startAngle = i * segmentArc;
+                const geo = new THREE.TorusGeometry(r, tube, 4, 40, drawArc);
+                const mat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.7, wireframe: isWireframe });
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.rotation.z = startAngle;
+                ringSet.add(mesh);
+            }
+            ringsGroup.add(ringSeT);
+        });
+
+        let timeScale = 1.0;
+        const btnTimelapse = document.getElementById('btnTimelapse');
+        if(btnTimelapse) {
+            btnTimelapse.addEventListener('mousedown', () => timeScale = 10.0);
+            btnTimelapse.addEventListener('mouseup', () => timeScale = 1.0);
+            btnTimelapse.addEventListener('mouseleave', () => timeScale = 1.0);
+            btnTimelapse.addEventListener('touchstart', (e) => { e.preventDefault(); timeScale = 10.0; });
+            btnTimelapse.addEventListener('touchend', (e) => { e.preventDefault(); timeScale = 1.0; });
+        }
+
+        document.getElementById('chaosPhysics').addEventListener('change', (e) => {
+            if (e.target.checked) {
+                chaosState.active = true;
+                chaosState.passes = 0;
+                chaosState.merging = false;
+                chaosState.lastDist = Infinity;
+                chaosState.approaching = true;
+
+                const len = nodesData.length;
+                // Shift existing (Group 0) for swing-by trajectory
+                for(let i=0; i<len; i++) {
+                    const n = nodesData[i];
+                    n.polyId = 0;
+                    n.pos.add(new THREE.Vector3(-500, 150, 0));
+                    n.vel.set(3.0, 0, 0); // Move Right
+                }
+
+                // Create new (Group 1)
+                for(let i=0; i<len; i++) {
+                    const n = nodesData[i];
+                    // Clone relative structure but place at opposing side
+                    const relPos = n.pos.clone().sub(new THREE.Vector3(-500, 150, 0));
+                    const pos = relPos.add(new THREE.Vector3(500, -150, 0)).add(new THREE.Vector3((Math.random()-0.5)*50, (Math.random()-0.5)*50, (Math.random()-0.5)*50));
+                    const vel = new THREE.Vector3(-3.0, 0, 0); // Move Left
+                    nodesData.push({ pos, vel, polyId: 1, degree: 0 });
+                }
+            }
+        });
+
+        document.getElementById('btnDuplicateRing').addEventListener('click', () => {
+            if (ringsGroup.children.length === 0) return;
+            const source = ringsGroup.children[ringsGroup.children.length - 1];
+            const clone = source.clone();
+            // Deep copy userData to ensure independence
+            clone.userData = JSON.parse(JSON.stringify(source.userData));
+            clone.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+            ringsGroup.add(clone);
+        });
+        
+        function updateRingGeometry() {
+            const tubeMult = parseFloat(document.getElementById('ringParamTube').value);
+            const radMult = parseFloat(document.getElementById('ringParamRad').value);
+            const res = parseInt(document.getElementById('ringParamRes').value);
+            const segsOverride = parseInt(document.getElementById('ringParamSegs').value);
+            const gapOverride = parseFloat(document.getElementById('ringParamGap').value);
+            const twist = parseFloat(document.getElementById('ringParamTwist').value);
+            const noise = parseFloat(document.getElementById('ringParamNoise').value);
+            
+            ringsGroup.children.forEach(g => {
+                const r = g.userData.baseRadius * radMult;
+                const t = g.userData.baseTube * tubeMult;
+                const segments = segsOverride; // Use override for all, or we could add a checkbox to apply to all
+                const gap = gapOverride;
+                const segmentArc = (Math.PI * 2) / segments;
+                const drawArc = Math.max(0.01, segmentArc - gap);
+                
+                // Rebuild children if count changed
+                while(g.children.length > segments) g.remove(g.children[g.children.length-1]);
+                while(g.children.length < segments) {
+                    const mesh = new THREE.Mesh(new THREE.BufferGeometry(), g.children[0].material);
+                    g.add(mesh);
+                }
+
+                g.children.forEach((mesh, i) => {
+                    mesh.geometry.dispose();
+                    mesh.geometry = new THREE.TorusGeometry(r, t, res, 40, drawArc);
+                    
+                    if (twist !== 0) {
+                        const pos = mesh.geometry.attributes.position;
+                        const tubularSegments = 40;
+                        const stride = tubularSegments + 1;
+                        
+                        for (let k = 0; k < pos.count; k++) {
+                            const ti = k % stride; 
+                            const u = ti / tubularSegments;
+                            const angle = u * twist * Math.PI * 2;
+                            const u_angle = u * drawArc;
+                            
+                            const cx = r * Math.cos(u_angle);
+                            const cy = r * Math.sin(u_angle);
+                            
+                            const x = pos.getX(k);
+                            const y = pos.getY(k);
+                            const z = pos.getZ(k);
+                            
+                            const dx = x - cx;
+                            const dy = y - cy;
+                            const dz = z;
+                            
+                            const cosU = Math.cos(u_angle);
+                            const sinU = Math.sin(u_angle);
+                            
+                            const vR = dx * cosU + dy * sinU;
+                            const vZ = dz;
+                            
+                            const cosT = Math.cos(angle);
+                            const sinT = Math.sin(angle);
+                            
+                            const vR_new = vR * cosT - vZ * sinT;
+                            const vZ_new = vR * sinT + vZ * cosT;
+                            
+                            pos.setXYZ(k, cx + vR_new * cosU, cy + vR_new * sinU, vZ_new);
+                        }
+                        mesh.geometry.computeVertexNormals();
+                    }
+
+                    if (noise > 0) {
+                        const pos = mesh.geometry.attributes.position;
+                        for (let k = 0; k < pos.count; k++) {
+                            pos.setXYZ(k, 
+                                pos.getX(k) + (Math.random() - 0.5) * noise,
+                                pos.getY(k) + (Math.random() - 0.5) * noise,
+                                pos.getZ(k) + (Math.random() - 0.5) * noise
+                            );
+                        }
+                        mesh.geometry.computeVertexNormals();
+                    }
+                    
+                    mesh.rotation.z = i * segmentArc;
+                });
+            });
+        }
+        
+        ['ringParamTube', 'ringParamRad', 'ringParamRes', 'ringParamSegs', 'ringParamGap', 'ringParamTwist', 'ringParamNoise'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateRingGeometry);
+        });
+
+        // Aura
+        const aurasGroup = new THREE.Group();
+        scene.add(aurasGroup);
+
+        function createAura() {
+            const densityInput = document.getElementById('auraDensity');
+            const particleCount = densityInput ? parseInt(densityInput.value) : 3000;
+            
+            const isRandom = document.getElementById('auraRandom').checked;
+            const uiColor = document.getElementById('auraColor').value;
+            const baseColor = isRandom ? new THREE.Color().setHSL(Math.random(), 1.0, 0.6) : new THREE.Color(uiColor);
+            
+            if (isRandom) {
+                document.getElementById('auraColor').value = '#' + baseColor.getHexString();
+            }
+
+            const group = new THREE.Group();
+            group.userData = { scaleOffset: 1.5 + Math.random() * 1.0 };
+
+            const geo = new THREE.BufferGeometry();
+            const pos = [];
+            const randomness = [];
+            
+            for(let i=0; i<particleCount; i++) {
+                const r = Math.cbrt(Math.random()); 
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                
+                const x = r * Math.sin(phi) * Math.cos(theta);
+                const y = r * Math.sin(phi) * Math.sin(theta);
+                const z = r * Math.cos(phi);
+                
+                pos.push(x, y, z);
+                randomness.push(Math.random(), Math.random(), Math.random());
+            }
+            
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+            geo.setAttribute('random', new THREE.Float32BufferAttribute(randomness, 3));
+            
+            const mat = new THREE.ShaderMaterial({
+                uniforms: {
+                    time: { value: Math.random() * 100 },
+                    color: { value: baseColor }
+                },
+                vertexShader: `
+                    uniform float time;
+                    attribute vec3 random;
+                    varying float vAlpha;
+                    varying float vShade;
+                    void main() {
+                        vec3 p = position;
+                        float t = time * 0.5;
+                        p.x += sin(t + random.y * 6.28) * 0.2 * random.z;
+                        p.y += cos(t + random.z * 6.28) * 0.2 * random.x;
+                        p.z += sin(t + random.x * 6.28) * 0.2 * random.y;
+                        vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
+                        gl_Position = projectionMatrix * mvPosition;
+                        gl_PointSize = (4.0 + random.x * 6.0) * (200.0 / -mvPosition.z);
+                        vAlpha = 0.6 + 0.4 * sin(time * 2.0 + random.y * 10.0);
+                        vShade = random.z;
+                    }
+                `,
+                fragmentShader: `
+                    uniform vec3 color;
+                    varying float vAlpha;
+                    varying float vShade;
+                    void main() {
+                        vec2 coord = gl_PointCoord - vec2(0.5);
+                        float dist = length(coord);
+                        if (dist > 0.5) discard;
+                        float strength = 1.0 - (dist * 2.0);
+                        strength = pow(strength, 2.0);
+                        vec3 shaded = color * (0.5 + 0.5 * vShade);
+                        gl_FragColor = vec4(shaded, vAlpha * strength);
+                    }
+                `,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+            
+            const points = new THREE.Points(geo, mat);
+            group.add(points);
+
+            const sphereGeo = new THREE.SphereGeometry(1, 32, 32);
+            const sphereMat = new THREE.MeshBasicMaterial({
+                color: baseColor,
+                transparent: true,
+                opacity: 0.03,
+                side: THREE.DoubleSide,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+            const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+            group.add(sphere);
+
+            aurasGroup.add(group);
+        }
+
+        document.getElementById('btnAddAura').addEventListener('click', createAura);
+        
+        // Pulsing Sphere
+        const pulseSpheresGroup = new THREE.Group();
+        scene.add(pulseSpheresGroup);
+
+        // Audio Analysis
+        let audioCtx, analyser, dataArray;
+        let isAudioInit = false;
+
+        async function initAudio() {
+            if (isAudioInit) return;
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const source = audioCtx.createMediaStreamSource(stream);
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+                source.connect(analyser);
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+                isAudioInit = true;
+            } catch (err) {
+                console.error('Audio init failed:', err);
+                document.getElementById('pulseAudio').checked = false;
+                alert('Microphone access denied or not supported.');
+            }
+        }
+
+        document.getElementById('pulseAudio').addEventListener('change', async (e) => {
+            if (e.target.checked) {
+                if (!isAudioInit) await initAudio();
+                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            }
+        });
+
+        function createPulseSphere() {
+            const size = 2 + Math.random() * 15;
+            const geo = new THREE.IcosahedronGeometry(size, 30); // High detail for smooth madness
+            const mat = new THREE.ShaderMaterial({
+                uniforms: {
+                    time: { value: 0 },
+                    color: { value: new THREE.Color(0xffffff) },
+                    spikeScale: { value: size * 4.0 }
+                },
+                vertexShader: `
+                    uniform float time;
+                    uniform float spikeScale;
+                    varying vec3 vNormal;
+                    varying vec3 vPos;
+                    void main() {
+                        vNormal = normal;
+                        vec3 p = position;
+                        
+                        // Heavy base deformation
+                        float deform = sin(p.x * 0.2 + time * 2.0) + sin(p.y * 0.3 + time * 2.5) + sin(p.z * 0.4 + time * 3.0);
+                        vec3 base = position + normal * deform * (spikeScale * 0.4);
+                        
+                        // Chaotic spikes
+                        float spike = sin(p.x * 1.5 + time * 5.0) * sin(p.y * 1.5 + time * 4.0) * sin(p.z * 1.5 + time * 3.0);
+                        float sharp = pow(abs(spike), 6.0); 
+                        float pulse = sin(time * 4.0) * 0.2 + 1.0;
+                        
+                        vec3 newPos = base + normal * sharp * spikeScale * pulse;
+                        vPos = newPos;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform float time;
+                    varying vec3 vNormal;
+                    varying vec3 vPos;
+                    vec3 hsl2rgb(vec3 c) {
+                        vec3 rgb = clamp(abs(mod(c.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0);
+                        return c.z + c.y * (rgb-0.5)*(1.0-abs(2.0*c.z-1.0));
+                    }
+                    void main() {
+                        float hue = fract(length(vPos) * 0.05 - time * 0.2);
+                        vec3 rainbow = hsl2rgb(vec3(hue, 0.8, 0.5));
+                        float intensity = pow(0.7 - dot(normalize(vNormal), vec3(0, 0, 1.0)), 3.0);
+                        gl_FragColor = vec4(rainbow + intensity * 0.4, 1.0);
+                    }
+                `,
+                transparent: true,
+                wireframe: true,
+                side: THREE.DoubleSide
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.userData = { baseSpikeScale: size * 4.0 };
+            pulseSpheresGroup.add(mesh);
+        }
+
+        document.getElementById('btnAddPulseSphere').addEventListener('click', createPulseSphere);
+
+        // Fragments
+        const fragments = [];
+        const fragmentsGroup = new THREE.Group();
+        scene.add(fragmentsGroup);
+
+        document.getElementById('btnShatter').addEventListener('click', () => {
+            pulseSpheresGroup.children.forEach(s => {
+                const radius = (s.geometry.parameters && s.geometry.parameters.radius) ? s.geometry.parameters.radius : 5;
+                const count = 15 + Math.floor(radius * 2);
+                
+                for(let i=0; i<count; i++) {
+                    const size = radius * (0.1 + Math.random() * 0.3);
+                    const geo = new THREE.TetrahedronGeometry(size, 0);
+                    const color = new THREE.Color().setHSL(Math.random(), 1.0, 0.6);
+                    const mat = new THREE.MeshBasicMaterial({ color: color, wireframe: true, transparent: true, opacity: 1.0 });
+                    const mesh = new THREE.Mesh(geo, mat);
+                    
+                    mesh.position.copy(s.position).add(new THREE.Vector3(
+                        (Math.random()-0.5)*radius, 
+                        (Math.random()-0.5)*radius, 
+                        (Math.random()-0.5)*radius
+                    ));
+                    
+                    const vel = mesh.position.clone().sub(s.position).normalize().multiplyScalar(0.2 + Math.random() * 0.5);
+                    
+                    fragmentsGroup.add(mesh);
+                    fragments.push({ mesh, vel, rot: new THREE.Vector3((Math.random()-0.5)*0.2, (Math.random()-0.5)*0.2, (Math.random()-0.5)*0.2) });
+                }
+            });
+            pulseSpheresGroup.clear();
+        });
+
+        document.getElementById('btnClear').addEventListener('click', () => {
+            ringsGroup.clear();
+            aurasGroup.clear();
+            pulseSpheresGroup.clear();
+            fragmentsGroup.clear();
+            fragments.length = 0;
+        });
+
+        // Initial Node
+        nodesData.push({ pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0,0,0), polyId: 0, degree: 0 });
+
+        // Instanced Mesh for Spheres
+        const sphereGeo = new THREE.SphereGeometry(0.015, 8, 6);
+        const sphereMat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+        const spheres = new THREE.InstancedMesh(sphereGeo, sphereMat, maxNodes);
+        spheres.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+        spheres.frustumCulled = false;
+        scene.add(spheres);
+        const dummy = new THREE.Object3D();
+
+        document.getElementById('nodeBrightness').addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            spheres.material.color.setHSL(0.5, 1.0, val / 200);
+        });
+
+        // Lines (Connections)
+        const maxLines = maxNodes * 8; // Estimate
+        const linesGeo = new THREE.BufferGeometry();
+        const linePositions = new Float32Array(maxLines * 6);
+        const lineColors = new Float32Array(maxLines * 6);
+        linesGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+        linesGeo.setAttribute('color', new THREE.BufferAttribute(lineColors, 3));
+        
+        const lineMat = new THREE.LineBasicMaterial({ 
+            vertexColors: true,
+            transparent: true, 
+            opacity: 0.2, 
+            blending: THREE.AdditiveBlending 
+        });
+        const lines = new THREE.LineSegments(linesGeo, lineMat);
+        scene.add(lines);
+
+        const countEl = document.getElementById('count');
+        
+        // Spatial Grid
+        const grid = new Map();
+        const cellSize = 15; // Slightly larger than max connectDist usually
+        function getCellKey(x, y, z) {
+            const ix = Math.floor(x / cellSize);
+            const iy = Math.floor(y / cellSize);
+            const iz = Math.floor(z / cellSize);
+            return `${ix},${iy},${iz}`;
+        }
+
+        const frustum = new THREE.Frustum();
+        const projScreenMatrix = new THREE.Matrix4();
+
+        // Ghost Trails Group
+        const ghostGroup = new THREE.Group();
+        scene.add(ghostGroup);
+
+        // Trails Setup
+        const fadeScene = new THREE.Scene();
+        const fadeCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+        const fadeGeo = new THREE.PlaneGeometry(2, 2);
+        const fadeMat = new THREE.MeshBasicMaterial({ 
+            color: 0x050505, 
+            transparent: true, 
+            opacity: 0.1 
+        });
+        const fadePlane = new THREE.Mesh(fadeGeo, fadeMat);
+        fadeScene.add(fadePlane);
+
+        let lastTime = Date.now();
+        let simTime = Date.now();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            controls.update();
+            const realNow = Date.now();
+            const dt = realNow - lastTime;
+            lastTime = realNow;
+            simTime += dt * timeScale;
+            const now = simTime;
+
+            // Audio Analysis (Global)
+            const isAudio = document.getElementById('pulseAudio').checked;
+            const isChaos = document.getElementById('chaosPhysics').checked;
+            let audioFactor = 1.0;
+            if (isAudio && isAudioInit && analyser) {
+                analyser.getByteFrequencyData(dataArray);
+                let sum = 0;
+                for(let i=0; i<16; i++) sum += dataArray[i];
+                const avg = sum / 16;
+                audioFactor = 0.2 + (avg / 255) * 3.0;
+            }
+
+            // 1. Expansion Logic
+            if (nodesData.length < maxNodes) {
+                const growth = Math.round(params.growth * timeScale);
+                const genMode = document.getElementById('genMode').value;
+                const genSpread = parseInt(document.getElementById('genSpread').value);
+                const genVelVal = parseInt(document.getElementById('genVel').value) * 0.001;
+
+                for (let i = 0; i < growth; i++) {
+                    if (nodesData.length >= maxNodes) break;
+                    
+                    let pos, vel;
+                    const currentRadius = 10 + Math.pow(nodesData.length, 0.4) * 4;
+
+                    if (genMode === 'sphere') {
+                        const theta = Math.random() * Math.PI * 2;
+                        const phi = Math.acos(2 * Math.random() - 1);
+                        const r = Math.cbrt(Math.random()) * currentRadius * (genSpread / 10);
+                        pos = new THREE.Vector3(
+                            r * Math.sin(phi) * Math.cos(theta),
+                            r * Math.sin(phi) * Math.sin(theta),
+                            r * Math.cos(phi)
+                        );
+                        vel = pos.clone().normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'cube') {
+                        const s = currentRadius * (genSpread / 10);
+                        pos = new THREE.Vector3(
+                            (Math.random() - 0.5) * 2 * s,
+                            (Math.random() - 0.5) * 2 * s,
+                            (Math.random() - 0.5) * 2 * s
+                        );
+                        vel = pos.clone().normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'ring') {
+                        const theta = Math.random() * Math.PI * 2;
+                        const r = currentRadius * (genSpread / 10);
+                        pos = new THREE.Vector3(
+                            r * Math.cos(theta),
+                            (Math.random() - 0.5) * (genSpread / 2),
+                            r * Math.sin(theta)
+                        );
+                        vel = new THREE.Vector3(Math.cos(theta), 0, Math.sin(theta)).multiplyScalar(genVelVal);
+                    } else if (genMode === 'spiral') {
+                        const angle = nodesData.length * 0.1;
+                        const r = (nodesData.length * 0.05 + 10) * (genSpread / 10);
+                        pos = new THREE.Vector3(
+                            r * Math.cos(angle),
+                            (Math.random() - 0.5) * (genSpread / 2),
+                            r * Math.sin(angle)
+                        );
+                        vel = new THREE.Vector3(Math.cos(angle), 0, Math.sin(angle)).multiplyScalar(genVelVal);
+                    } else if (genMode === 'fountain') {
+                        pos = new THREE.Vector3(
+                            (Math.random() - 0.5) * genSpread,
+                            0,
+                            (Math.random() - 0.5) * genSpread
+                        );
+                        vel = new THREE.Vector3(
+                            (Math.random() - 0.5) * 0.5,
+                            1.0,
+                            (Math.random() - 0.5) * 0.5
+                        ).normalize().multiplyScalar(genVelVal * 5);
+                    } else if (genMode === 'plane') {
+                        const s = currentRadius * (genSpread / 10);
+                        pos = new THREE.Vector3(
+                            (Math.random() - 0.5) * 2 * s,
+                            0,
+                            (Math.random() - 0.5) * 2 * s
+                        );
+                        vel = new THREE.Vector3(
+                            (Math.random() - 0.5),
+                            (Math.random() - 0.5) * 0.1,
+                            (Math.random() - 0.5)
+                        ).normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'cone') {
+                        const h = genSpread * 2;
+                        const y = Math.random() * h;
+                        const r = (y / h) * currentRadius * (genSpread / 10);
+                        const theta = Math.random() * Math.PI * 2;
+                        pos = new THREE.Vector3(
+                            r * Math.cos(theta),
+                            y - h/2,
+                            r * Math.sin(theta)
+                        );
+                        vel = new THREE.Vector3(Math.cos(theta), 0.5, Math.sin(theta)).normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'cylinder') {
+                        const h = genSpread * 2;
+                        const r = currentRadius * (genSpread / 10);
+                        const theta = Math.random() * Math.PI * 2;
+                        const y = (Math.random() - 0.5) * h;
+                        pos = new THREE.Vector3(
+                            r * Math.cos(theta),
+                            y,
+                            r * Math.sin(theta)
+                        );
+                        vel = new THREE.Vector3(Math.cos(theta), 0, Math.sin(theta)).normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'torus') {
+                        const R = currentRadius * (genSpread / 10);
+                        const tube = R * 0.3;
+                        const u = Math.random() * Math.PI * 2;
+                        const v = Math.random() * Math.PI * 2;
+                        pos = new THREE.Vector3(
+                            (R + tube * Math.cos(v)) * Math.cos(u),
+                            tube * Math.sin(v),
+                            (R + tube * Math.cos(v)) * Math.sin(u)
+                        );
+                        vel = new THREE.Vector3(Math.cos(u)*Math.cos(v), Math.sin(v), Math.sin(u)*Math.cos(v)).normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'helix') {
+                        const r = currentRadius * (genSpread / 10);
+                        const h = genSpread * 4;
+                        const t = Math.random() * 6 * Math.PI;
+                        const y = (t / (6 * Math.PI)) * h - h/2;
+                        pos = new THREE.Vector3(
+                            r * Math.cos(t),
+                            y,
+                            r * Math.sin(t)
+                        );
+                        vel = new THREE.Vector3(Math.cos(t), 0, Math.sin(t)).normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'cross') {
+                        const s = currentRadius * (genSpread / 5);
+                        const axis = Math.random();
+                        if (axis < 0.33) {
+                            pos = new THREE.Vector3((Math.random()-0.5)*s, 0, 0);
+                            vel = new THREE.Vector3(1, 0, 0).multiplyScalar(Math.sign(pos.x) * genVelVal);
+                        } else if (axis < 0.66) {
+                            pos = new THREE.Vector3(0, (Math.random()-0.5)*s, 0);
+                            vel = new THREE.Vector3(0, 1, 0).multiplyScalar(Math.sign(pos.y) * genVelVal);
+                        } else {
+                            pos = new THREE.Vector3(0, 0, (Math.random()-0.5)*s);
+                            vel = new THREE.Vector3(0, 0, 1).multiplyScalar(Math.sign(pos.z) * genVelVal);
+                        }
+                    } else if (genMode === 'grid') {
+                        const s = currentRadius * (genSpread / 10);
+                        const step = s / 2;
+                        pos = new THREE.Vector3(
+                            Math.round((Math.random()-0.5)*4) * step,
+                            Math.round((Math.random()-0.5)*4) * step,
+                            Math.round((Math.random()-0.5)*4) * step
+                        );
+                        vel = pos.clone().normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'hourglass') {
+                        const h = genSpread * 2;
+                        const y = (Math.random() - 0.5) * h;
+                        const r = (Math.abs(y) / h) * currentRadius * (genSpread / 5) + 1;
+                        const theta = Math.random() * Math.PI * 2;
+                        pos = new THREE.Vector3(r * Math.cos(theta), y, r * Math.sin(theta));
+                        vel = new THREE.Vector3(Math.cos(theta), Math.sign(y), Math.sin(theta)).normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'atom') {
+                        if (Math.random() < 0.2) {
+                            pos = new THREE.Vector3((Math.random()-0.5)*2, (Math.random()-0.5)*2, (Math.random()-0.5)*2);
+                        } else {
+                            const r = genSpread * (1 + Math.floor(Math.random()*3));
+                            const ang = Math.random() * Math.PI * 2;
+                            const axis = Math.floor(Math.random()*3);
+                            if (axis===0) pos = new THREE.Vector3(0, r*Math.cos(ang), r*Math.sin(ang));
+                            else if (axis===1) pos = new THREE.Vector3(r*Math.cos(ang), 0, r*Math.sin(ang));
+                            else pos = new THREE.Vector3(r*Math.cos(ang), r*Math.sin(ang), 0);
+                        }
+                        vel = pos.clone().normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'dna') {
+                        const h = genSpread * 4;
+                        const t = Math.random() * 4 * Math.PI;
+                        const y = (t / (4 * Math.PI) - 0.5) * h;
+                        const r = currentRadius * 0.5;
+                        const strand = Math.random() < 0.5 ? 0 : Math.PI;
+                        pos = new THREE.Vector3(r * Math.cos(t + strand), y, r * Math.sin(t + strand));
+                        vel = new THREE.Vector3(0, 1, 0).multiplyScalar(genVelVal);
+                    } else if (genMode === 'pyramid') {
+                        const h = genSpread * 2;
+                        const y = Math.random() * h;
+                        const r = (1 - y/h) * genSpread;
+                        const x = (Math.random() - 0.5) * 2 * r;
+                        const z = (Math.random() - 0.5) * 2 * r;
+                        pos = new THREE.Vector3(x, y - h/2, z);
+                        vel = new THREE.Vector3(0, 1, 0).multiplyScalar(genVelVal);
+                    } else if (genMode === 'diamond') {
+                        let x = Math.random()-0.5, y = Math.random()-0.5, z = Math.random()-0.5;
+                        const sum = Math.abs(x) + Math.abs(y) + Math.abs(z);
+                        const s = (genSpread / sum);
+                        pos = new THREE.Vector3(x*s, y*s, z*s);
+                        vel = pos.clone().normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'star') {
+                        const r = genSpread * Math.pow(Math.random(), 2); // Concentrate near center
+                        const theta = Math.random() * Math.PI * 2;
+                        const phi = Math.acos(2 * Math.random() - 1);
+                        // Spike bias
+                        const spike = Math.pow(Math.max(Math.abs(Math.cos(theta)), Math.abs(Math.sin(theta)*Math.cos(phi)), Math.abs(Math.sin(phi))), 4);
+                        const dist = r * (0.5 + 2 * spike);
+                        pos = new THREE.Vector3(dist * Math.sin(phi) * Math.cos(theta), dist * Math.sin(phi) * Math.sin(theta), dist * Math.cos(phi));
+                        vel = pos.clone().normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'galaxy') {
+                        const arms = 3;
+                        const armOffset = Math.floor(Math.random()*arms) * (Math.PI*2/arms);
+                        const dist = Math.random() * genSpread * 2;
+                        const angle = dist * 0.1 + armOffset;
+                        pos = new THREE.Vector3(Math.cos(angle)*dist, (Math.random()-0.5)*genSpread*0.2, Math.sin(angle)*dist);
+                        vel = new THREE.Vector3(-Math.sin(angle), 0, Math.cos(angle)).multiplyScalar(genVelVal);
+                    } else if (genMode === 'snowflake') {
+                        const branch = Math.floor(Math.random()*6);
+                        const angle = branch * Math.PI / 3;
+                        const dist = Math.random() * genSpread * 2;
+                        pos = new THREE.Vector3(Math.cos(angle)*dist, (Math.random()-0.5)*2, Math.sin(angle)*dist);
+                        if (Math.random() > 0.5) {
+                            const subAngle = angle + Math.PI/3;
+                            pos.add(new THREE.Vector3(Math.cos(subAngle)*dist*0.3, 0, Math.sin(subAngle)*dist*0.3));
+                        }
+                        vel = pos.clone().normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'heart') {
+                        const t = Math.random() * Math.PI * 2;
+                        const scale = genSpread * 0.08; // Adjusted scale for better definition
+                        const x = 16 * Math.pow(Math.sin(t), 3);
+                        const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+                        
+                        // Center the heart vertically (original equation is offset)
+                        const centeredY = y + 6;
+
+                        const z = (Math.random() - 0.5) * genSpread * 0.15; // Reduced Z spread for clarity
+                        pos = new THREE.Vector3(x * scale, centeredY * scale, z);
+                        vel = pos.clone().normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'trefoil') {
+                        const t = Math.random() * Math.PI * 2;
+                        const x = Math.sin(t) + 2 * Math.sin(2 * t);
+                        const y = Math.cos(t) - 2 * Math.cos(2 * t);
+                        const z = -Math.sin(3 * t);
+                        const scale = genSpread * 0.5;
+                        pos = new THREE.Vector3(x*scale, y*scale, z*scale);
+                        vel = new THREE.Vector3(Math.cos(t), Math.sin(t), 0).multiplyScalar(genVelVal);
+                    } else if (genMode === 'mobius') {
+                        const u = Math.random() * Math.PI * 2;
+                        const v = (Math.random() - 0.5) * 2;
+                        const R = genSpread;
+                        const x = (1 + v/2 * Math.cos(u/2)) * Math.cos(u) * R;
+                        const y = (1 + v/2 * Math.cos(u/2)) * Math.sin(u) * R;
+                        const z = v/2 * Math.sin(u/2) * R;
+                        pos = new THREE.Vector3(x, y, z);
+                        vel = pos.clone().normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'klein') {
+                        const u = Math.random() * Math.PI * 2;
+                        const v = Math.random() * Math.PI * 2;
+                        const R = genSpread;
+                        const x = (R + Math.cos(u/2) * Math.sin(v) - Math.sin(u/2) * Math.sin(2*v)) * Math.cos(u);
+                        const y = (R + Math.cos(u/2) * Math.sin(v) - Math.sin(u/2) * Math.sin(2*v)) * Math.sin(u);
+                        const z = Math.sin(u/2) * Math.sin(v) + Math.cos(u/2) * Math.sin(2*v);
+                        pos = new THREE.Vector3(x, y, z * R * 0.5);
+                        vel = pos.clone().normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'saddle') {
+                        const s = genSpread;
+                        const x = (Math.random() - 0.5) * 2 * s;
+                        const z = (Math.random() - 0.5) * 2 * s;
+                        const y = (x*x - z*z) / s;
+                        pos = new THREE.Vector3(x, y, z);
+                        vel = new THREE.Vector3(x, -y, z).normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'dome') {
+                        const theta = Math.random() * Math.PI * 2;
+                        const phi = Math.acos(Math.random());
+                        const r = currentRadius * (genSpread / 10);
+                        pos = new THREE.Vector3(
+                            r * Math.sin(phi) * Math.cos(theta),
+                            r * Math.cos(phi),
+                            r * Math.sin(phi) * Math.sin(theta)
+                        );
+                        vel = pos.clone().normalize().multiplyScalar(genVelVal);
+                    } else if (genMode === 'text') {
+                        if (textPointIndex < textPoints.length) {
+                            const pt = textPoints[textPointIndex++];
+                            const scale = genSpread * 0.05;
+                            pos = new THREE.Vector3(pt.x * scale, pt.y * scale, (Math.random()-0.5)*genSpread*0.1);
+                            vel = pos.clone().normalize().multiplyScalar(genVelVal * 0.5);
+                        } else {
+                            break;
+                        }
+                    }
+                    
+                    nodesData.push({ pos, vel, polyId: 0, degree: 0 });
+                }
+            }
+            
+            // Entropy (Disappearing nodes) - Disable in Chaos mode to preserve mass
+            if (!isChaos && nodesData.length > 10 && Math.random() * 100 < params.entropy * timeScale) {
+                const removeCount = Math.ceil(nodesData.length * 0.001);
+                for(let i=0; i<removeCount; i++) {
+                    if (nodesData.length <= 1) break;
+                    const idx = Math.floor(Math.random() * nodesData.length);
+                    // Swap remove
+                    nodesData[idx] = nodesData[nodesData.length - 1];
+                    nodesData.pop();
+                }
+            }
+
+            countEl.innerText = nodesData.length + (isChaos ? ` | Pass: ${chaosState.passes} | ${chaosState.merging ? 'MERGING' : (chaosState.approaching ? 'Approaching' : 'Receding')}` : '');
+
+            // Update Rings
+            const isWobble = document.getElementById('ringWobble').checked;
+            const isThick = document.getElementById('ringThick').checked;
+            const isGlitch = document.getElementById('ringGlitch').checked;
+            const isGhost = document.getElementById('ringGhost').checked;
+            
+            // Advanced Params
+            const pOp = parseFloat(document.getElementById('ringParamOp').value);
+            const pPSpd = parseFloat(document.getElementById('ringParamPSpd').value);
+            const pPStr = parseFloat(document.getElementById('ringParamPStr').value);
+            const pCSpd = parseFloat(document.getElementById('ringParamCSpd').value);
+            const pSSpd = parseFloat(document.getElementById('ringParamSSpd').value);
+            const pTumble = parseFloat(document.getElementById('ringParamTumble').value);
+            const pFlat = parseFloat(document.getElementById('ringParamFlat').value);
+            const pSpin = parseFloat(document.getElementById('ringParamSpin').value);
+
+            ringsGroup.children.forEach(g => {
+                if (g.userData.mode === '1plane') {
+                    g.rotateZ(g.userData.rotSpeedZ * pSpin);
+                } else if (g.userData.mode === '2planes') {
+                    g.rotateZ(g.userData.rotSpeedZ * pSpin);
+                    if (g.userData.tumbleAxis) {
+                        g.rotateOnWorldAxis(g.userData.tumbleAxis, pTumble * (g.userData.tumbleSpeed > 0 ? 1 : -1));
+                    }
+                } else {
+                    g.rotation.x += g.userData.rotSpeedX * pSpin;
+                    g.rotation.y += g.userData.rotSpeedY * pSpin;
+                    g.rotation.z += g.userData.rotSpeedZ * pSpin;
+                }
+
+                // Segment Spin
+                g.children.forEach(seg => seg.rotation.z += pSSpd);
+
+                // Pulse & Audio
+                let scale = 1 + Math.sin(now * 0.001 * pPSpd) * pPStr;
+                if (isAudio && audioFactor > 1.0) scale *= (1 + (audioFactor - 1) * 0.3);
+                
+                if (isChaos) {
+                    // Chaos: Jitter scale and check collisions
+                    scale *= (0.9 + Math.random() * 0.2);
+                    g.userData.chaosScale = (g.userData.chaosScale || 1.0);
+                    scale *= g.userData.chaosScale;
+
+                    // Collision check against other rings
+                    for (let j = ringsGroup.children.length - 1; j >= 0; j--) {
+                        const other = ringsGroup.children[j];
+                        if (g !== other && !other.userData.dead && !g.userData.dead) {
+                            const r1 = g.userData.baseRadius * scale;
+                            const r2 = other.userData.baseRadius * (other.scale.x); // approx
+                            if (Math.abs(r1 - r2) < 10) {
+                                // Consume smaller
+                                if (r1 >= r2) {
+                                    g.userData.chaosScale *= 1.2;
+                                    other.userData.dead = true;
+                                    ringsGroup.remove(other);
+                                    g.children.forEach(c => c.material.emissive = new THREE.Color(0xffffff));
+                                    setTimeout(() => { if(g.children) g.children.forEach(c => c.material.emissive = new THREE.Color(0x000000)); }, 100);
+                                } else {
+                                    other.userData.chaosScale *= 1.2;
+                                    g.userData.dead = true;
+                                    ringsGroup.remove(g);
+                                    other.children.forEach(c => c.material.emissive = new THREE.Color(0xffffff));
+                                    setTimeout(() => { if(other.children) other.children.forEach(c => c.material.emissive = new THREE.Color(0x000000)); }, 100);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                g.scale.setScalar(scale);
+
+                // 6. Axis Wobble
+                if (isWobble) {
+                    g.rotation.x += Math.sin(now * 0.002) * 0.005;
+                    g.rotation.y += Math.cos(now * 0.0015) * 0.005;
+                }
+
+                // 7. Thickness Modulation (Z-scale of torus)
+                if (isThick) {
+                    g.scale.z *= (1 + Math.sin(now * 0.005) * 0.5) * pFlat;
+                } else {
+                    g.scale.z = scale * pFlat;
+                }
+
+                // 9. Glitch Effect
+                if (isGlitch && Math.random() < 0.02) {
+                    g.scale.multiplyScalar(1.2);
+                    g.rotation.z += (Math.random() - 0.5) * 0.5;
+                }
+
+                // 8. Ghost Trails (Spawn)
+                if (isGhost && Math.random() < 0.1) {
+                    spawnRingGhost(g);
+                }
+
+                // Color Cycle
+                const hueShift = (now * 0.0001 * pCSpd);
+                g.children.forEach((seg, i) => {
+                    let h, s, l;
+                    if (g.userData.useRainbow) {
+                        h = hueShift % 1;
+                        s = 1.0; l = 0.5;
+                    } else {
+                        h = g.userData.baseHue;
+                        s = g.userData.baseSat; l = g.userData.baseLum;
+                    }
+                    seg.material.color.setHSL(h, s, l);
+                    seg.material.opacity = pOp;
+                });
+            });
+
+            // Update Ghosts
+            for (let i = ghostGroup.children.length - 1; i >= 0; i--) {
+                const gh = ghostGroup.children[i];
+                gh.material.opacity -= 0.02;
+                gh.scale.multiplyScalar(1.02);
+                if (gh.material.opacity <= 0) {
+                    ghostGroup.remove(gh);
+                }
+            }
+
+            // Update Aura
+            aurasGroup.children.forEach(aura => {
+                const currentRadius = 10 + Math.pow(nodesData.length, 0.4) * 4;
+                aura.scale.setScalar(currentRadius * aura.userData.scaleOffset);
+                aura.children.forEach(c => {
+                    if (c.material && c.material.uniforms && c.material.uniforms.time) {
+                        c.material.uniforms.time.value += 0.01 * timeScale;
+                    }
+                });
+            });
+
+            // Update Pulsing Spheres
+            const isRainbow = document.getElementById('pulseRainbow').checked;
+            const deformVal = parseInt(document.getElementById('pulseDeform').value);
+            const deformMult = deformVal / 10.0;
+
+            pulseSpheresGroup.children.forEach((s, i) => {
+                s.material.uniforms.time.value += 0.02 * timeScale;
+                let currentScale = s.userData.baseSpikeScale * deformMult;
+                if (isAudio) {
+                    currentScale *= audioFactor;
+                }
+                s.material.uniforms.spikeScale.value = currentScale;
+
+                if (isRainbow) {
+                    const hue = (now * 0.0005 + i * 0.1) % 1.0;
+                    s.material.uniforms.color.value.setHSL(hue, 1.0, 0.5);
+                }
+            });
+
+            // Update Fragments
+            for (let i = fragments.length - 1; i >= 0; i--) {
+                const f = fragments[i];
+                f.mesh.position.add(f.vel.clone().multiplyScalar(timeScale));
+                f.mesh.rotation.x += f.rot.x * timeScale;
+                f.mesh.rotation.y += f.rot.y * timeScale;
+                f.mesh.rotation.z += f.rot.z * timeScale;
+                f.mesh.material.opacity -= 0.01 * timeScale;
+                if (f.mesh.material.opacity <= 0) {
+                    fragmentsGroup.remove(f.mesh);
+                    fragments.splice(i, 1);
+                }
+            }
+
+            // 2. Update Geometry
+            camera.updateMatrixWorld();
+            projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+            frustum.setFromProjectionMatrix(projScreenMatrix);
+
+            grid.clear();
+            const expansionFactor = params.expansion * 0.001;
+
+            const isNodePulse = document.getElementById('nodePulse').checked;
+            const nodePulseSpeed = parseFloat(document.getElementById('nodePulseSpeed').value);
+            const isHeartbeat = document.getElementById('heartbeatMode').checked;
+            
+            let visibleCount = 0;
+            for (let i = 0; i < nodesData.length; i++) {
+                const n = nodesData[i];
+                
+                if (isChaos) {
+                    // Chaos Lump Physics
+                    // Calculate Centers of Mass (once per frame ideally, but here per node for simplicity of code structure, optimized below)
+                    if (i === 0) {
+                        chaosState.center0.set(0,0,0); chaosState.center1.set(0,0,0);
+                        let c0=0, c1=0;
+                        for(let k=0; k<nodesData.length; k++) {
+                            if(nodesData[k].polyId === 0) { chaosState.center0.add(nodesData[k].pos); c0++; }
+                            else { chaosState.center1.add(nodesData[k].pos); c1++; }
+                        }
+                        if(c0>0) chaosState.center0.divideScalar(c0);
+                        if(c1>0) chaosState.center1.divideScalar(c1);
+
+                        const distCenters = chaosState.center0.distanceTo(chaosState.center1);
+                        
+                        // Pass Detection with Hysteresis (prevents jitter bugs)
+                        const deltaDist = distCenters - chaosState.lastDist;
+                        if (chaosState.approaching) {
+                            if (deltaDist > 0.5) { // Clearly receding
+                                if (distCenters < 600) { // Close encounter
+                                    chaosState.passes++;
+                                    if (chaosState.passes >= 2) chaosState.merging = true;
+                                }
+                                chaosState.approaching = false;
+                            }
+                        } else {
+                            if (deltaDist < -0.5) { // Clearly approaching
+                                chaosState.approaching = true;
+                            }
+                        }
+                        chaosState.lastDist = distCenters;
+                    }
+                    
+                    // 1. Bulk Gravity (Attract to opposing center)
+                    const targetCenter = n.polyId === 0 ? chaosState.center1 : chaosState.center0;
+                    const dirToCenter = targetCenter.clone().sub(n.pos);
+                    const dCenter = dirToCenter.length();
+                    
+                    // Gravity increases significantly during merger phase
+                    const gForce = chaosState.merging ? 0.2 : 0.05;
+                    const force = gForce * (1000 / (dCenter * dCenter + 1000));
+                    n.vel.add(dirToCenter.normalize().multiplyScalar(force * timeScale));
+
+                    // 2. Tidal Ejection (Node-to-Node interactions)
+                    for(let k=0; k<3; k++) {
+                        const other = nodesData[Math.floor(Math.random() * nodesData.length)];
+                        if (other && other.polyId !== n.polyId) {
+                            const diff = other.pos.clone().sub(n.pos);
+                            const d = diff.length();
+                            if (d < 150 && d > 1) {
+                                // Close encounters cause chaotic scattering (slingshot)
+                                const scatter = 0.05 / d;
+                                n.vel.add(diff.normalize().multiplyScalar(scatter * (Math.random() > 0.5 ? 1 : -0.5) * timeScale));
+                            }
+                        }
+                    }
+                    const damping = chaosState.merging ? 0.96 : 0.995;
+                    n.vel.multiplyScalar(Math.pow(damping, timeScale)); // Low damping during swing to preserve energy
+                    n.pos.add(n.vel.clone().multiplyScalar(timeScale));
+                } else {
+                    // Outward expansion
+                    n.pos.add(n.vel.clone().multiplyScalar(0.1 * timeScale)); // Inertia
+                    n.pos.add(n.pos.clone().normalize().multiplyScalar(expansionFactor * timeScale));
+                    // Subtle drift
+                    n.pos.applyAxisAngle(new THREE.Vector3(0,1,0), 0.002 * timeScale);
+                }
+                
+                n.visible = frustum.containsPoint(n.pos);
+
+                // Update InstancedMesh
+                if (n.visible) {
+                    dummy.position.copy(n.pos);
+                    let s = 1.0;
+                    if (isNodePulse) {
+                        s = 1.0 + Math.sin(now * 0.005 * nodePulseSpeed + i * 0.1) * 0.5;
+                    }
+                    if (isHeartbeat) {
+                        const t = (now * 0.0015) % 1;
+                        let h = 0;
+                        if (t < 0.15) h = Math.sin(t / 0.15 * Math.PI);
+                        else if (t > 0.25 && t < 0.4) h = 0.6 * Math.sin((t - 0.25) / 0.15 * Math.PI);
+                        s *= (1.0 + h * 0.8);
+                    }
+                    dummy.scale.setScalar(s);
+                    dummy.updateMatrix();
+                    spheres.setMatrixAt(visibleCount++, dummy.matrix);
+                }
+                
+                // Populate Grid
+                const key = getCellKey(n.pos.x, n.pos.y, n.pos.z);
+                if (!grid.has(key)) grid.set(key, []);
+                grid.get(key).push(i);
+            }
+            spheres.count = visibleCount;
+            spheres.instanceMatrix.needsUpdate = true;
+
+            // Reset degrees for physics next frame
+            for(let i=0; i<nodesData.length; i++) nodesData[i].degree = 0;
+
+            // 3. Update Connections (Polygon formation)
+            let lineIdx = 0;
+            const cDistSq = params.connectDist * params.connectDist;
+            const color = new THREE.Color();
+            
+            // Iterate grid cells to find neighbors
+            // Optimization: iterate nodes, check neighbor cells
+            for (let i = 0; i < nodesData.length; i++) {
+                const n1 = nodesData[i];
+                if (!n1.visible) continue;
+
+                const ix = Math.floor(n1.pos.x / cellSize);
+                const iy = Math.floor(n1.pos.y / cellSize);
+                const iz = Math.floor(n1.pos.z / cellSize);
+                
+                // Check 3x3x3 neighbors
+                for (let x = -1; x <= 1; x++) {
+                    for (let y = -1; y <= 1; y++) {
+                        for (let z = -1; z <= 1; z++) {
+                            const key = `${ix+x},${iy+y},${iz+z}`;
+                            const cell = grid.get(key);
+                            if (!cell) continue;
+                            
+                            for (let j of cell) {
+                                if (j === i) continue; // Skip self
+                                const n2 = nodesData[j];
+                                
+                                // Duplicate check: if n2 is visible, only process if i < j
+                                if (n2.visible && j < i) continue;
+
+                                const d2 = n1.pos.distanceToSquared(n2.pos);
+                                
+                                if (d2 < cDistSq) {
+                                    n1.degree++;
+                                    n2.degree++;
+                                    if (lineIdx >= maxLines * 6) break;
+                                    
+                                    // Positions
+                                    linePositions[lineIdx] = n1.pos.x;
+                                    linePositions[lineIdx+1] = n1.pos.y;
+                                    linePositions[lineIdx+2] = n1.pos.z;
+                                    linePositions[lineIdx+3] = n2.pos.x;
+                                    linePositions[lineIdx+4] = n2.pos.y;
+                                    linePositions[lineIdx+5] = n2.pos.z;
+                                    
+                                    // Dynamic Colors based on distance from center
+                                    const dist1 = n1.pos.length();
+                                    const dist2 = n2.pos.length();
+                                    
+                                    color.setHSL((dist1 * 0.01) % 1.0, 1.0, 0.5);
+                                    lineColors[lineIdx] = color.r;
+                                    lineColors[lineIdx+1] = color.g;
+                                    lineColors[lineIdx+2] = color.b;
+                                    
+                                    color.setHSL((dist2 * 0.01) % 1.0, 1.0, 0.5);
+                                    lineColors[lineIdx+3] = color.r;
+                                    lineColors[lineIdx+4] = color.g;
+                                    lineColors[lineIdx+5] = color.b;
+                                    
+                                    lineIdx += 6;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            linesGeo.attributes.position.needsUpdate = true;
+            linesGeo.attributes.color.needsUpdate = true;
+            linesGeo.setDrawRange(0, lineIdx / 3);
+
+            // Trails Rendering Logic
+            const showTrails = document.getElementById('showTrails').checked;
+            if (showTrails) {
+                renderer.autoClear = false;
+                fadeMat.opacity = parseFloat(document.getElementById('trailFade').value);
+                renderer.render(fadeScene, fadeCamera);
+                renderer.clearDepth();
+            } else {
+                renderer.autoClear = true;
+            }
+            renderer.render(scene, camera);
+        }
+        
+
+        function spawnRingGhost(originalGroup) {
+            originalGroup.children.forEach(mesh => {
+                const g = mesh.geometry; // Share geometry
+                const m = mesh.material.clone();
+                m.transparent = true;
+                m.opacity = 0.4;
+                const ghost = new THREE.Mesh(g, m);
+                ghost.position.copy(mesh.parent.position); // Group pos is 0,0,0 usually, but just in case
+                ghost.quaternion.copy(mesh.parent.quaternion).multiply(mesh.quaternion); // Combine rotations
+                ghost.scale.copy(mesh.parent.scale);
+                ghostGroup.add(ghost);
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

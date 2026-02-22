@@ -1,0 +1,59 @@
+:root {
+  --lock-bg: rgba(10, 12, 16, 0.72);
+  --lock-card: rgba(20, 24, 32, 0.96);
+  --lock-text: #f3f4f6;
+  --lock-accent: #f59e0b;
+}
+
+.lock-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--lock-bg);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  z-index: 9999;
+  backdrop-filter: blur(12px);
+}
+
+.lock-card {
+  max-width: 520px;
+  width: min(520px, 90vw);
+  background: var(--lock-card);
+  color: var(--lock-text);
+  border-radius: 20px;
+  padding: 28px;
+  text-align: center;
+  box-shadow: 0 30px 70px -40px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: grid;
+  gap: 14px;
+}
+
+.lock-card h2 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.lock-card p {
+  margin: 0;
+  color: rgba(243, 244, 246, 0.8);
+}
+
+.lock-card a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--lock-accent);
+  color: #1f1300;
+  text-decoration: none;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 10px 18px;
+  box-shadow: 0 16px 30px -20px rgba(245, 158, 11, 0.8);
+}
+
+body.is-locked {
+  overflow: hidden;
+}

@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Simulation Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f1f0eb;
+        --bg-deep: #e2dfd6;
+        --ink: #12100c;
+        --muted: #4d463a;
+        --accent: #d94834;
+        --accent-dark: #000000;
+        --card: #ffffff;
+        --shadow: rgba(18, 16, 12, 0.12);
+        --shadow-strong: rgba(18, 16, 12, 0.22);
+        --dot-opacity: 0.35;
+        --grain-opacity: 0.25;
+        --mouse-x: 50%;
+        --mouse-y: 50%;
+        --scroll: 0;
+        --time: 0;
+        --accent-shift: 0deg;
+        --tilt-x: 0deg;
+        --tilt-y: 0deg;
+        --hero-shift: 0px;
+        --glass: rgba(255, 255, 255, 0.72);
+        --glass-strong: rgba(255, 255, 255, 0.88);
+        --ring: rgba(18, 16, 12, 0.08);
+        --card-radius: 22px;
+        --card-pad: 26px;
+        --density: 1;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(900px 600px at 10% 10%, rgba(196, 225, 245, 0.7), transparent 60%),
+          radial-gradient(800px 500px at 90% 15%, rgba(237, 214, 245, 0.6), transparent 62%),
+          radial-gradient(700px 500px at 50% 90%, rgba(214, 242, 232, 0.6), transparent 65%),
+          radial-gradient(420px 260px at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.35), transparent 70%),
+          linear-gradient(180deg, #eef4f8 0%, #e4efe9 45%, #f6efe7 100%);
+        position: relative;
+      }
+
+      body[data-theme="aurora"] {
+        --bg: #0f1623;
+        --bg-deep: #101826;
+        --ink: #eef3ff;
+        --muted: rgba(238, 243, 255, 0.72);
+        --accent: #7dd3fc;
+        --accent-dark: #38bdf8;
+        --card: rgba(16, 24, 40, 0.82);
+        --glass: rgba(15, 23, 42, 0.7);
+        --glass-strong: rgba(15, 23, 42, 0.85);
+        --ring: rgba(125, 211, 252, 0.2);
+        color-scheme: dark;
+        background:
+          radial-gradient(900px 600px at 15% 10%, rgba(125, 211, 252, 0.3), transparent 60%),
+          radial-gradient(800px 500px at 90% 20%, rgba(129, 140, 248, 0.25), transparent 62%),
+          linear-gradient(160deg, #0b1120 0%, #111827 60%, #0b1220 100%);
+      }
+
+      body[data-theme="graphite"] {
+        --bg: #f1f5f9;
+        --bg-deep: #e2e8f0;
+        --ink: #0f172a;
+        --muted: rgba(15, 23, 42, 0.7);
+        --accent: #475569;
+        --accent-dark: #0f172a;
+        --card: #ffffff;
+        --glass: rgba(255, 255, 255, 0.8);
+        --glass-strong: rgba(255, 255, 255, 0.92);
+        --ring: rgba(15, 23, 42, 0.08);
+      }
+
+      body[data-theme="solar"] {
+        --bg: #fff6e6;
+        --bg-deep: #f7e8c8;
+        --ink: #2b1d0f;
+        --muted: rgba(43, 29, 15, 0.6);
+        --accent: #f97316;
+        --accent-dark: #9a3412;
+        --card: rgba(255, 255, 255, 0.94);
+        --glass: rgba(255, 247, 237, 0.8);
+        --glass-strong: rgba(255, 247, 237, 0.94);
+        --ring: rgba(124, 45, 18, 0.12);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 12px 12px, rgba(18, 16, 12, 0.08) 0, rgba(18, 16, 12, 0.08) 1px, transparent 1px) 0 0 / 22px 22px,
+          radial-gradient(circle at 8px 8px, rgba(18, 16, 12, 0.06) 0, rgba(18, 16, 12, 0.06) 1px, transparent 1px) 0 0 / 14px 14px,
+          linear-gradient(0deg, rgba(18, 16, 12, 0.03), rgba(18, 16, 12, 0.03));
+        opacity: var(--dot-opacity);
+        mix-blend-mode: multiply;
+        z-index: 0;
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          repeating-linear-gradient(45deg, rgba(18, 16, 12, 0.02) 0 1px, transparent 1px 3px),
+          repeating-linear-gradient(-45deg, rgba(18, 16, 12, 0.02) 0 1px, transparent 1px 4px);
+        opacity: var(--grain-opacity);
+        z-index: 0;
+      }
+
+      .frame::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(600px 240px at 0% 0%, rgba(217, 72, 52, 0.08), transparent 70%),
+          radial-gradient(500px 280px at 100% 10%, rgba(29, 125, 106, 0.08), transparent 70%),
+          radial-gradient(420px 260px at 50% 0%, rgba(51, 96, 183, 0.08), transparent 70%);
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 64px 24px 72px;
+        display: grid;
+        gap: 32px;
+        position: relative;
+        z-index: 1;
+        filter: hue-rotate(var(--accent-shift));
+      }
+
+      .layout-shell {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 260px;
+        gap: 28px;
+        align-items: start;
+      }
+
+      .layout-main {
+        display: grid;
+        gap: 28px;
+      }
+
+      header {
+        display: grid;
+        gap: 18px;
+        position: relative;
+        transform: translateY(var(--hero-shift));
+        padding: 26px 28px;
+        border-radius: 26px;
+        background: linear-gradient(120deg, var(--glass), rgba(255, 255, 255, 0.52));
+        border: 1px solid var(--ring);
+        box-shadow: 0 30px 70px -40px var(--shadow-strong);
+      }
+
+      header::after {
+        content: "";
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(18, 16, 12, 0.2), transparent);
+        margin-top: 6px;
+      }
+
+      header::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: linear-gradient(120deg, rgba(255, 255, 255, 0.35), transparent 55%);
+        opacity: 0.6;
+        pointer-events: none;
+      }
+
+      .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.35em;
+        font-size: 0.72rem;
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      h1 {
+        font-family: "Fraunces", "Times New Roman", serif;
+        font-weight: 700;
+        font-size: clamp(2.7rem, 5vw, 4rem);
+        margin: 0;
+        max-width: 16ch;
+        line-height: 1.1;
+        text-shadow: 0 8px 24px rgba(18, 16, 12, 0.08);
+      }
+
+      .subhead {
+        font-size: 1.08rem;
+        color: var(--muted);
+        max-width: 60ch;
+        margin: 0;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: calc(16px + var(--scroll) * 0.4px);
+      }
+
+      .grid::before {
+        content: "";
+        grid-column: 1 / -1;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(18, 16, 12, 0.15), transparent);
+      }
+
+      .path {
+        display: grid;
+        gap: 14px;
+        filter: drop-shadow(0 10px 30px color-mix(in srgb, var(--accent) 25%, transparent));
+        padding: 18px 20px;
+        border-radius: 20px;
+        background: var(--glass-strong);
+        border: 1px solid var(--ring);
+      }
+
+      .path-label {
+        font-size: 0.85rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.24em;
+        font-weight: 600;
+      }
+
+      .path-line {
+        position: relative;
+        height: 44px;
+        display: grid;
+        align-items: center;
+      }
+
+      .path-line::before {
+        content: "";
+        position: absolute;
+        left: 8px;
+        right: 8px;
+        top: 50%;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(217, 72, 52, 0.3), rgba(29, 125, 106, 0.35), rgba(51, 96, 183, 0.35));
+        transform: translateY(-50%);
+        border-radius: 999px;
+        animation: pathPulse 3.5s ease-in-out infinite;
+      }
+
+      .path-nodes {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .path-node {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        justify-self: center;
+        font-size: 0.9rem;
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(18, 16, 12, 0.08);
+        border-radius: 999px;
+        padding: 6px 12px;
+        box-shadow: 0 12px 30px -22px var(--shadow-strong);
+        transition: transform 180ms ease;
+      }
+
+      .path-node::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: currentColor;
+        box-shadow: 0 0 0 6px rgba(217, 72, 52, 0.12);
+      }
+
+      .path-node:hover {
+        transform: translateY(-2px);
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: var(--card-radius);
+        padding: calc(var(--card-pad) * var(--density));
+        box-shadow: 0 24px 50px -35px var(--shadow),
+          0 12px 24px -18px var(--shadow-strong);
+        border: 1px solid rgba(18, 16, 12, 0.08);
+        border-top: 4px solid var(--card-accent, var(--accent));
+        display: grid;
+        gap: 16px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+        transform: perspective(900px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+      }
+
+      .card.is-critical {
+        border-top-width: 6px;
+        border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 65%, rgba(18, 16, 12, 0.08));
+        box-shadow: 0 36px 80px -36px color-mix(in srgb, var(--card-accent, var(--accent)) 55%, transparent),
+          0 18px 40px -30px var(--shadow-strong);
+      }
+
+      .critical-flag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: #4c1d95;
+        background: rgba(216, 180, 254, 0.6);
+        border-radius: 999px;
+        padding: 6px 12px;
+        border: 1px solid rgba(124, 58, 237, 0.3);
+        box-shadow: 0 10px 18px -14px rgba(18, 16, 12, 0.4);
+      }
+
+      .card .app-index {
+        position: absolute;
+        top: 16px;
+        right: 18px;
+        font-size: 0.75rem;
+        letter-spacing: 0.2em;
+        color: rgba(18, 16, 12, 0.45);
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(18, 16, 12, 0.08);
+      }
+
+      .card .app-index::before {
+        content: "";
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border-radius: 6px;
+        margin-right: 6px;
+        background: color-mix(in srgb, var(--card-accent, var(--accent)) 60%, #fff);
+      }
+
+      .card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          350px 200px at 20% 0%,
+          color-mix(in srgb, var(--card-accent, var(--accent)) 22%, transparent),
+          transparent 60%
+        );
+        opacity: 0;
+        transition: opacity 220ms ease;
+        pointer-events: none;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        top: -30%;
+        right: -30%;
+        width: 160px;
+        height: 160px;
+        background: radial-gradient(circle, color-mix(in srgb, var(--card-accent, var(--accent)) 20%, transparent), transparent 60%);
+        opacity: 0.6;
+      }
+
+      .card.is-critical::before {
+        opacity: 0.9;
+      }
+
+      .card:hover::after,
+      .card:focus-within::after {
+        opacity: 1;
+      }
+
+      .card:hover,
+      .card:focus-within {
+        transform: translateY(-4px);
+        box-shadow: 0 30px 60px -32px var(--shadow-strong),
+          0 20px 40px -24px color-mix(in srgb, var(--card-accent, var(--accent)) 35%, transparent);
+        border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 35%, rgba(18, 16, 12, 0.08));
+      }
+
+      .card[data-theme="fractal"] {
+        --card-accent: #1d7d6a;
+      }
+
+      .card[data-theme="collision"] {
+        --card-accent: #3360b7;
+      }
+
+      .card[data-theme="calculator"] {
+        --card-accent: #d94834;
+      }
+
+      .card[data-active="true"] {
+        transform: translateY(-6px);
+        box-shadow: 0 34px 70px -30px var(--shadow-strong),
+          0 24px 50px -28px color-mix(in srgb, var(--card-accent, var(--accent)) 45%, transparent);
+        border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 55%, rgba(18, 16, 12, 0.08));
+      }
+
+      .card.is-locked {
+        filter: grayscale(0.2);
+        opacity: 0.85;
+      }
+
+      .card.is-locked.is-active {
+        animation: lockedPulse 1.4s ease-in-out infinite;
+      }
+
+      .lock-strip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--accent-dark);
+        background: rgba(217, 72, 52, 0.08);
+        border-radius: 999px;
+        padding: 6px 10px;
+        border: 1px solid rgba(217, 72, 52, 0.2);
+        box-shadow: 0 10px 18px -14px rgba(18, 16, 12, 0.4);
+      }
+
+      .badge {
+        align-self: start;
+        justify-self: start;
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--card-accent, var(--accent)) 16%, #fff);
+        color: var(--ink);
+        border: 1px solid color-mix(in srgb, var(--card-accent, var(--accent)) 35%, rgba(18, 16, 12, 0.12));
+        box-shadow: 0 10px 20px -16px rgba(18, 16, 12, 0.4);
+      }
+
+      .card h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        position: relative;
+      }
+
+      .card h2::after {
+        content: "";
+        display: block;
+        width: 36px;
+        height: 3px;
+        margin-top: 8px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--card-accent, var(--accent)) 55%, #fff);
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .concepts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .concepts span {
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(18, 16, 12, 0.06);
+        border: 1px solid rgba(18, 16, 12, 0.08);
+        font-size: 0.78rem;
+      }
+
+      .card a {
+        color: inherit;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+      }
+
+      .card a span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        background: rgba(217, 72, 52, 0.12);
+        color: var(--accent-dark);
+        font-weight: 700;
+        transition: transform 200ms ease, background 200ms ease;
+      }
+
+      .card a:hover span,
+      .card a:focus span {
+        transform: translateX(4px);
+        background: rgba(217, 72, 52, 0.18);
+      }
+
+      .meta {
+        display: flex;
+        gap: 14px;
+        font-size: 0.85rem;
+        color: var(--muted);
+        flex-wrap: wrap;
+      }
+
+      .meta span {
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: linear-gradient(120deg, rgba(18, 16, 12, 0.04), rgba(18, 16, 12, 0.08));
+        border: 1px solid rgba(18, 16, 12, 0.08);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+      }
+
+      .meta strong {
+        color: var(--ink);
+      }
+
+      .card-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .preview-inline {
+        display: none;
+        gap: 8px;
+        padding: 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px dashed rgba(18, 16, 12, 0.12);
+        color: var(--muted);
+      }
+
+      .preview-inline.is-open {
+        display: grid;
+      }
+
+      .hover-preview {
+        position: absolute;
+        right: 16px;
+        top: 58px;
+        width: min(240px, 70%);
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(18, 16, 12, 0.12);
+        box-shadow: 0 18px 40px -28px rgba(18, 16, 12, 0.35);
+        font-size: 0.82rem;
+        color: var(--muted);
+        opacity: 0;
+        transform: translateY(6px);
+        transition: opacity 160ms ease, transform 160ms ease;
+        pointer-events: none;
+      }
+
+      .card:hover .hover-preview {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .preview-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.5);
+        display: none;
+        place-items: center;
+        z-index: 9999;
+        padding: 24px;
+        backdrop-filter: blur(10px);
+      }
+
+      .preview-modal.is-open {
+        display: grid;
+      }
+
+      .preview-card {
+        width: min(720px, 94vw);
+        background: var(--glass-strong);
+        border-radius: 22px;
+        padding: 22px;
+        border: 1px solid var(--ring);
+        box-shadow: 0 30px 70px -40px rgba(15, 23, 42, 0.45);
+        display: grid;
+        gap: 12px;
+      }
+
+      .preview-card h3 {
+        margin: 0;
+        font-size: 1.4rem;
+      }
+
+      .preview-card p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .preview-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .btn-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(18, 16, 12, 0.12);
+        background: rgba(255, 255, 255, 0.75);
+        color: var(--ink);
+        text-decoration: none;
+        font-family: inherit;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+      }
+
+      .btn-pill:hover,
+      .btn-pill:focus {
+        transform: translateY(-2px);
+        border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 45%, rgba(18, 16, 12, 0.12));
+        box-shadow: 0 12px 22px -16px rgba(18, 16, 12, 0.35);
+      }
+
+      .btn-pill.primary {
+        background: color-mix(in srgb, var(--card-accent, var(--accent)) 24%, #fff);
+      }
+
+      .btn-pill.ghost {
+        background: transparent;
+      }
+
+      .btn-pill.icon::before {
+        content: attr(data-icon);
+        font-size: 0.9rem;
+      }
+
+      .card-actions a:first-child {
+        position: relative;
+        isolation: isolate;
+      }
+
+      .card-actions a:first-child::after {
+        content: "";
+        position: absolute;
+        inset: -6px -8px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--card-accent, var(--accent)) 18%, transparent);
+        opacity: 0;
+        transition: opacity 200ms ease;
+        z-index: -1;
+      }
+
+      .card-actions a:first-child:hover::after,
+      .card-actions a:first-child:focus::after {
+        opacity: 1;
+      }
+
+      .locked-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(248, 250, 252, 0.7);
+        display: grid;
+        place-items: center;
+        opacity: 0;
+        transition: opacity 200ms ease;
+        pointer-events: none;
+      }
+
+      .card.is-locked:hover .locked-overlay,
+      .card.is-locked:focus-within .locked-overlay {
+        opacity: 1;
+      }
+
+      .locked-overlay span {
+        background: #fff;
+        border-radius: 999px;
+        padding: 8px 14px;
+        border: 1px solid rgba(18, 16, 12, 0.12);
+        font-weight: 600;
+      }
+
+      .hub-alert {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 12px 16px;
+        border-radius: 16px;
+        background: var(--glass-strong);
+        border: 1px solid var(--ring);
+        color: var(--muted);
+        box-shadow: 0 18px 40px -30px rgba(18, 16, 12, 0.35);
+        backdrop-filter: blur(10px);
+      }
+
+      .hub-alert::before {
+        content: "◎";
+        font-size: 1.1rem;
+        color: var(--accent);
+      }
+
+      .hub-alert strong {
+        color: var(--ink);
+      }
+
+
+      .link-ghost {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(18, 16, 12, 0.12);
+        color: var(--ink);
+        text-decoration: none;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.6);
+        transition: transform 200ms ease, background 200ms ease, border-color 200ms ease;
+      }
+
+      .link-ghost:hover,
+      .link-ghost:focus {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.9);
+        border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 40%, rgba(18, 16, 12, 0.12));
+      }
+
+      .link-ghost::after {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--card-accent, var(--accent)) 60%, #fff);
+      }
+
+      .path-node.is-active {
+        color: var(--ink);
+        background: color-mix(in srgb, var(--card-accent, var(--accent)) 16%, #fff);
+        border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 40%, rgba(18, 16, 12, 0.12));
+        box-shadow: 0 16px 30px -20px color-mix(in srgb, var(--card-accent, var(--accent)) 55%, transparent);
+      }
+
+      .path-node.is-active::before {
+        box-shadow: 0 0 0 8px color-mix(in srgb, var(--card-accent, var(--accent)) 30%, transparent);
+      }
+
+      .motion-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .motion-toggle input {
+        width: 18px;
+        height: 18px;
+      }
+
+      body[data-motion="off"] *,
+      body[data-motion="off"] *::before,
+      body[data-motion="off"] *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
+
+      body.show-focus a:focus-visible,
+      body.show-focus button:focus-visible {
+        outline: 3px solid color-mix(in srgb, var(--accent) 60%, #fff);
+        outline-offset: 3px;
+      }
+
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 0.85rem;
+        color: var(--muted);
+        border-top: 1px dashed rgba(18, 16, 12, 0.15);
+        padding-top: 16px;
+        padding-bottom: 8px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 16px;
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .style-panel {
+        position: sticky;
+        top: 16px;
+        display: grid;
+        gap: 12px;
+        padding: 14px;
+        border-radius: 18px;
+        background: var(--glass-strong);
+        border: 1px solid var(--ring);
+        box-shadow: 0 20px 40px -28px var(--shadow-strong);
+      }
+
+      .style-panel label {
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      .style-panel select,
+      .style-panel input[type="range"] {
+        width: 100%;
+      }
+
+      .cta {
+        background: var(--accent);
+        color: #fff;
+        border-radius: 999px;
+        padding: 10px 18px;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: 0 10px 18px -12px rgba(217, 72, 52, 0.8);
+        transition: transform 200ms ease, box-shadow 200ms ease;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid color-mix(in srgb, var(--accent) 65%, #000);
+      }
+
+      .cta::after {
+        content: "";
+        position: absolute;
+        top: -60%;
+        left: -20%;
+        width: 40%;
+        height: 220%;
+        background: rgba(255, 255, 255, 0.4);
+        transform: rotate(20deg) translateX(-120%);
+        transition: transform 420ms ease;
+      }
+
+      .cta:hover,
+      .cta:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 26px -16px rgba(217, 72, 52, 0.9);
+      }
+
+      .cta:hover::after,
+      .cta:focus::after {
+        transform: rotate(20deg) translateX(320%);
+      }
+
+      .hero-bar {
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(18, 16, 12, 0.08);
+        overflow: hidden;
+      }
+
+      .hero-bar span {
+        display: block;
+        height: 100%;
+        width: calc(var(--scroll) * 1%);
+        background: linear-gradient(90deg, var(--accent), #60a5fa);
+        transition: width 200ms ease;
+      }
+
+      .hero-bar span::after {
+        content: "";
+        display: block;
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+        transform: translateX(-100%);
+        animation: heroShine 2.8s ease-in-out infinite;
+      }
+
+      @keyframes heroShine {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      .card.reveal {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      .card.reveal.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+        transition: opacity 400ms ease, transform 400ms ease;
+      }
+
+      @keyframes pathPulse {
+        0%,
+        100% {
+          opacity: 0.4;
+        }
+        50% {
+          opacity: 0.9;
+        }
+      }
+
+      @keyframes lockedPulse {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-4px);
+        }
+      }
+
+      @media (max-width: 640px) {
+        .frame {
+          padding: 48px 18px 60px;
+        }
+
+        .footer {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        header {
+          padding: 20px 18px;
+        }
+
+        .path {
+          padding: 14px 16px;
+        }
+      }
+
+      @media (max-width: 980px) {
+        .layout-shell {
+          grid-template-columns: 1fr;
+        }
+
+        .style-panel {
+          position: static;
+          order: -1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="frame">
+      <header>
+        <div class="eyebrow">Simulation Hub</div>
+        <h1>Choose a simulation to explore and evolve.</h1>
+        <p class="subhead">
+          Two focused experiments, each tuned for discovery. Start with fractals
+          for generative patterns, or dive into collisions for cosmic dynamics.
+        </p>
+        <div class="hero-bar" aria-hidden="true"><span></span></div>
+      </header>
+
+      <div class="layout-shell">
+        <div class="layout-main">
+          <div class="hub-alert" id="hub-alert">
+            <strong>Lock status:</strong>
+            <span>Collect 300 keys in the Key Vault to unlock all buggy apps.</span>
+            <a class="link-ghost" href="key-vault.html">Go to Key Vault</a>
+          </div>
+
+          <section class="path" aria-label="Simulation path">
+            <div class="path-label">Simulation Path</div>
+            <div class="path-line">
+              <div class="path-nodes">
+                <div class="path-node" data-step="fractal" style="color: #1d7d6a;">Fractals</div>
+                <div class="path-node" data-step="collision" style="color: #3360b7;">Collisions</div>
+                <div class="path-node" data-step="calculator" style="color: #d94834;">Calculator</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="grid" id="app-grid"></section>
+        </div>
+
+        <section class="style-panel" aria-label="Style settings">
+          <div class="eyebrow">Style Lab</div>
+          <label for="theme-select">Theme</label>
+          <select id="theme-select">
+            <option value="classic">Classic</option>
+            <option value="aurora">Aurora</option>
+            <option value="graphite">Graphite</option>
+            <option value="solar">Solar</option>
+          </select>
+          <label for="density-range">Card Density</label>
+          <input type="range" id="density-range" min="0.8" max="1.2" step="0.05" value="1" />
+          <label>
+            <input type="checkbox" id="texture-toggle" checked />
+            Texture Layer
+          </label>
+        </section>
+      </div>
+
+      <div class="preview-modal" id="preview-modal" aria-hidden="true">
+        <div class="preview-card">
+          <h3 id="preview-title">Preview</h3>
+          <p id="preview-summary"></p>
+          <div class="concepts" id="preview-concepts"></div>
+          <div class="preview-actions">
+            <button class="btn-pill ghost" id="preview-close">Close</button>
+            <a class="btn-pill primary" id="preview-launch" href="#">Launch</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Built for quick experiments and satisfying visuals.</span>
+        <label class="motion-toggle">
+          <input type="checkbox" id="motion-toggle" />
+          Reduce motion
+        </label>
+        <a class="cta" href="fractal-sim.html">Start with Fractals</a>
+      </div>
+    </main>
+    <script>
+      const root = document.documentElement;
+      const grid = document.getElementById("app-grid");
+      const nodes = Array.from(document.querySelectorAll(".path-node"));
+      const motionToggle = document.getElementById("motion-toggle");
+      const alert = document.getElementById("hub-alert");
+      const heroBar = document.querySelector(".hero-bar span");
+      const themeSelect = document.getElementById("theme-select");
+      const densityRange = document.getElementById("density-range");
+      const textureToggle = document.getElementById("texture-toggle");
+      const previewModal = document.getElementById("preview-modal");
+      const previewTitle = document.getElementById("preview-title");
+      const previewSummary = document.getElementById("preview-summary");
+      const previewConcepts = document.getElementById("preview-concepts");
+      const previewClose = document.getElementById("preview-close");
+      const previewLaunch = document.getElementById("preview-launch");
+
+      const baseAccent = getComputedStyle(root).getPropertyValue("--accent");
+      const baseAccentDark = getComputedStyle(root).getPropertyValue("--accent-dark");
+
+      const unlockedAll = localStorage.getItem("simhub-unlocked-all") === "true";
+      let keys = Number(localStorage.getItem("simhub-keys") || "0");
+      const unlockedApps = JSON.parse(localStorage.getItem("simhub-unlocked-apps") || "[]");
+
+      const conceptSets = {
+        Game: ["Spatial memory", "Fast reactions", "Pattern spotting", "Timing", "Flow", "Strategy", "Focus", "Momentum", "Tactics", "Score-chasing"],
+        Education: ["Recall", "Reasoning", "Concept mapping", "Skill building", "Practice loops", "Mental models", "Clarity", "Retention", "Analysis", "Curiosity"],
+        Tool: ["Productivity", "Speed", "Automation", "Utility", "Precision", "Workflow", "Focus", "Iteration", "Control", "Signal"],
+        Simulation: ["Systems", "Dynamics", "Cause & effect", "Parameter tuning", "Exploration", "Visualization", "Emergence", "Control", "Physics", "Scale"],
+        Creative: ["Mood", "Texture", "Palette", "Flow state", "Variation", "Play", "Experiment", "Layering", "Atmosphere", "Discovery"],
+        Critical: ["Personal safety", "Clarity", "Consistency", "Focus", "Rest", "Recovery", "Rhythm", "Calibration", "Intent", "Balance"],
+      };
+
+      const apps = [
+        {
+          id: "brainwave-suite",
+          title: "CRITICAL — Brainwave Suite",
+          description: "A professional brainwave environment for sleep, relaxation, and gamma focus support.",
+          href: "brainwave-suite.html",
+          badge: "Critical",
+          meta: ["Mode: Personal", "Focus: Sleep + Relax + Gamma"],
+          accent: "#7c3aed",
+          locked: false,
+          critical: true,
+          actions: ["Open suite", "Read more"],
+        },
+        {
+          id: "key-vault",
+          title: "Key Vault",
+          description: "Collect 300 keys to unlock every locked app in the hub.",
+          href: "key-vault.html",
+          badge: "Game",
+          meta: ["Mode: Unlock", "Focus: Progress"],
+          accent: "#f59e0b",
+          locked: false,
+          actions: ["Launch", "Preview"],
+        },
+        {
+          id: "fractal",
+          title: "Fractal Simulation",
+          description: "Generate evolving fractal structures with adjustable parameters and hypnotic visuals.",
+          href: "fractal-sim.html",
+          badge: "Exploratory",
+          meta: ["Mode: Exploratory", "Focus: Pattern emergence"],
+          accent: "#1d7d6a",
+          step: "fractal",
+          locked: true,
+          actions: ["Launch simulation", "Preview"],
+        },
+        {
+          id: "collision",
+          title: "Galactic Collision Sim",
+          description: "Model interacting galaxies, tune orbital forces, and watch tidal tails stretch across space.",
+          href: "galactic_collision.html",
+          badge: "Dynamic",
+          meta: ["Mode: Dynamic", "Focus: Gravity play"],
+          accent: "#3360b7",
+          step: "collision",
+          locked: true,
+          actions: ["Launch simulation", "Read more"],
+        },
+        {
+          id: "calculator",
+          title: "Ultra Scientific Calculator",
+          description: "Precision combined with flair. A learning tool and scientific calculator built for exploration.",
+          href: "calculator.html",
+          badge: "Scientific",
+          meta: ["Mode: Scientific & fun", "Focus: Classroom-friendly tools"],
+          accent: "#d94834",
+          step: "calculator",
+          locked: true,
+          actions: ["Launch calculator", "Preview"],
+        },
+        {
+          id: "pacman",
+          title: "Pac-Man",
+          description: "Classic Pac-Man: clear the maze, eat power pellets, and outsmart the ghosts.",
+          href: "pacman.html",
+          badge: "Game",
+          meta: ["Mode: Arcade", "Focus: Chase + timing"],
+          accent: "#facc15",
+          locked: false,
+          actions: ["Play", "Preview"],
+        },
+        {
+          id: "screensaver-maker",
+          title: "Screensaver Maker",
+          description: "Design and preview a fractal-based screensaver with 100+ modular tools and presets.",
+          href: "screensaver-maker.html",
+          badge: "Tool",
+          meta: ["Mode: Builder", "Focus: Automation"],
+          accent: "#38bdf8",
+          locked: false,
+          actions: ["Open", "Preview"],
+        },
+        { id: "orbit-playground", title: "Orbit Playground", description: "Tune orbital radius and speed to see how a single body traces a clean ellipse around a glowing core.", href: "orbit-playground.html", badge: "Simulation", meta: ["Mode: Orbital", "Focus: Gravity"], accent: "#38bdf8", locked: true, actions: ["Launch", "Preview"] },
+        { id: "comet-slingshot", title: "Comet Slingshot", description: "Experiment with slingshot paths using a single orbital track and see how velocity shapes the curve.", href: "comet-slingshot.html", badge: "Simulation", meta: ["Mode: Velocity", "Focus: Space"], accent: "#60a5fa", locked: true, actions: ["Launch", "Preview"] },
+        { id: "particle-painter", title: "Particle Painter", description: "Click to release sprays of particles and paint kinetic trails across the canvas.", href: "particle-painter.html", badge: "Creative", meta: ["Mode: Particles", "Focus: Motion"], accent: "#22d3ee", locked: true, actions: ["Launch", "Preview"] },
+        { id: "meteor-shower", title: "Meteor Shower", description: "Spawn glowing meteors and adjust gravity to mimic atmospheric streaks.", href: "meteor-shower.html", badge: "Simulation", meta: ["Mode: Cosmic", "Focus: Trails"], accent: "#f97316", locked: true, actions: ["Launch", "Preview"] },
+        { id: "ember-field", title: "Ember Field", description: "Sketch ember bursts and watch them scatter like sparks in the night air.", href: "ember-field.html", badge: "Creative", meta: ["Mode: Ember", "Focus: Flow"], accent: "#fb7185", locked: true, actions: ["Launch", "Preview"] },
+        { id: "pomodoro-station", title: "Pomodoro Station", description: "A calm focus timer for 25-minute sessions with a smooth progress bar.", href: "pomodoro-station.html", badge: "Tool", meta: ["Mode: Focus", "Focus: Work"], accent: "#f59e0b", locked: true, actions: ["Launch", "Preview"] },
+        { id: "journal-app", title: "Journal", description: "A private notebook for reflections with import/export + share.", href: "journal-app.html", badge: "Tool", meta: ["Mode: Notes", "Focus: Reflection"], accent: "#38bdf8", locked: true, actions: ["Launch", "Preview"] },
+        { id: "focus-countdown", title: "Focus Countdown", description: "A tight 10-minute countdown for bursts of deep focus.", href: "focus-countdown.html", badge: "Tool", meta: ["Mode: Sprint", "Focus: Energy"], accent: "#34d399", locked: true, actions: ["Launch", "Preview"] },
+        { id: "quick-quiz", title: "Quick Quiz", description: "Fast multiple-choice questions that warm up your brain.", href: "quick-quiz.html", badge: "Education", meta: ["Mode: Quiz", "Focus: Speed"], accent: "#a78bfa", locked: true, actions: ["Launch", "Preview"] },
+        { id: "history-spark", title: "History Spark", description: "A tiny history quiz to keep big timelines in memory.", href: "history-spark.html", badge: "Education", meta: ["Mode: Quiz", "Focus: Facts"], accent: "#f472b6", locked: true, actions: ["Launch", "Preview"] },
+        { id: "flashcard-deck", title: "Flashcard Deck", description: "Flip through short prompts and definitions for fast study loops.", href: "flashcard-deck.html", badge: "Education", meta: ["Mode: Recall", "Focus: Study"], accent: "#38bdf8", locked: true, actions: ["Launch", "Preview"] },
+        { id: "vocab-jump", title: "Vocab Jump", description: "Quick vocabulary flips for short study sprints.", href: "vocab-jump.html", badge: "Education", meta: ["Mode: Vocabulary", "Focus: Language"], accent: "#facc15", locked: true, actions: ["Launch", "Preview"] },
+        { id: "word-scramble", title: "Word Scramble", description: "Unscramble playful words to keep your brain agile.", href: "word-scramble.html", badge: "Game", meta: ["Mode: Puzzle", "Focus: Words"], accent: "#22c55e", locked: true, actions: ["Launch", "Preview"] },
+        { id: "code-scramble", title: "Code Scramble", description: "Unscramble coding terms and build recall for developer vocabulary.", href: "code-scramble.html", badge: "Game", meta: ["Mode: Puzzle", "Focus: Coding"], accent: "#0ea5e9", locked: true, actions: ["Launch", "Preview"] },
+        { id: "typing-trainer", title: "Typing Trainer", description: "Practice steady typing speed and accuracy with a calming prompt.", href: "typing-trainer.html", badge: "Tool", meta: ["Mode: Typing", "Focus: Accuracy"], accent: "#f472b6", locked: true, actions: ["Launch", "Preview"] },
+        { id: "rhythm-typing", title: "Rhythm Typing", description: "Short rhythmic phrase practice for timing and control.", href: "rhythm-typing.html", badge: "Tool", meta: ["Mode: Typing", "Focus: Rhythm"], accent: "#a3e635", locked: true, actions: ["Launch", "Preview"] },
+        { id: "unit-converter", title: "Unit Converter", description: "Convert between meters, kilometers, and centimeters on the fly.", href: "unit-converter.html", badge: "Tool", meta: ["Mode: Math", "Focus: Units"], accent: "#38bdf8", locked: true, actions: ["Launch", "Preview"] },
+        { id: "energy-converter", title: "Energy Converter", description: "Translate between joules, kilojoules, and calories.", href: "energy-converter.html", badge: "Education", meta: ["Mode: Physics", "Focus: Energy"], accent: "#f59e0b", locked: true, actions: ["Launch", "Preview"] },
+        { id: "color-lab", title: "Color Lab", description: "Mix RGB values to explore color theory and lighting moods.", href: "color-lab.html", badge: "Creative", meta: ["Mode: Color", "Focus: Palette"], accent: "#a855f7", locked: true, actions: ["Launch", "Preview"] },
+        { id: "gradient-forge", title: "Gradient Forge", description: "Slide RGB values and craft the base tone for a gradient palette.", href: "gradient-forge.html", badge: "Creative", meta: ["Mode: Color", "Focus: Gradient"], accent: "#22c55e", locked: true, actions: ["Launch", "Preview"] },
+        { id: "sorting-visualizer", title: "Sorting Visualizer", description: "Step through a bubble sort and watch values swap into order.", href: "sorting-visualizer.html", badge: "Education", meta: ["Mode: Algorithms", "Focus: Sorting"], accent: "#4ade80", locked: true, actions: ["Launch", "Preview"] },
+        { id: "stack-sorter", title: "Stack Sorter", description: "A compact sorting view for fast algorithm intuition.", href: "stack-sorter.html", badge: "Education", meta: ["Mode: Sorting", "Focus: Logic"], accent: "#fb7185", locked: true, actions: ["Launch", "Preview"] },
+        { id: "memory-grid", title: "Memory Grid", description: "Flip tiles to match hidden symbols and train recall speed.", href: "memory-grid.html", badge: "Game", meta: ["Mode: Memory", "Focus: Match"], accent: "#38bdf8", locked: true, actions: ["Launch", "Preview"] },
+        { id: "constellation-match", title: "Constellation Match", description: "Match star symbols in a dark grid to simulate a night-sky memory drill.", href: "constellation-match.html", badge: "Game", meta: ["Mode: Memory", "Focus: Stars"], accent: "#94a3b8", locked: true, actions: ["Launch", "Preview"] },
+        { id: "math-sprint", title: "Math Sprint", description: "Rapid arithmetic prompts to build quick calculation skill.", href: "math-sprint.html", badge: "Education", meta: ["Mode: Math", "Focus: Speed"], accent: "#facc15", locked: true, actions: ["Launch", "Preview"] },
+        { id: "prime-hunt", title: "Prime Hunt", description: "Quick number challenges that sharpen mental math instincts.", href: "prime-hunt.html", badge: "Education", meta: ["Mode: Numbers", "Focus: Hunt"], accent: "#38bdf8", locked: true, actions: ["Launch", "Preview"] },
+        { id: "logic-quiz", title: "Logic Quiz", description: "Short logic puzzles designed to train reasoning skills.", href: "logic-quiz.html", badge: "Education", meta: ["Mode: Logic", "Focus: Reasoning"], accent: "#a78bfa", locked: true, actions: ["Launch", "Preview"] },
+        { id: "eco-flash", title: "Eco Flash", description: "Fast ecology prompts to remember cycles and ecosystems.", href: "eco-flash.html", badge: "Education", meta: ["Mode: Ecology", "Focus: Nature"], accent: "#34d399", locked: true, actions: ["Launch", "Preview"] },
+        { id: "cipher-scramble", title: "Cipher Scramble", description: "Unscramble secret-leaning words and strengthen pattern recognition.", href: "cipher-scramble.html", badge: "Game", meta: ["Mode: Cipher", "Focus: Puzzle"], accent: "#f97316", locked: true, actions: ["Launch", "Preview"] },
+        { id: "velocity-drill", title: "Velocity Drill", description: "Quick arithmetic drills inspired by motion and speed.", href: "velocity-drill.html", badge: "Education", meta: ["Mode: Physics", "Focus: Math"], accent: "#60a5fa", locked: true, actions: ["Launch", "Preview"] },
+        { id: "chrono-lab", title: "Chrono Lab", description: "A 15-minute lab timer for experiments and timed exercises.", href: "chrono-lab.html", badge: "Tool", meta: ["Mode: Timer", "Focus: Labs"], accent: "#38bdf8", locked: true, actions: ["Launch", "Preview"] },
+      ];
+
+      const buildConcepts = (app) => {
+        const base = conceptSets[app.badge] || conceptSets.Simulation;
+        return base.slice(0, 10);
+      };
+
+      const renderCard = (app) => {
+        const card = document.createElement("article");
+        card.className = app.critical ? "card is-critical" : "card";
+        card.style.setProperty("--card-accent", app.accent);
+        card.dataset.href = app.href;
+        if (app.step) card.dataset.step = app.step;
+        const locked = app.locked && !unlockedAll && !unlockedApps.includes(app.id);
+        if (locked) card.classList.add("is-locked");
+
+        const meta = app.meta
+          .map((item) => `<span><strong>${item.split(":")[0]}:</strong> ${item.split(":")[1].trim()}</span>`)
+          .join("");
+        const concepts = buildConcepts(app)
+          .map((concept) => `<span>${concept}</span>`)
+          .join("");
+
+        card.innerHTML = `
+          <div class="badge">${app.badge}</div>
+          ${app.critical ? `<div class="critical-flag">Critical</div>` : ""}
+          <div class="app-index">#${app.id.replace(/-/g, "").slice(0, 6).toUpperCase()}</div>
+          ${locked ? `<div class="lock-strip">Locked</div>` : ""}
+          <h2>${app.title}</h2>
+          <p>${app.description}</p>
+          <div class="meta">${meta}</div>
+          <div class="concepts">${concepts}</div>
+          <div class="hover-preview">Preview: ${app.description}</div>
+          <div class="preview-inline" id="inline-${app.id}">
+            <strong>Preview</strong>
+            <span>${app.description}</span>
+          </div>
+          <div class="card-actions">
+            ${
+              locked && keys < 300
+                ? `<a class="btn-pill primary icon" data-icon="🔑" href="key-vault.html">Collect Key</a>`
+                : locked
+                  ? `<button class="btn-pill primary unlock-btn" data-app-id="${app.id}">Unlock</button>`
+                  : `<a class="btn-pill primary icon" data-icon="→" href="${app.href}">${app.actions[0]}</a>`
+            }
+            <a class="btn-pill ghost icon" data-icon="📄" href="read-more.html?id=${app.id}">Read more</a>
+            <button class="btn-pill ghost icon preview-btn" data-icon="👁" data-app-id="${app.id}" type="button">Preview</button>
+            <button class="btn-pill ghost icon" data-icon="☆" type="button">Save</button>
+          </div>
+          <div class="locked-overlay"><span>${keys >= 300 ? "Locked — click unlock" : "Locked — collect keys"}</span></div>
+        `;
+        return card;
+      };
+
+      apps.forEach((app) => grid.appendChild(renderCard(app)));
+
+      const cards = Array.from(document.querySelectorAll(".card"));
+      const previewButtons = Array.from(document.querySelectorAll(".preview-btn"));
+      const unlockButtons = Array.from(document.querySelectorAll(".unlock-btn"));
+
+      const setActiveCard = (card) => {
+        cards.forEach((item) => item.removeAttribute("data-active"));
+        card.setAttribute("data-active", "true");
+      };
+
+      const setPathActive = (step) => {
+        nodes.forEach((node) => {
+          node.classList.toggle("is-active", node.dataset.step === step);
+        });
+      };
+
+      const setGlobalAccent = (card) => {
+        const accent = getComputedStyle(card).getPropertyValue("--card-accent") || baseAccent;
+        root.style.setProperty("--accent", accent.trim());
+        root.style.setProperty("--accent-dark", accent.trim());
+      };
+
+      cards.forEach((card, index) => {
+        card.classList.add("reveal");
+        card.dataset.index = String(index + 1);
+        card.addEventListener("mouseenter", () => {
+          setGlobalAccent(card);
+          setPathActive(card.dataset.step);
+        });
+        card.addEventListener("focusin", () => {
+          setGlobalAccent(card);
+          setPathActive(card.dataset.step);
+        });
+        card.addEventListener("mouseleave", () => {
+          root.style.setProperty("--accent", baseAccent);
+          root.style.setProperty("--accent-dark", baseAccentDark);
+          setPathActive(null);
+          root.style.setProperty("--tilt-x", "0deg");
+          root.style.setProperty("--tilt-y", "0deg");
+        });
+        card.addEventListener("focusout", () => {
+          root.style.setProperty("--accent", baseAccent);
+          root.style.setProperty("--accent-dark", baseAccentDark);
+          setPathActive(null);
+        });
+        card.addEventListener("click", () => {
+          setActiveCard(card);
+          setPathActive(card.dataset.step);
+          root.style.setProperty("--accent-shift", `${index * 8}deg`);
+        });
+        card.addEventListener("mousemove", (event) => {
+          const rect = card.getBoundingClientRect();
+          const px = (event.clientX - rect.left) / rect.width - 0.5;
+          const py = (event.clientY - rect.top) / rect.height - 0.5;
+          root.style.setProperty("--tilt-x", `${(-py * 6).toFixed(2)}deg`);
+          root.style.setProperty("--tilt-y", `${(px * 6).toFixed(2)}deg`);
+        });
+      });
+
+      unlockButtons.forEach((button) => {
+        button.addEventListener("click", (event) => {
+          event.preventDefault();
+          const appId = button.dataset.appId;
+          if (keys < 1) {
+            alert("Collect keys in the Key Vault first.");
+            return;
+          }
+          if (!unlockedApps.includes(appId)) {
+            unlockedApps.push(appId);
+            localStorage.setItem("simhub-unlocked-apps", JSON.stringify(unlockedApps));
+          }
+          keys = Math.max(0, keys - 1);
+          localStorage.setItem("simhub-keys", String(keys));
+          const card = button.closest(".card");
+          if (card) {
+            card.classList.remove("is-locked");
+            const launchHref = card.dataset.href;
+            button.outerHTML = `<a class=\"btn-pill primary icon\" data-icon=\"→\" href=\"${launchHref}\">Launch</a>`;
+          }
+        });
+      });
+
+      previewButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const appId = button.dataset.appId;
+          const app = apps.find((item) => item.id === appId);
+          if (!app) return;
+          previewTitle.textContent = app.title;
+          previewSummary.textContent = app.description;
+          previewLaunch.href = app.href;
+          previewConcepts.innerHTML = buildConcepts(app).map((c) => `<span>${c}</span>`).join("");
+          previewModal.classList.add("is-open");
+
+          const inline = document.getElementById(`inline-${app.id}`);
+          if (inline) inline.classList.toggle("is-open");
+        });
+      });
+
+      previewClose.addEventListener("click", () => {
+        previewModal.classList.remove("is-open");
+      });
+
+      previewModal.addEventListener("click", (event) => {
+        if (event.target === previewModal) previewModal.classList.remove("is-open");
+      });
+
+      motionToggle.addEventListener("change", (event) => {
+        document.body.dataset.motion = event.target.checked ? "off" : "on";
+      });
+
+      const applyStyleSettings = () => {
+        const theme = themeSelect.value;
+        document.body.dataset.theme = theme === "classic" ? "" : theme;
+        document.body.style.setProperty("--density", densityRange.value);
+        document.body.dataset.texture = textureToggle.checked ? "on" : "off";
+        localStorage.setItem("simhub-theme", theme);
+        localStorage.setItem("simhub-density", densityRange.value);
+        localStorage.setItem("simhub-texture", textureToggle.checked ? "on" : "off");
+        document.body.style.setProperty("--dot-opacity", textureToggle.checked ? "0.35" : "0");
+        document.body.style.setProperty("--grain-opacity", textureToggle.checked ? "0.25" : "0");
+      };
+
+      const initStyleSettings = () => {
+        const savedTheme = localStorage.getItem("simhub-theme") || "classic";
+        const savedDensity = localStorage.getItem("simhub-density") || "1";
+        const savedTexture = localStorage.getItem("simhub-texture") || "on";
+        themeSelect.value = savedTheme;
+        densityRange.value = savedDensity;
+        textureToggle.checked = savedTexture === "on";
+        applyStyleSettings();
+      };
+
+      themeSelect.addEventListener("change", applyStyleSettings);
+      densityRange.addEventListener("input", applyStyleSettings);
+      textureToggle.addEventListener("change", applyStyleSettings);
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Tab") {
+          document.body.classList.add("show-focus");
+        }
+      });
+
+      document.addEventListener("mousedown", () => {
+        document.body.classList.remove("show-focus");
+      });
+
+      document.addEventListener("mousemove", (event) => {
+        const x = `${(event.clientX / window.innerWidth) * 100}%`;
+        const y = `${(event.clientY / window.innerHeight) * 100}%`;
+        root.style.setProperty("--mouse-x", x);
+        root.style.setProperty("--mouse-y", y);
+      });
+
+      const updateScroll = () => {
+        const max = document.body.scrollHeight - window.innerHeight;
+        const progress = max > 0 ? Math.min(100, (window.scrollY / max) * 100) : 0;
+        root.style.setProperty("--scroll", progress.toFixed(2));
+        if (heroBar) heroBar.style.width = `${progress}%`;
+        root.style.setProperty("--dot-opacity", (0.2 + progress / 500).toFixed(2));
+        root.style.setProperty("--hero-shift", `${(progress / 20).toFixed(1)}px`);
+      };
+
+      window.addEventListener("scroll", updateScroll, { passive: true });
+      updateScroll();
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) entry.target.classList.add("is-visible");
+          });
+        },
+        { threshold: 0.15 }
+      );
+      cards.forEach((card) => observer.observe(card));
+
+      const tickTime = () => {
+        const now = Date.now();
+        root.style.setProperty("--time", (now % 100000).toString());
+        const phase = (now / 2000) % 1;
+        root.style.setProperty("--grain-opacity", (0.18 + phase * 0.06).toFixed(2));
+        requestAnimationFrame(tickTime);
+      };
+      tickTime();
+
+      if (!unlockedAll) {
+        const lockedCards = cards.filter((card) => card.classList.contains("is-locked"));
+        let pulseIndex = 0;
+        setInterval(() => {
+          if (!lockedCards.length) return;
+          lockedCards.forEach((card) => card.classList.remove("is-active"));
+          lockedCards[pulseIndex % lockedCards.length].classList.add("is-active");
+          pulseIndex += 1;
+        }, 1400);
+      }
+
+      if (unlockedAll) {
+        alert.innerHTML = "<strong>Status:</strong> All apps unlocked. Enjoy the experiments.";
+      } else {
+        alert.innerHTML = `<strong>Lock status:</strong> ${Math.min(keys, 300)} / 300 keys collected. <a class=\"link-ghost\" href=\"key-vault.html\">Go to Key Vault</a>`;
+      }
+
+      initStyleSettings();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Color Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="mini-apps.css" />
+    <link rel="stylesheet" href="lock.css" />
+  </head>
+  <body data-app-id="color-lab" style="--accent: #a855f7; --accent-2: #ec4899;">
+    <main class="app-shell layout-split">
+      <header class="app-header">
+        <div class="eyebrow">Creative</div>
+        <h1>Color Lab</h1>
+        <p class="subhead">Mix RGB values to explore color theory and lighting moods.</p>
+        <div class="chip-row">
+          <span class="chip">Color</span><span class="chip">Design</span><span class="chip">Mixing</span>
+        </div>
+      </header>
+      <section class="app-panel">
+        <div class="app-card">
+          <div id="app" data-app="color"></div>
+        </div>
+      </section>
+      <aside class="app-aside">
+        <strong>Tips</strong>
+        <div>- Try low saturation blends.</div><div>- Use it for palette ideas.</div>
+        <div style="margin-top:10px">Return to <a href="index.html" style="color:inherit">Simulation Hub</a></div>
+      </aside>
+    </main>
+    <script>
+      window.APP_CONFIG = {};
+    </script>
+    <script src="lock.js"></script>
+    <script src="mini-apps.js"></script>
+  </body>
+</html>

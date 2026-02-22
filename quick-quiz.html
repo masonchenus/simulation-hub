@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quick Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="mini-apps.css" />
+    <link rel="stylesheet" href="lock.css" />
+  </head>
+  <body data-app-id="quick-quiz" style="--accent: #a78bfa; --accent-2: #8b5cf6;">
+    <main class="app-shell layout-split">
+      <header class="app-header">
+        <div class="eyebrow">Education</div>
+        <h1>Quick Quiz</h1>
+        <p class="subhead">Fast multiple-choice questions that warm up your brain.</p>
+        <div class="chip-row">
+          <span class="chip">Quiz</span><span class="chip">Recall</span><span class="chip">Speed</span>
+        </div>
+      </header>
+      <section class="app-panel">
+        <div class="app-card">
+          <div id="app" data-app="quiz"></div>
+        </div>
+      </section>
+      <aside class="app-aside">
+        <strong>Tips</strong>
+        <div>- Hit next to keep the pace.</div><div>- Try for a perfect score.</div>
+        <div style="margin-top:10px">Return to <a href="index.html" style="color:inherit">Simulation Hub</a></div>
+      </aside>
+    </main>
+    <script>
+      window.APP_CONFIG = {"questions":[{"prompt":"What planet is known as the red planet?","options":["Mars","Venus","Jupiter"],"answer":"Mars"},{"prompt":"Which gas do plants absorb?","options":["Oxygen","Carbon dioxide","Helium"],"answer":"Carbon dioxide"},{"prompt":"3 × 8 equals?","options":["24","18","32"],"answer":"24"}]};
+    </script>
+    <script src="lock.js"></script>
+    <script src="mini-apps.js"></script>
+  </body>
+</html>
