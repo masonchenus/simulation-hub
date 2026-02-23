@@ -82,6 +82,8 @@
                         <option value="'Brush Script MT', 'Comic Sans MS', cursive, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'">Cursive</option>
                         <option value="'Zapfino', 'Chalkduster', 'Copperplate', fantasy, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'">Calligraphy</option>
                     </select>
+                    <label style="display:block; margin-top:2px; font-size:10px; color:#aaa;"><input type="checkbox" id="textFadeEffect"> Fade Effect</label>
+                    <label style="display:block; margin-top:2px; font-size:10px; color:#aaa;"><input type="checkbox" id="textTypingEffect"> Typing Effect</label>
                     <button id="btnUpdateText" style="cursor:pointer; font-size:10px; background:#333; color:#aaa; border:1px solid #444; border-radius:3px; margin-top:2px; width:100%;">Set</button>
                 </div>
             </label>
@@ -221,7 +223,7 @@
                 textControls.style.display = 'none';
             }
             nodesData.length = 0;
-            nodesData.push({ pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0,0,0), polyId: 0, degree: 0 });
+            nodesData.push({ pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0,0,0), polyId: 0, degree: 0, life: -1 });
         });
 
         document.getElementById('btnSnapshot').addEventListener('click', () => {
@@ -233,6 +235,7 @@
         
         let textPoints = [];
         let textPointIndex = 0;
+        let textRotation = new THREE.Quaternion();
         
         function generateTextPoints(text) {
             const canvas = document.createElement('canvas');
@@ -242,8 +245,8 @@
             const fontFamily = fontSelect ? fontSelect.value : 'Arial, sans-serif';
             ctx.font = `bold ${fontSize}px ${fontFamily}`;
             const measure = ctx.measureText(text);
-            const width = Math.ceil(measure.width);
-            const height = Math.ceil(fontSize * 1.2);
+            const width = Math.ceil(measure.width + fontSize);
+            const height = Math.ceil(fontSize * 2.5);
             
             canvas.width = width;
             canvas.height = height;
@@ -260,30 +263,50 @@
             for (let y = 0; y < height; y += step) {
                 for (let x = 0; x < width; x += step) {
                     const i = (y * width + x) * 4;
-                    if (data[i + 3] > 128) {
+                    if (data[i + 3] > 50) {
                         textPoints.push({ x: x - width/2, y: -(y - height/2) });
                     }
                 }
             }
-            // Shuffle
-            for (let i = textPoints.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [textPoints[i], textPoints[j]] = [textPoints[j], textPoints[i]];
+            
+            const typingEffect = document.getElementById('textTypingEffect').checked;
+            if (typingEffect) {
+                // Sort by X (left to right), then Y (top to bottom)
+                textPoints.sort((a, b) => (a.x - b.x) || (b.y - a.y));
+            } else {
+                // Shuffle
+                for (let i = textPoints.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [textPoints[i], textPoints[j]] = [textPoints[j], textPoints[i]];
+                }
             }
             textPointIndex = 0;
+            textRotation.copy(camera.quaternion);
         }
         
         document.getElementById('btnUpdateText').addEventListener('click', () => {
             generateTextPoints(document.getElementById('textInput').value);
             nodesData.length = 0;
-            nodesData.push({ pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0,0,0), polyId: 0, degree: 0 });
+            nodesData.push({ pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0,0,0), polyId: 0, degree: 0, life: -1 });
         });
 
         document.getElementById('fontSelect').addEventListener('change', () => {
             document.getElementById('textInput').style.fontFamily = document.getElementById('fontSelect').value;
             generateTextPoints(document.getElementById('textInput').value);
             nodesData.length = 0;
-            nodesData.push({ pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0,0,0), polyId: 0, degree: 0 });
+            nodesData.push({ pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0,0,0), polyId: 0, degree: 0, life: -1 });
+        });
+        
+        document.getElementById('textTypingEffect').addEventListener('change', () => {
+            generateTextPoints(document.getElementById('textInput').value);
+            nodesData.length = 0;
+            nodesData.push({ pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0,0,0), polyId: 0, degree: 0, life: -1 });
+        });
+
+        document.getElementById('textFadeEffect').addEventListener('change', () => {
+            generateTextPoints(document.getElementById('textInput').value);
+            nodesData.length = 0;
+            nodesData.push({ pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0,0,0), polyId: 0, degree: 0, life: -1 });
         });
 
         // Rings
@@ -758,7 +781,7 @@
         });
 
         // Initial Node
-        nodesData.push({ pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0,0,0), polyId: 0, degree: 0 });
+        nodesData.push({ pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0,0,0), polyId: 0, degree: 0, life: -1 });
 
         // Instanced Mesh for Spheres
         const sphereGeo = new THREE.SphereGeometry(0.015, 8, 6);
@@ -858,6 +881,7 @@
                     if (nodesData.length >= maxNodes) break;
                     
                     let pos, vel;
+                    let life = -1; // Default to permanent
                     const currentRadius = 10 + Math.pow(nodesData.length, 0.4) * 4;
 
                     if (genMode === 'sphere') {
@@ -1109,16 +1133,20 @@
                         vel = pos.clone().normalize().multiplyScalar(genVelVal);
                     } else if (genMode === 'text') {
                         if (textPointIndex < textPoints.length) {
+                            if (document.getElementById('textFadeEffect').checked) {
+                                life = 150; // Lifespan in frames
+                            }
                             const pt = textPoints[textPointIndex++];
                             const scale = genSpread * 0.05;
                             pos = new THREE.Vector3(pt.x * scale, pt.y * scale, (Math.random()-0.5)*genSpread*0.1);
+                            pos.applyQuaternion(textRotation);
                             vel = pos.clone().normalize().multiplyScalar(genVelVal * 0.5);
                         } else {
                             break;
                         }
                     }
                     
-                    nodesData.push({ pos, vel, polyId: 0, degree: 0 });
+                    nodesData.push({ pos, vel, polyId: 0, degree: 0, life: life });
                 }
             }
             
@@ -1318,6 +1346,11 @@
             for (let i = 0; i < nodesData.length; i++) {
                 const n = nodesData[i];
                 
+                // Life management
+                if (n.life > 0) {
+                    n.life -= 1 * timeScale;
+                }
+
                 if (isChaos) {
                     // Chaos Lump Physics
                     // Calculate Centers of Mass (once per frame ideally, but here per node for simplicity of code structure, optimized below)
@@ -1400,6 +1433,9 @@
                         if (t < 0.15) h = Math.sin(t / 0.15 * Math.PI);
                         else if (t > 0.25 && t < 0.4) h = 0.6 * Math.sin((t - 0.25) / 0.15 * Math.PI);
                         s *= (1.0 + h * 0.8);
+                    }
+                    if (n.life > 0) {
+                        s *= Math.max(0, n.life / 150.0);
                     }
                     dummy.scale.setScalar(s);
                     dummy.updateMatrix();
@@ -1487,6 +1523,13 @@
             linesGeo.attributes.position.needsUpdate = true;
             linesGeo.attributes.color.needsUpdate = true;
             linesGeo.setDrawRange(0, lineIdx / 3);
+
+            // Remove dead particles (after all loops using indices are done)
+            for (let i = nodesData.length - 1; i >= 0; i--) {
+                if (nodesData[i].life !== -1 && nodesData[i].life <= 0) {
+                    nodesData.splice(i, 1);
+                }
+            }
 
             // Trails Rendering Logic
             const showTrails = document.getElementById('showTrails').checked;

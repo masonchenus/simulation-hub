@@ -1875,12 +1875,20 @@
   const brainwaveApp = () => {
     const presets = {
       gamma: { label: "Gamma", base: 220, beat: 41.6, desc: "Peak focus, cognitive energy, binding." },
+      lowgamma: { label: "Low Gamma", base: 210, beat: 30, desc: "Complex tasks, high-level learning." },
+      performance: { label: "Performance", base: 205, beat: 23, desc: "Sustained engagement, 'The Zone'." },
       beta: { label: "Beta", base: 200, beat: 20, desc: "Focus, active thinking, alertness." },
       alpha: { label: "Alpha", base: 180, beat: 10, desc: "Relaxation, pre-sleep, lucid calm." },
       theta: { label: "Theta", base: 140, beat: 6, desc: "Deep meditation, REM sleep, flow." },
+      dream: { label: "Dream", base: 130, beat: 4, desc: "Vivid imagery, hypnagogic state." },
       delta: { label: "Delta", base: 100, beat: 2, desc: "Deep sleep, healing, detachment." },
+      deep: { label: "Deep", base: 90, beat: 1, desc: "Restorative sleep, growth hormone." },
+      subdelta: { label: "Sub-Delta", base: 60, beat: 0.5, desc: "Deep unconsciousness, clearance." },
+      pinsleep: { label: "Pin-Sleep", base: 55, beat: 0.1, desc: "0.1Hz deep restoration." },
       epsilon: { label: "Epsilon", base: 70, beat: 0.2, desc: "Suspended state, profound stillness." },
+      schumann: { label: "Earth", base: 194.18, beat: 7.83, desc: "Schumann Resonance, grounding." },
     };
+    const colors = { gamma: "#a855f7", lowgamma: "#8b5cf6", performance: "#6366f1", beta: "#3b82f6", alpha: "#22c55e", theta: "#eab308", dream: "#f59e0b", delta: "#f97316", deep: "#ef4444", subdelta: "#dc2626", pinsleep: "#b91c1c", epsilon: "#64748b", schumann: "#06b6d4" };
     let active = "beta";
     let ctx = null;
     let oscL = null;
@@ -1890,19 +1898,30 @@
     let noiseGain = null;
     let whiteNode = null;
     let whiteGain = null;
+    let brownNode = null;
+    let brownGain = null;
+    let rainNode = null;
+    let rainGain = null;
+    let rainFilter = null;
+    let isoGain = null;
+    let isoOsc = null;
+    let panner = null;
+    let panOsc = null;
     let analyser = null;
     let dataArray = null;
     let timer = null;
     let timeLeft = 0;
     let playing = false;
+    let stopTimeout = null;
+    let breathInterval = null;
 
     setHTML(`
-      <div class="app-card">
-        <div class="control-row" style="justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <div class="app-card" id="bw-card" style="transition:border-color 0.5s">
+        <div class="control-row" style="justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem">
           <h3 style="margin:0">Brainwave Tuner</h3>
           <div style="display:flex;gap:10px;align-items:center">
             <button class="btn btn-ghost" id="bw-zen" style="font-size:0.7rem;padding:4px 8px;height:auto">Zen Mode</button>
-            <span style="font-size:0.7rem;background:var(--muted);color:#fff;padding:2px 6px;border-radius:4px;opacity:0.7">Headphones Required</span>
+            <span style="font-size:0.7rem;background:var(--muted);color:#fff;padding:2px 6px;border-radius:4px;opacity:0.7">Headphones Rec.</span>
           </div>
         </div>
         <div id="bw-main-ui">
@@ -1911,7 +1930,8 @@
             `<button class="btn btn-ghost ${k === active ? 'is-active' : ''}" data-wave="${k}" style="flex:1;border:1px solid currentColor">${presets[k].label}</button>`
           ).join("")}
         </div>
-        <div style="text-align:center;margin-bottom:2rem">
+        <div style="text-align:center;margin-bottom:2rem;position:relative">
+          <div id="bw-breath-vis" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.5);width:120px;height:120px;border-radius:50%;border:4px solid var(--accent);opacity:0;pointer-events:none;transition:transform 4s ease-in-out, opacity 0.5s"></div>
           <div style="font-size:3.5rem;font-weight:800;line-height:1" id="bw-freq">${presets[active].beat} Hz</div>
           <div style="color:var(--muted);margin-top:0.5rem" id="bw-desc">${presets[active].desc}</div>
           <div id="bw-timer-display" style="font-size:1.2rem;color:var(--accent);margin-top:0.5rem;height:1.5rem;font-weight:700"></div>
@@ -1926,26 +1946,53 @@
             <input type="range" id="bw-vol" min="0" max="100" value="20" style="width:100%" />
           </div>
         </div>
-        <div class="control-row" style="margin-bottom:1rem; flex-wrap:wrap; gap:1rem">
-           <div style="flex:1;display:flex;flex-direction:column;gap:0.5rem;min-width:120px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+           <div style="display:flex;flex-direction:column;gap:0.5rem">
             <label style="font-size:0.8rem;color:var(--muted)">Pink Noise</label>
             <input type="range" id="bw-noise" min="0" max="100" value="0" style="width:100%" />
           </div>
-           <div style="flex:1;display:flex;flex-direction:column;gap:0.5rem;min-width:120px">
-            <label style="font-size:0.8rem;color:var(--muted)">White Noise (Masking)</label>
+           <div style="display:flex;flex-direction:column;gap:0.5rem">
+            <label style="font-size:0.8rem;color:var(--muted)">Brown Noise</label>
+            <input type="range" id="bw-brown" min="0" max="100" value="0" style="width:100%" />
+          </div>
+           <div style="display:flex;flex-direction:column;gap:0.5rem">
+            <label style="font-size:0.8rem;color:var(--muted)">White Noise</label>
             <input type="range" id="bw-white" min="0" max="100" value="0" style="width:100%" />
           </div>
+           <div style="display:flex;flex-direction:column;gap:0.5rem">
+            <label style="font-size:0.8rem;color:var(--muted)">Rain</label>
+            <input type="range" id="bw-rain" min="0" max="100" value="0" style="width:100%" />
+          </div>
         </div>
-        <div class="control-row" style="margin-bottom:1rem">
+        <div class="control-row" style="margin-bottom:1rem;gap:1rem;align-items:end">
+           <div style="flex:1;display:flex;flex-direction:column;gap:0.5rem">
+            <label style="font-size:0.8rem;color:var(--muted)">Carrier Freq: <span id="bw-carrier-val">${presets[active].base}Hz</span></label>
+            <input type="range" id="bw-carrier" min="50" max="500" step="5" value="${presets[active].base}" style="width:100%" />
+          </div>
            <div style="flex:1;display:flex;flex-direction:column;gap:0.5rem">
             <label style="font-size:0.8rem;color:var(--muted)">Timer</label>
             <select id="bw-timer-select" class="input" style="padding:4px;height:32px;font-size:0.9rem">
                 <option value="0">Infinite</option>
                 <option value="15">15 Minutes</option>
                 <option value="30">30 Minutes</option>
+                <option value="45">45 Minutes</option>
                 <option value="60">60 Minutes</option>
+                <option value="90">90 Minutes</option>
+                <option value="sleep">Sleep Cycle (Theta &rarr; Delta &rarr; Epsilon)</option>
+                <option value="pinsleep">Pin-Sleep Protocol (Rapid Descent)</option>
             </select>
           </div>
+        </div>
+        <div class="control-row" style="flex-wrap:wrap;gap:0.5rem">
+            <label class="btn btn-ghost" style="font-size:0.8rem;padding:4px 8px;height:auto;flex:1;justify-content:center">
+                <input type="checkbox" id="bw-iso" style="margin-right:6px"> Isochronic
+            </label>
+            <label class="btn btn-ghost" style="font-size:0.8rem;padding:4px 8px;height:auto;flex:1;justify-content:center">
+                <input type="checkbox" id="bw-pan" style="margin-right:6px"> Auto-Pan
+            </label>
+            <label class="btn btn-ghost" style="font-size:0.8rem;padding:4px 8px;height:auto;flex:1;justify-content:center">
+                <input type="checkbox" id="bw-breath" style="margin-right:6px"> Breath
+            </label>
         </div>
         </div>
       </div>
@@ -1958,7 +2005,15 @@
     const volSlider = mount.querySelector("#bw-vol");
     const noiseSlider = mount.querySelector("#bw-noise");
     const whiteSlider = mount.querySelector("#bw-white");
+    const brownSlider = mount.querySelector("#bw-brown");
+    const rainSlider = mount.querySelector("#bw-rain");
+    const carrierSlider = mount.querySelector("#bw-carrier");
+    const carrierVal = mount.querySelector("#bw-carrier-val");
     const timerSelect = mount.querySelector("#bw-timer-select");
+    const isoCheck = mount.querySelector("#bw-iso");
+    const panCheck = mount.querySelector("#bw-pan");
+    const breathCheck = mount.querySelector("#bw-breath");
+    const breathVis = mount.querySelector("#bw-breath-vis");
     const timerDisplay = mount.querySelector("#bw-timer-display");
     const freqDisplay = mount.querySelector("#bw-freq");
     const descDisplay = mount.querySelector("#bw-desc");
@@ -1983,9 +2038,27 @@
       }
     });
 
+    // Load Settings
     const savedTimer = localStorage.getItem("bw-timer");
     if (savedTimer) timerSelect.value = savedTimer;
     timerSelect.addEventListener("change", () => localStorage.setItem("bw-timer", timerSelect.value));
+    
+    const loadVol = (id, el) => {
+        const v = localStorage.getItem(id);
+        if (v) el.value = v;
+    };
+    loadVol("bw-vol", volSlider);
+    loadVol("bw-noise", noiseSlider);
+    loadVol("bw-white", whiteSlider);
+    loadVol("bw-brown", brownSlider);
+    loadVol("bw-rain", rainSlider);
+    if (localStorage.getItem("bw-iso") === "true") isoCheck.checked = true;
+    if (localStorage.getItem("bw-pan") === "true") panCheck.checked = true;
+    if (localStorage.getItem("bw-breath") === "true") breathCheck.checked = true;
+
+    const saveVol = (id, el) => localStorage.setItem(id, el.value);
+    const saveCheck = (id, el) => localStorage.setItem(id, el.checked);
+
 
     const createPinkNoise = (ctx) => {
         const bufferSize = ctx.sampleRate * 2;
@@ -2017,16 +2090,45 @@
         return buffer;
     };
 
+    const createBrownNoise = (ctx) => {
+        const bufferSize = ctx.sampleRate * 2;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const output = buffer.getChannelData(0);
+        let lastOut = 0;
+        for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            output[i] = (lastOut + (0.02 * white)) / 1.02;
+            lastOut = output[i];
+            output[i] *= 3.5; 
+        }
+        return buffer;
+    };
+
     const stop = () => {
-      if (oscL) { oscL.stop(); oscL.disconnect(); oscL = null; }
-      if (oscR) { oscR.stop(); oscR.disconnect(); oscR = null; }
-      if (noiseNode) { noiseNode.stop(); noiseNode.disconnect(); noiseNode = null; }
-      if (whiteNode) { whiteNode.stop(); whiteNode.disconnect(); whiteNode = null; }
-      if (gain) { gain.disconnect(); gain = null; }
-      if (noiseGain) { noiseGain.disconnect(); noiseGain = null; }
-      if (whiteGain) { whiteGain.disconnect(); whiteGain = null; }
-      if (analyser) { analyser.disconnect(); analyser = null; }
+      const fadeTime = 1.5;
+      const now = ctx ? ctx.currentTime : 0;
+      if (stopTimeout) clearTimeout(stopTimeout);
+      
+      if (gain) gain.gain.linearRampToValueAtTime(0, now + fadeTime);
+      if (noiseGain) noiseGain.gain.linearRampToValueAtTime(0, now + fadeTime);
+      if (whiteGain) whiteGain.gain.linearRampToValueAtTime(0, now + fadeTime);
+      if (brownGain) brownGain.gain.linearRampToValueAtTime(0, now + fadeTime);
+      if (rainGain) rainGain.gain.linearRampToValueAtTime(0, now + fadeTime);
+
+      stopTimeout = setTimeout(() => {
+        if (oscL) { oscL.stop(); oscL.disconnect(); oscL = null; }
+        if (oscR) { oscR.stop(); oscR.disconnect(); oscR = null; }
+        if (isoOsc) { isoOsc.stop(); isoOsc.disconnect(); isoOsc = null; }
+        if (panOsc) { panOsc.stop(); panOsc.disconnect(); panOsc = null; }
+        [noiseNode, whiteNode, brownNode, rainNode].forEach(n => { if(n) { n.stop(); n.disconnect(); } });
+        noiseNode = whiteNode = brownNode = rainNode = null;
+        if (analyser) { analyser.disconnect(); analyser = null; }
+        if (ctx && ctx.state !== 'closed') ctx.suspend();
+      }, fadeTime * 1000);
+
       playing = false;
+      clearInterval(breathInterval);
+      breathVis.style.opacity = 0;
       toggleBtn.textContent = "Play";
       toggleBtn.classList.remove("btn-ghost");
       cancelAnimationFrame(animationFrame);
@@ -2038,7 +2140,33 @@
     const start = () => {
       if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
       if (ctx.state === "suspended") ctx.resume();
-      stop();
+      
+      // Hard stop previous nodes to prevent race condition with stop()'s timeout
+      if (stopTimeout) clearTimeout(stopTimeout);
+      if (oscL) { try { oscL.stop(); oscL.disconnect(); } catch(e){} oscL = null; }
+      if (oscR) { try { oscR.stop(); oscR.disconnect(); } catch(e){} oscR = null; }
+      if (isoOsc) { try { isoOsc.stop(); isoOsc.disconnect(); } catch(e){} isoOsc = null; }
+      if (panOsc) { try { panOsc.stop(); panOsc.disconnect(); } catch(e){} panOsc = null; }
+      [noiseNode, whiteNode, brownNode, rainNode].forEach(n => { if(n) { try { n.stop(); n.disconnect(); } catch(e){} } });
+      noiseNode = whiteNode = brownNode = rainNode = null;
+
+      // Handle Sleep Cycle Init
+      if (timerSelect.value === 'sleep' || timerSelect.value === 'pinsleep') {
+          if (active !== 'theta') {
+              active = 'theta';
+              const p = presets[active];
+              carrierSlider.value = p.base;
+              carrierVal.textContent = p.base + "Hz";
+              freqDisplay.textContent = `${p.beat} Hz`; 
+              descDisplay.textContent = p.desc;
+              const color = colors[active] || "#8b5cf6";
+              mount.querySelector("#bw-card").style.borderColor = color;
+              mount.querySelector("#bw-timer-display").style.color = color;
+              breathVis.style.borderColor = color;
+              cCtx.strokeStyle = color;
+              mount.querySelectorAll("[data-wave]").forEach(b => b.classList.toggle("is-active", b.dataset.wave === active));
+          }
+      }
 
       analyser = ctx.createAnalyser();
       analyser.fftSize = 2048;
@@ -2046,13 +2174,22 @@
       analyser.connect(ctx.destination);
 
       const p = presets[active];
+      const baseFreq = parseInt(carrierSlider.value);
+
       gain = ctx.createGain();
       gain.gain.value = (volSlider.value / 100) * 0.1;
       gain.connect(analyser);
+
+      // Isochronic Gate
+      isoGain = ctx.createGain();
+      isoGain.gain.value = 1;
+      isoGain.connect(gain);
+
       const merger = ctx.createChannelMerger(2);
-      merger.connect(gain);
-      oscL = ctx.createOscillator(); oscL.type = "sine"; oscL.frequency.value = p.base; oscL.connect(merger, 0, 0);
-      oscR = ctx.createOscillator(); oscR.type = "sine"; oscR.frequency.value = p.base + p.beat; oscR.connect(merger, 0, 1);
+      merger.connect(isoGain);
+
+      oscL = ctx.createOscillator(); oscL.type = "sine"; oscL.frequency.value = baseFreq; oscL.connect(merger, 0, 0);
+      oscR = ctx.createOscillator(); oscR.type = "sine"; oscR.frequency.value = baseFreq + p.beat; oscR.connect(merger, 0, 1);
       oscL.start(); oscR.start();
 
       // Noise
@@ -2077,35 +2214,169 @@
       whiteNode.connect(whiteGain);
       whiteNode.start();
 
+      // Brown Noise
+      brownGain = ctx.createGain();
+      brownGain.gain.value = (brownSlider.value / 100) * 0.05;
+      brownGain.connect(analyser);
+      const brownBuffer = createBrownNoise(ctx);
+      brownNode = ctx.createBufferSource();
+      brownNode.buffer = brownBuffer;
+      brownNode.loop = true;
+      brownNode.connect(brownGain);
+      brownNode.start();
+
+      // Rain (Filtered Pink)
+      rainGain = ctx.createGain();
+      rainGain.gain.value = (rainSlider.value / 100) * 0.05;
+      rainFilter = ctx.createBiquadFilter();
+      rainFilter.type = "lowpass";
+      rainFilter.frequency.value = 800;
+      rainFilter.connect(rainGain);
+      rainGain.connect(analyser);
+      const rainBuffer = createPinkNoise(ctx);
+      rainNode = ctx.createBufferSource();
+      rainNode.buffer = rainBuffer;
+      rainNode.loop = true;
+      rainNode.connect(rainFilter);
+      rainNode.start();
+
+      // Auto-Pan
+      if (panCheck.checked) {
+          panner = ctx.createStereoPanner();
+          panOsc = ctx.createOscillator();
+          panOsc.frequency.value = 0.1; // Slow pan
+          panOsc.connect(panner.pan);
+          panOsc.start();
+          // Re-route noises through panner
+          noiseGain.disconnect(); whiteGain.disconnect(); brownGain.disconnect(); rainGain.disconnect();
+          noiseGain.connect(panner); whiteGain.connect(panner); brownGain.connect(panner); rainGain.connect(panner);
+          panner.connect(analyser);
+      }
+
+      // Isochronic Pulse
+      if (isoCheck.checked) {
+          isoOsc = ctx.createOscillator();
+          isoOsc.frequency.value = p.beat;
+          const isoMod = ctx.createGain();
+          isoMod.gain.value = 0.5; // Depth
+          isoOsc.connect(isoMod);
+          isoMod.connect(isoGain.gain);
+          isoOsc.start();
+      }
+
       playing = true;
       toggleBtn.textContent = "Stop";
       toggleBtn.classList.add("btn-ghost");
       draw();
 
+      // Breath
+      if (breathCheck.checked) {
+          breathVis.style.opacity = 1;
+          const breathe = () => {
+              breathVis.style.transform = breathVis.style.transform.includes("1.5") ? "translate(-50%,-50%) scale(0.5)" : "translate(-50%,-50%) scale(1.5)";
+          };
+          breathe();
+          breathInterval = setInterval(breathe, 4000);
+      }
+
+      const applyWave = (key) => {
+          active = key;
+          const p = presets[active];
+          const now = ctx.currentTime;
+          if (oscL) oscL.frequency.setTargetAtTime(p.base, now, 2);
+          if (oscR) oscR.frequency.setTargetAtTime(p.base + p.beat, now, 2);
+          carrierSlider.value = p.base;
+          carrierVal.textContent = p.base + "Hz";
+          freqDisplay.textContent = `${p.beat} Hz`; 
+          descDisplay.textContent = p.desc;
+          const color = colors[active] || "#8b5cf6";
+          mount.querySelector("#bw-card").style.borderColor = color;
+          mount.querySelector("#bw-timer-display").style.color = color;
+          breathVis.style.borderColor = color;
+          cCtx.strokeStyle = color;
+          mount.querySelectorAll("[data-wave]").forEach(b => b.classList.toggle("is-active", b.dataset.wave === active));
+      };
+
       // Timer
-      const mins = parseInt(timerSelect.value);
-      if (mins > 0) {
-          timeLeft = mins * 60;
+      let mins = parseInt(timerSelect.value);
+      let sleepStage = timerSelect.value === 'sleep' ? 1 : 0;
+      let pinStage = timerSelect.value === 'pinsleep' ? 1 : 0;
+
+      if (sleepStage === 1) mins = 20;
+
+      if (mins > 0 || pinStage === 1) {
+          if (pinStage === 1) timeLeft = 10;
+          else timeLeft = mins * 60;
+
           timerDisplay.textContent = formatTime(timeLeft);
           timer = setInterval(() => {
               timeLeft--;
               timerDisplay.textContent = formatTime(timeLeft);
-              if (timeLeft <= 0) stop();
+              if (timeLeft <= 0) {
+                  if (sleepStage === 1) {
+                      sleepStage = 2;
+                      applyWave('delta');
+                      timeLeft = 40 * 60; // 40 mins Delta
+                  } else if (sleepStage === 2) {
+                      sleepStage = 3;
+                      applyWave('epsilon');
+                      timeLeft = 30 * 60; // 30 mins Epsilon
+                  } else if (pinStage > 0) {
+                      if (pinStage === 1) { pinStage = 2; applyWave('dream'); timeLeft = 60; }
+                      else if (pinStage === 2) { pinStage = 3; applyWave('delta'); timeLeft = 60; }
+                      else if (pinStage === 3) { pinStage = 4; applyWave('deep'); timeLeft = 60; }
+                      else if (pinStage === 4) { pinStage = 5; applyWave('subdelta'); timeLeft = 60; }
+                      else if (pinStage === 5) { pinStage = 6; applyWave('pinsleep'); timeLeft = 60; }
+                      else { stop(); }
+                  } else {
+                      stop();
+                  }
+              }
           }, 1000);
       }
     };
 
     toggleBtn.addEventListener("click", () => { if (playing) stop(); else start(); });
-    volSlider.addEventListener("input", () => { if (gain) gain.gain.value = (volSlider.value / 100) * 0.1; });
-    noiseSlider.addEventListener("input", () => { if (noiseGain) noiseGain.gain.value = (noiseSlider.value / 100) * 0.05; });
-    whiteSlider.addEventListener("input", () => { if (whiteGain) whiteGain.gain.value = (whiteSlider.value / 100) * 0.05; });
+    
+    const updateVol = (g, el, scale=0.05) => { if (g) g.gain.setTargetAtTime((el.value / 100) * scale, ctx.currentTime, 0.1); saveVol(el.id, el); };
+    volSlider.addEventListener("input", () => updateVol(gain, volSlider, 0.1));
+    noiseSlider.addEventListener("input", () => updateVol(noiseGain, noiseSlider));
+    whiteSlider.addEventListener("input", () => updateVol(whiteGain, whiteSlider));
+    brownSlider.addEventListener("input", () => updateVol(brownGain, brownSlider));
+    rainSlider.addEventListener("input", () => updateVol(rainGain, rainSlider));
+
+    carrierSlider.addEventListener("input", () => {
+        carrierVal.textContent = carrierSlider.value + "Hz";
+        if (playing && oscL && oscR) {
+            const base = parseInt(carrierSlider.value);
+            const beat = presets[active].beat;
+            oscL.frequency.setTargetAtTime(base, ctx.currentTime, 0.1);
+            oscR.frequency.setTargetAtTime(base + beat, ctx.currentTime, 0.1);
+        }
+    });
+
+    [isoCheck, panCheck, breathCheck].forEach(el => el.addEventListener("change", () => {
+        saveCheck(el.id, el);
+        if (playing) { stop(); start(); } // Restart to apply structural changes
+    }));
+
     mount.querySelectorAll("[data-wave]").forEach((btn) => {
       btn.addEventListener("click", () => {
         mount.querySelectorAll("[data-wave]").forEach((b) => b.classList.remove("is-active"));
         btn.classList.add("is-active");
         active = btn.dataset.wave;
         const p = presets[active];
+        carrierSlider.value = p.base;
+        carrierVal.textContent = p.base + "Hz";
         freqDisplay.textContent = `${p.beat} Hz`; descDisplay.textContent = p.desc;
+        
+        // Color Sync
+        const color = colors[active] || "#8b5cf6";
+        mount.querySelector("#bw-card").style.borderColor = color;
+        mount.querySelector("#bw-timer-display").style.color = color;
+        breathVis.style.borderColor = color;
+        cCtx.strokeStyle = color;
+
         if (playing) start();
       });
     });
@@ -2115,7 +2386,7 @@
       animationFrame = requestAnimationFrame(draw);
       analyser.getByteTimeDomainData(dataArray);
       cCtx.clearRect(0, 0, canvas.width, canvas.height);
-      cCtx.beginPath(); cCtx.strokeStyle = "#3b82f6"; cCtx.lineWidth = 2;
+      cCtx.beginPath(); cCtx.lineWidth = 2;
       
       const sliceWidth = canvas.width * 1.0 / dataArray.length;
       let x = 0;
