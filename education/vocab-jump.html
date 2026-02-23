@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vocab Jump</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/mini-apps.css" />
+    <link rel="stylesheet" href="../css/lock.css" />
+  </head>
+  <body data-app-id="vocab-jump" style="--accent: #facc15; --accent-2: #f59e0b;">
+    <main class="app-shell layout-stack">
+      <header class="app-header">
+        <div class="eyebrow">Education</div>
+        <h1>Vocab Jump</h1>
+        <p class="subhead">Quick vocabulary flips for short study sprints.</p>
+        <div class="chip-row">
+          <span class="chip">Words</span><span class="chip">Language</span><span class="chip">Flashcards</span>
+        </div>
+      </header>
+      <section class="app-panel">
+        <div class="app-card">
+          <div id="app" data-app="flashcards"></div>
+        </div>
+      </section>
+      <aside class="app-aside">
+        <strong>Tips</strong>
+        <div>- Read the definition, then flip.</div><div>- Try to answer before flipping.</div>
+        <div style="margin-top:10px">Return to <a href="../index.html" style="color:inherit">Simulation Hub</a></div>
+      </aside>
+    </main>
+    <script>
+      window.APP_CONFIG = {"cards":[{"front":"Innovate","back":"To introduce new ideas or methods."},{"front":"Calibrate","back":"To fine-tune for accuracy."},{"front":"Momentum","back":"A force that keeps movement going."}]};
+    </script>
+    <script src="../js/lock.js"></script>
+    <script src="../js/mini-apps.js"></script>
+  </body>
+</html>
