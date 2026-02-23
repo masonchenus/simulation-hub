@@ -1,0 +1,2444 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Brainwave Suite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/lock.css" />
+    <style>
+      :root {
+        --bg: #0b0b15;
+        --panel: rgba(20, 20, 35, 0.6);
+        --panel-strong: rgba(255, 255, 255, 0.08);
+        --text: #f8fafc;
+        --muted: rgba(248, 250, 252, 0.6);
+        --accent: #7c3aed;
+        --accent-2: #38bdf8;
+        --accent-3: #f472b6;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(900px 600px at 10% 10%, rgba(124, 58, 237, 0.25), transparent 60%),
+          radial-gradient(700px 500px at 90% 15%, rgba(56, 189, 248, 0.22), transparent 62%),
+          radial-gradient(650px 450px at 50% 85%, rgba(244, 114, 182, 0.2), transparent 60%),
+          linear-gradient(180deg, #05050a 0%, #0b0b15 100%);
+      }
+
+      .app-shell {
+        width: 100%;
+        max-width: 1800px;
+        margin: 0 auto;
+        padding: 32px 24px 64px;
+        display: grid;
+        gap: 40px;
+      }
+
+      .app-header {
+        display: grid;
+        gap: 16px;
+        text-align: center;
+        justify-items: center;
+      }
+
+      .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.4em;
+        font-size: 0.68rem;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      h1 {
+        font-family: "Fraunces", "Times New Roman", serif;
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin: 0;
+        text-shadow: 0 0 40px rgba(124, 58, 237, 0.3);
+      }
+
+      .subhead {
+        margin: 0;
+        color: rgba(248, 250, 252, 0.8);
+        max-width: 60ch;
+        font-size: 1.1rem;
+        line-height: 1.6;
+      }
+
+      .layout-split {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        width: 100%;
+        gap: 32px;
+        align-items: start;
+      }
+
+      .app-card {
+        background: var(--panel);
+        border-radius: 32px;
+        padding: 32px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(20px);
+      }
+
+      .stage {
+        min-height: 360px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0 0 60px rgba(0,0,0,0.5);
+      }
+
+      #viz-canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 1;
+        mix-blend-mode: screen;
+      }
+
+      .orb {
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        filter: blur(4px);
+        opacity: 0.7;
+        mix-blend-mode: screen;
+        animation: drift 10s ease-in-out infinite;
+      }
+
+      .orb.primary {
+        background: radial-gradient(circle, rgba(124, 58, 237, 0.9), transparent 60%);
+        top: 20%;
+        left: 15%;
+        animation-delay: -2s;
+      }
+
+      .orb.secondary {
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.9), transparent 60%);
+        bottom: 10%;
+        right: 18%;
+        animation-delay: -4s;
+      }
+
+      .orb.tertiary {
+        background: radial-gradient(circle, rgba(244, 114, 182, 0.8), transparent 60%);
+        top: 35%;
+        right: 40%;
+        animation-delay: -6s;
+      }
+
+      .wave {
+        position: absolute;
+        inset: -40% 0 0 0;
+        background: radial-gradient(circle at 50% 60%, rgba(255, 255, 255, 0.16), transparent 70%);
+        animation: wavePulse 6s ease-in-out infinite;
+      }
+
+      .ripple {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08), transparent 60%);
+        animation: rippleSpin 18s linear infinite;
+        mix-blend-mode: screen;
+      }
+
+      @keyframes wavePulse {
+        0%, 100% {
+          transform: scale(0.8);
+          opacity: 0.4;
+        }
+        50% {
+          transform: scale(1.05);
+          opacity: 0.8;
+        }
+      }
+
+      @keyframes rippleSpin {
+        0% { transform: rotate(0deg) scale(0.95); opacity: 0.4; }
+        100% { transform: rotate(360deg) scale(1.1); opacity: 0.7; }
+      }
+
+      @keyframes drift {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(12px, -10px) scale(1.05); }
+      }
+
+      .breath-pacer {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 120px; height: 120px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 0 30px rgba(124, 58, 237, 0.1);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.6s ease;
+      }
+
+      .mode-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .mode-btn {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--text);
+        border-radius: 14px;
+        padding: 12px 10px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .mode-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-2px);
+      }
+
+      .mode-btn.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+        box-shadow: 0 8px 20px -6px var(--accent);
+        transform: translateY(-2px);
+        font-weight: 700;
+      }
+
+      .control-row {
+        display: grid;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .control-row label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: rgba(248, 250, 252, 0.5);
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: var(--accent);
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        appearance: none;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: transform 0.1s;
+      }
+
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+      }
+
+      .pill-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .pill {
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: var(--panel-strong);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        font-size: 0.8rem;
+      }
+
+      .preset-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+      }
+
+      .preset-card {
+        padding: 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        display: grid;
+        gap: 6px;
+      }
+
+      .preset-card strong {
+        color: var(--text);
+      }
+
+      .preset-card span {
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      .preset-more {
+        display: grid;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .preset-more button {
+        align-self: start;
+      }
+
+      .sound-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 8px;
+        margin-top: 24px;
+      }
+
+      .sound-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
+
+      .sound-tile {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 10px;
+        min-height: 40px;
+        cursor: pointer;
+        transition: transform 120ms ease, background 120ms ease;
+        color: var(--text);
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 6px 8px;
+        display: grid;
+        place-items: center;
+      }
+
+      .sound-tile.active {
+        transform: translateY(-2px);
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+      }
+
+      .noise-hub {
+        display: grid;
+        gap: 16px;
+        margin-top: 24px;
+        padding: 20px;
+        border-radius: 20px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .noise-hub label {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .noise-hub input[type="range"] {
+        width: 100%;
+      }
+
+      .noise-hub .row {
+        display: grid;
+        gap: 6px;
+      }
+
+      .hifi-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .custom-panel {
+        display: grid;
+        gap: 16px;
+        margin-top: 24px;
+        padding: 20px;
+        border-radius: 20px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .custom-panel input,
+      .custom-panel select {
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        padding: 12px 14px;
+        font-family: inherit;
+        font-size: 0.95rem;
+      }
+
+      .custom-panel .row {
+        display: grid;
+        gap: 6px;
+      }
+
+      .custom-divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.12);
+        margin: 6px 0;
+      }
+
+      .wave-canvas {
+        width: 100%;
+        height: 140px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      #timer-display {
+        text-align: center;
+        font-family: "Space Grotesk", monospace;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--accent-2);
+        margin-top: 8px;
+      }
+
+      .cta-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 32px;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 999px;
+        padding: 14px 24px;
+        font-weight: 700;
+        font-size: 1rem;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(124, 58, 237, 0.5);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: none;
+      }
+
+      .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .glide-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+
+      .routine-row {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .routine-row .btn-ghost {
+        justify-content: center;
+      }
+
+      .tone-row {
+        display: grid;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .tone-row select {
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        padding: 12px 14px;
+        font-family: inherit;
+        font-size: 1rem;
+      }
+
+      #preset-select {
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        padding: 12px 14px;
+        font-family: inherit;
+        font-size: 1rem;
+      }
+
+      .base-row {
+        display: grid;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .base-row input {
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        padding: 12px 14px;
+        font-family: inherit;
+      }
+
+      .beat-label {
+        font-size: 0.85rem;
+        color: var(--muted);
+        text-align: right;
+        font-family: monospace;
+      }
+
+      .app-aside {
+        display: grid;
+        gap: 20px;
+        color: var(--muted);
+        align-content: start;
+      }
+
+      .metric {
+        display: grid;
+        gap: 6px;
+        padding: 16px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .metric strong {
+        color: var(--text);
+      }
+
+      #zen-exit {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 1000;
+        display: none;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--text);
+        padding: 12px 24px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      
+      body.zen-mode #zen-exit {
+        display: block;
+      }
+
+      body.zen-mode .app-header,
+      body.zen-mode .app-aside,
+      body.zen-mode .mode-row,
+      body.zen-mode .control-row,
+      body.zen-mode .tone-row,
+      body.zen-mode .base-row,
+      body.zen-mode .cta-row,
+      body.zen-mode .glide-row,
+      body.zen-mode .routine-row,
+      body.zen-mode .sound-grid,
+      body.zen-mode .sound-actions,
+      body.zen-mode .noise-hub,
+      body.zen-mode .custom-panel {
+        display: none !important;
+      }
+
+      body.zen-mode .app-shell {
+        padding: 0;
+        max-width: 100%;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      body.zen-mode .layout-split,
+      body.zen-mode .app-panel {
+        display: block;
+        height: 100%;
+      }
+
+      body.zen-mode .app-card {
+        background: #000;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+        height: 100%;
+      }
+
+      body.zen-mode .stage {
+        height: 100%;
+        border-radius: 0;
+        border: none;
+        background: #000;
+      }
+
+      @media (max-width: 900px) {
+        .layout-split {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 700px) {
+        .app-shell {
+          padding: 24px 16px 48px;
+        }
+
+        .mode-row {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .sound-grid {
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+
+        .preset-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .cta-row,
+        .glide-row,
+        .routine-row {
+          grid-template-columns: 1fr;
+          display: grid;
+        }
+
+        .stage {
+          min-height: 240px;
+        }
+      }
+
+      @media (max-width: 420px) {
+        .sound-grid {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body data-app-id="brainwave">
+    <button id="zen-exit">Exit Zen Mode</button>
+    <main class="app-shell">
+      <header class="app-header">
+        <div class="eyebrow">Critical Personal Suite</div>
+        <h1>Brainwave Suite</h1>
+        <p class="subhead">
+          A professional environment to support sleep, deep relaxation, and gamma focus. Adjust
+          intensity, choose a mode, and let the visual field guide your session.
+        </p>
+      </header>
+
+      <div class="layout-split">
+      <section class="app-panel">
+        <div class="app-card">
+          <div class="stage" id="stage">
+            <canvas id="viz-canvas"></canvas>
+            <div class="wave"></div>
+            <div class="ripple"></div>
+            <div class="orb primary"></div>
+            <div class="orb secondary"></div>
+            <div class="orb tertiary"></div>
+            <div class="breath-pacer" id="breath-pacer"></div>
+          </div>
+
+          <div class="mode-row" id="mode-row">
+            <button class="mode-btn" data-mode="subdelta">Sub-Delta</button>
+            <button class="mode-btn active" data-mode="sleep">Sleep (Delta)</button>
+            <button class="mode-btn" data-mode="relax">Relax (Alpha)</button>
+            <button class="mode-btn" data-mode="beta">Beta Focus</button>
+            <button class="mode-btn" data-mode="gamma">Gamma Focus</button>
+            <button class="mode-btn" data-mode="highgamma">High-Gamma</button>
+          </div>
+
+          <div class="control-row">
+            <label for="intensity">Intensity</label>
+            <input type="range" id="intensity" min="0" max="100" value="40" />
+          </div>
+
+          <div class="control-row">
+            <label for="breath">Breath Cycle (seconds)</label>
+            <input type="range" id="breath" min="4" max="14" value="8" />
+          </div>
+
+          <div class="control-row">
+            <label for="session-duration">Session Timer</label>
+            <select id="session-duration">
+              <option value="0">Infinite</option>
+              <option value="10">10 Minutes</option>
+              <option value="20" selected>20 Minutes</option>
+              <option value="30">30 Minutes</option>
+              <option value="60">60 Minutes</option>
+            </select>
+            <div id="timer-display" style="display:none">00:00</div>
+          </div>
+
+          <div class="control-row">
+            <label for="preset-select">Preset Library (100+)</label>
+            <select id="preset-select"></select>
+          </div>
+
+          <div class="tone-row">
+            <label for="tone-type">Tone Engine</label>
+            <select id="tone-type">
+              <option value="binaural">Binaural (L/R split)</option>
+              <option value="monaural">Monaural (beat in one channel)</option>
+              <option value="isochronic">Isochronic (pulsed tone)</option>
+              <option value="test">Ear Check (Left/Right)</option>
+            </select>
+          </div>
+
+          <div class="control-row">
+            <label>Signal Modifiers</label>
+            <div class="pill-row" style="gap:12px; align-items:center;">
+              <select id="carrier-waveform" style="border-radius:8px; padding:6px; background:rgba(255,255,255,0.05); color:var(--text); border:1px solid rgba(255,255,255,0.1);">
+                <option value="sine">Sine Wave (Soft)</option>
+                <option value="triangle">Triangle (Clear)</option>
+                <option value="sawtooth">Sawtooth (Buzz)</option>
+              </select>
+              <select id="pulse-shape" style="border-radius:8px; padding:6px; background:rgba(255,255,255,0.05); color:var(--text); border:1px solid rgba(255,255,255,0.1);">
+                <option value="sine">Smooth Pulse</option>
+                <option value="square">Sharp Pulse</option>
+              </select>
+            </div>
+            <div class="pill-row" style="margin-top:8px;">
+              <label class="hifi-toggle"><input type="checkbox" id="harmonic-toggle"> Harmonic Layer</label>
+              <label class="hifi-toggle"><input type="checkbox" id="wobble-toggle"> Freq Wobble</label>
+              <label class="hifi-toggle"><input type="checkbox" id="noise-pulse-toggle"> Entrain Noise</label>
+            </div>
+          </div>
+
+          <div class="base-row">
+            <label for="left-frequency">Left Ear Frequency (Hz)</label>
+            <input type="number" id="left-frequency" min="20" max="1000" step="0.1" value="200" />
+            <label for="right-frequency">Right Ear Frequency (Hz)</label>
+            <input type="number" id="right-frequency" min="20" max="1000" step="0.1" value="208" />
+            <div class="beat-label" id="beat-label">Perceived beat: 8.0 Hz</div>
+          </div>
+
+          <div class="cta-row">
+            <button class="btn" id="start">Start Session</button>
+            <button class="btn btn-ghost" id="pause">Pause</button>
+            <button class="btn btn-ghost" id="zen-toggle">Zen Mode</button>
+            <a class="btn btn-ghost" href="../index.html">Back to Hub</a>
+          </div>
+
+          <div class="glide-row">
+            <button class="btn btn-ghost" id="ascend">Ascend (Sleep → Hyper Focus)</button>
+            <button class="btn btn-ghost" id="descend">Descend (Hyper Focus → Sleep)</button>
+          </div>
+
+          <div class="routine-row">
+            <button class="btn btn-ghost" id="breathing-waves">Breathing Waves</button>
+            <button class="btn btn-ghost" id="sleep-drifts">Sleep Drifts</button>
+            <button class="btn btn-ghost" id="calm-descents">Calm Descents</button>
+            <button class="btn btn-ghost" id="wake-ascend">Wake-up Ascend</button>
+            <button class="btn btn-ghost" id="focus-glide">Focus Glide</button>
+            <button class="btn btn-ghost" id="power-nap">Power Nap</button>
+          </div>
+
+          <div class="sound-grid" id="sound-grid" aria-label="Dynamic sound tiles"></div>
+          <div class="sound-actions">
+            <button class="btn btn-ghost" id="sound-cancel">Cancel Dynamic Sounds</button>
+            <button class="btn btn-ghost" id="sound-stop">Stop Ambient</button>
+          </div>
+          <div class="noise-hub">
+            <strong>Noise Hub</strong>
+            <div class="row">
+              <label for="noise-intensity">Noise Intensity</label>
+              <input type="range" id="noise-intensity" min="0" max="100" value="30" />
+            </div>
+            <div class="row">
+              <label for="noise-low">Low Frequency (Hz)</label>
+              <input type="range" id="noise-low" min="1" max="120" value="6" />
+            </div>
+            <div class="row">
+              <label for="noise-high">High Frequency (Hz)</label>
+              <input type="range" id="noise-high" min="20" max="2000" value="70" />
+            </div>
+            <label class="hifi-toggle">
+              <input type="checkbox" id="hifi-toggle" />
+              Hi‑Fi enhancer (spatial + gentle reverb)
+            </label>
+            <button class="btn btn-ghost" id="noise-download">Download Noise</button>
+          </div>
+
+          <div class="custom-panel">
+            <strong>Custom Frequencies</strong>
+            <div class="row">
+              <label for="custom-tone">Single Tone (Hz)</label>
+              <input type="number" id="custom-tone" min="20" max="1000" step="0.1" value="432" />
+            </div>
+            <div class="sound-actions">
+              <button class="btn btn-ghost try-tone" data-hz="174">Try 174 Hz</button>
+              <button class="btn btn-ghost try-tone" data-hz="285">Try 285 Hz</button>
+              <button class="btn btn-ghost try-tone" data-hz="332">Try 332 Hz</button>
+              <button class="btn btn-ghost try-tone" data-hz="432">Try 432 Hz</button>
+              <button class="btn btn-ghost try-tone" data-hz="491">Try 491 Hz</button>
+              <button class="btn btn-ghost try-tone" data-hz="528">Try 528 Hz</button>
+              <button class="btn btn-ghost try-tone" data-hz="639">Try 639 Hz</button>
+              <button class="btn btn-ghost try-tone" data-hz="741">Try 741 Hz</button>
+              <button class="btn btn-ghost try-tone" data-hz="852">Try 852 Hz</button>
+              <button class="btn btn-ghost try-tone" data-hz="963">Try 963 Hz</button>
+            </div>
+            <div id="tone-explanation" style="font-size: 0.85rem; color: var(--muted); margin-top: 8px; min-height: 1.2em;"></div>
+            <div class="custom-divider" aria-hidden="true"></div>
+            <div class="row">
+              <label for="custom-left">Custom Binaural (Left Hz)</label>
+              <input type="number" id="custom-left" min="20" max="1000" step="0.1" value="200" />
+            </div>
+            <div class="row">
+              <label for="custom-right">Custom Binaural (Right Hz)</label>
+              <input type="number" id="custom-right" min="20" max="1000" step="0.1" value="208" />
+            </div>
+            <div class="row">
+              <label for="custom-name">Preset Name</label>
+              <input type="text" id="custom-name" value="My Binaural" />
+            </div>
+            <div class="sound-actions">
+              <button class="btn btn-ghost" id="custom-play">Play Tone</button>
+              <button class="btn btn-ghost" id="custom-download">Download Tone</button>
+              <button class="btn" id="custom-save">Confirm & Add Preset</button>
+            </div>
+          </div>
+
+          <div class="custom-panel">
+            <strong>Binaural Beat Calculator</strong>
+            <div class="row">
+              <label for="calc-beat">Desired Beat Frequency (Hz)</label>
+              <input type="number" id="calc-beat" min="0.1" max="200" step="0.1" value="10" />
+            </div>
+            <div class="row">
+              <label for="calc-carrier">Carrier Frequency (Hz)</label>
+              <input type="number" id="calc-carrier" min="40" max="1000" step="1" value="200" />
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:8px;">
+               <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; text-align:center;">
+                 <div style="font-size:0.75rem; color:var(--muted); margin-bottom:4px;">Left Ear</div>
+                 <div id="calc-left-disp" style="font-size:1.1rem; font-weight:700;">195.0 Hz</div>
+               </div>
+               <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; text-align:center;">
+                 <div style="font-size:0.75rem; color:var(--muted); margin-bottom:4px;">Right Ear</div>
+                 <div id="calc-right-disp" style="font-size:1.1rem; font-weight:700;">205.0 Hz</div>
+               </div>
+            </div>
+            <div class="sound-actions">
+              <button class="btn btn-ghost" id="calc-suggest">Suggest Carrier</button>
+              <button class="btn" id="calc-apply">Apply to Custom</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="app-aside">
+          <div class="metric">
+            <strong>Session Mode</strong>
+            <span id="mode-label">Sleep (Delta)</span>
+          </div>
+          <div class="metric">
+            <strong>Intensity</strong>
+            <span id="intensity-label">40%</span>
+          </div>
+          <div class="metric">
+            <strong>Breath Cycle</strong>
+            <span id="breath-label">8s inhale/exhale</span>
+          </div>
+          <div class="pill-row">
+            <span class="pill">Binaural ready</span>
+            <span class="pill">Visual entrainment</span>
+            <span class="pill">Gamma boost</span>
+          </div>
+          <div class="preset-grid" id="preset-info"></div>
+          <div class="preset-more">
+            <button class="btn btn-ghost" id="preset-read">Read more</button>
+            <div id="preset-article" class="preset-card" style="display:none"></div>
+          </div>
+          <canvas class="wave-canvas" id="wave-canvas" width="900" height="180"></canvas>
+          <p>
+            Use headphones for best results. This suite is for relaxation support and is not a
+            medical device.
+          </p>
+      </aside>
+      </div>
+    </main>
+
+    <script>
+      const stage = document.getElementById("stage");
+      const vizCanvas = document.getElementById("viz-canvas");
+      const modeRow = document.getElementById("mode-row");
+      const modeLabel = document.getElementById("mode-label");
+      const intensity = document.getElementById("intensity");
+      const intensityLabel = document.getElementById("intensity-label");
+      const breath = document.getElementById("breath");
+      const breathLabel = document.getElementById("breath-label");
+      const breathPacer = document.getElementById("breath-pacer");
+      const sessionDuration = document.getElementById("session-duration");
+      const timerDisplay = document.getElementById("timer-display");
+      const presetSelect = document.getElementById("preset-select");
+      const presetInfo = document.getElementById("preset-info");
+      const toneType = document.getElementById("tone-type");
+      const leftFrequency = document.getElementById("left-frequency");
+      const rightFrequency = document.getElementById("right-frequency");
+      const beatLabel = document.getElementById("beat-label");
+      const soundGrid = document.getElementById("sound-grid");
+      const soundCancel = document.getElementById("sound-cancel");
+      const soundStop = document.getElementById("sound-stop");
+      const noiseIntensity = document.getElementById("noise-intensity");
+      const noiseLow = document.getElementById("noise-low");
+      const noiseHigh = document.getElementById("noise-high");
+      const noiseDownload = document.getElementById("noise-download");
+      const hifiToggle = document.getElementById("hifi-toggle");
+      const customTone = document.getElementById("custom-tone");
+      const customLeft = document.getElementById("custom-left");
+      const customRight = document.getElementById("custom-right");
+      const customName = document.getElementById("custom-name");
+      const customPlay = document.getElementById("custom-play");
+      const customDownload = document.getElementById("custom-download");
+      const customSave = document.getElementById("custom-save");
+      const tryToneButtons = Array.from(document.querySelectorAll(".try-tone"));
+      const toneExplanation = document.getElementById("tone-explanation");
+      const presetRead = document.getElementById("preset-read");
+      const presetArticle = document.getElementById("preset-article");
+      const waveCanvas = document.getElementById("wave-canvas");
+      const startBtn = document.getElementById("start");
+      const pauseBtn = document.getElementById("pause");
+      const zenToggle = document.getElementById("zen-toggle");
+      const zenExit = document.getElementById("zen-exit");
+      const ascendBtn = document.getElementById("ascend");
+      const descendBtn = document.getElementById("descend");
+      const breathingBtn = document.getElementById("breathing-waves");
+      const sleepDriftsBtn = document.getElementById("sleep-drifts");
+      const calmDescentsBtn = document.getElementById("calm-descents");
+      const wakeAscendBtn = document.getElementById("wake-ascend");
+      const focusGlideBtn = document.getElementById("focus-glide");
+      const powerNapBtn = document.getElementById("power-nap");
+      const carrierWaveform = document.getElementById("carrier-waveform");
+      const pulseShape = document.getElementById("pulse-shape");
+      const harmonicToggle = document.getElementById("harmonic-toggle");
+      const wobbleToggle = document.getElementById("wobble-toggle");
+      const noisePulseToggle = document.getElementById("noise-pulse-toggle");
+      const calcBeat = document.getElementById("calc-beat");
+      const calcCarrier = document.getElementById("calc-carrier");
+      const calcLeftDisp = document.getElementById("calc-left-disp");
+      const calcRightDisp = document.getElementById("calc-right-disp");
+      const calcSuggest = document.getElementById("calc-suggest");
+      const calcApply = document.getElementById("calc-apply");
+
+      let running = false;
+      let mode = "sleep";
+      let audioCtx = null;
+      let leftBase = 200;
+      let rightBase = 208;
+      let leftOsc = null;
+      let rightOsc = null;
+      let leftOsc2 = null;
+      let rightOsc2 = null;
+      let merger = null;
+      let monoOsc = null;
+      let isoOsc = null;
+      let isoGate = null;
+      let isoLfo = null;
+      let isoLfoGain = null;
+      let isoBias = null;
+      let earTestOsc = null;
+      let earTestPanner = null;
+      let masterGain = null;
+      let binauralGain = null;
+      let monoGain = null;
+      let harmonicGainL = null;
+      let harmonicGainR = null;
+      let isoGain = null;
+      let testGain = null;
+      let analyser = null;
+      let frequencyData = null;
+      let timeData = null;
+      let noiseSource = null;
+      let noiseGain = null;
+      let noiseFilter = null;
+      let filterLfo = null;
+      let filterLfoGain = null;
+      let soundDepth = 0;
+      let ambientSource = null;
+      let ambientFilter = null;
+      let ambientHighpass = null;
+      let ambientGain = null;
+      let ambientLfo = null;
+      let ambientLfoGain = null;
+      let ambientType = "white";
+      let hifiEnabled = false;
+      let stereoDelayL = null;
+      let stereoDelayR = null;
+      let stereoGainL = null;
+      let stereoGainR = null;
+      let convolver = null;
+      let customOsc = null;
+      let breathLfo = null;
+      let breathGain = null;
+      let vizParticles = [];
+      let sessionTimer = null;
+      let sessionTimeLeft = 0;
+      let wobbleLfo = null;
+      let wobbleGain = null;
+      let noisePulseGain = null;
+
+      const basePresets = [
+        { name: "Sub-Delta Drift", freq: 0.6, mode: "subdelta", note: "Ultra-slow sub-delta downshift.", details: "At 0.6 Hz, this preset targets the sub-delta range, often associated with deep unconsciousness and the glymphatic system's waste clearance in the brain. Ideal for profound rest." },
+        { name: "Sub-Delta Deep", freq: 0.9, mode: "subdelta", note: "Deepest sub-delta support.", details: "0.9 Hz encourages a state of suspended animation, helping to quiet the mind completely and disconnect from sensory input for total regeneration." },
+        { name: "Delta Sleep Deep", freq: 1.2, mode: "sleep", note: "Restorative sleep & growth hormone.", details: "1.2 Hz is a classic delta frequency linked to the deepest stages of NREM sleep. It promotes physical healing, immune system support, and the release of growth hormone." },
+        { name: "Delta Dream Drift", freq: 3.4, mode: "sleep", note: "Dreamy delta drift.", details: "At 3.4 Hz, you hover near the border of Theta. This state is associated with deep relaxation where dream-like imagery begins to form, suitable for pre-sleep winding down." },
+        { name: "Theta Restore", freq: 4.5, mode: "theta", note: "Theta restoration and drift.", details: "4.5 Hz is the 'Shamanic State' of consciousness. It promotes vivid imagery, deep meditation, and emotional processing, acting as a bridge to the subconscious." },
+        { name: "Theta Calm", freq: 6.0, mode: "theta", note: "Relaxed theta focus.", details: "6.0 Hz encourages a state of relaxed introspection. It is often used for hypnosis and self-programming, allowing you to access memory and intuition without distraction." },
+        { name: "Schumann Resonance", freq: 7.83, mode: "theta", note: "Earth's resonant frequency.", details: "7.83 Hz is the fundamental frequency of the Earth's electromagnetic field. Entraining to this frequency is said to be grounding, promoting a sense of balance and well-being." },
+        { name: "Alpha Ease", freq: 9.0, mode: "relax", note: "Alpha calm and ease.", details: "9.0 Hz sits comfortably in the Alpha band, promoting a relaxed, detached awareness. It is excellent for stress reduction and 'taking a break' without falling asleep." },
+        { name: "Alpha Centering", freq: 10.0, mode: "relax", note: "Reset with alpha clarity.", details: "10 Hz is the center of the Alpha band, associated with mood elevation, serotonin release, and a state of 'relaxed alertness'. Perfect for stabilizing the mind." },
+        { name: "SMR Focus", freq: 14.0, mode: "beta", note: "Sensory Motor Rhythm.", details: "14 Hz (SMR) is associated with a state of calm, physical stillness combined with mental alertness. It is widely used to improve focus and reduce fidgeting." },
+        { name: "Beta Focus", freq: 16.0, mode: "beta", note: "Steady beta focus.", details: "16 Hz promotes active concentration and analytical thinking. Use this frequency when you need to process information, study, or solve logical problems." },
+        { name: "High Beta Drive", freq: 20.0, mode: "beta", note: "Higher beta for alert focus.", details: "20 Hz pushes into high beta, stimulating high energy and alertness. Useful for overcoming fatigue, but prolonged use may cause anxiety in some." },
+        { name: "Gamma Spark", freq: 40.0, mode: "gamma", note: "High-energy gamma.", details: "40 Hz is the gold standard for Gamma entrainment. It is linked to 'binding' sensory information, memory recall, and moments of high-level insight or 'Eureka' moments." },
+        { name: "Gamma Peak", freq: 41.6, mode: "gamma", note: "Precise 41.6Hz gamma.", details: "41.6 Hz is a specific high-gamma frequency often used to energize the cortex and improve cognitive processing speed and synchronization." },
+        { name: "High Gamma Clarity", freq: 80.0, mode: "highgamma", note: "Very high gamma focus.", details: "80 Hz is an experimental high-gamma frequency. It is believed to stimulate heightened perception and consciousness, potentially aiding in advanced meditation." },
+        { name: "Epsilon Stillness", freq: 0.2, mode: "subdelta", note: "Suspended state.", details: "0.2 Hz is in the Epsilon range. This extremely slow frequency is associated with states of suspended animation and extremely deep, void-like meditation." },
+        { name: "Focus Flow", freq: 12.0, mode: "beta", note: "SMR/Beta border.", details: "12 Hz is often used for mental stability and 'flow' states." },
+        { name: "Deep Restoration", freq: 1.5, mode: "sleep", note: "Healing delta.", details: "1.5 Hz is associated with pain relief and healing." },
+        { name: "Memory Boost", freq: 10.2, mode: "relax", note: "Alpha peak.", details: "10.2 Hz is sometimes cited for memory retention." },
+        { name: "Creativity Burst", freq: 7.83, mode: "theta", note: "Schumann resonance.", details: "7.83 Hz grounding and creativity." },
+        { name: "Alertness", freq: 18.0, mode: "beta", note: "High beta.", details: "18 Hz for high energy and alertness." },
+        { name: "Profound Relaxation", freq: 0.5, mode: "subdelta", note: "Deepest relaxation.", details: "0.5 Hz encourages profound relaxation and pain relief." },
+        { name: "Sleep Cycle Entry", freq: 1.5, mode: "sleep", note: "Transition to sleep.", details: "1.5 Hz helps in transitioning from wakefulness to sleep." },
+        { name: "Emotional Release", freq: 3.5, mode: "delta", note: "Releasing blockages.", details: "3.5 Hz is associated with emotional release and feeling of unity." },
+        { name: "Introspection", freq: 4.2, mode: "theta", note: "Inner journey.", details: "4.2 Hz promotes introspection and inner guidance." },
+        { name: "Visualization", freq: 5.8, mode: "theta", note: "Mental imagery.", details: "5.8 Hz is useful for visualization and problem solving." },
+        { name: "Pre-Sleep Calm", freq: 7.2, mode: "theta", note: "Calming down.", details: "7.2 Hz helps reduce anxiety and prepares the mind for sleep." },
+        { name: "Stress Relief", freq: 8.3, mode: "relax", note: "After-work reset.", details: "8.3 Hz is great for relieving stress and mental fog." },
+        { name: "Mental Stability", freq: 11.0, mode: "relax", note: "Stable mind.", details: "11 Hz promotes a relaxed yet focused state." },
+        { name: "Active Focus", freq: 13.5, mode: "beta", note: "Engaged work.", details: "13.5 Hz is good for active tasks and external focus." },
+        { name: "Calculation", freq: 17.0, mode: "beta", note: "Math & Logic.", details: "17 Hz enhances logical thinking and calculation abilities." },
+        { name: "Performance", freq: 23.0, mode: "beta", note: "High performance.", details: "23 Hz is associated with high cognitive functioning." },
+        { name: "High Level Processing", freq: 32.0, mode: "gamma", note: "Complex tasks.", details: "32 Hz supports high-level information processing." },
+        { name: "Perception Binding", freq: 42.0, mode: "gamma", note: "Sensory binding.", details: "42 Hz is linked to the binding of sensory inputs into a coherent perception." },
+        { name: "Hyper Gamma", freq: 100.0, mode: "highgamma", note: "Consciousness expansion.", details: "100 Hz is in the Hyper Gamma range, associated with higher consciousness." },
+        { name: "Lambda State", freq: 200.0, mode: "highgamma", note: "Tibetan monk state.", details: "200 Hz Lambda waves are associated with advanced meditation states." },
+      ];
+
+      const energyPresets = Array.from({ length: 60 }, (_, i) => {
+        const freq = 18 + i * 0.4;
+        const isGamma = freq >= 30;
+        return {
+          name: `Energy Boost ${i + 1}`,
+          freq: freq,
+          mode: isGamma ? "gamma" : "beta",
+          note: isGamma ? "Gamma range: Peak focus and cognitive energy." : "High Beta: Alertness and active concentration.",
+        };
+      });
+
+      const sleepPresets = Array.from({ length: 60 }, (_, i) => ({
+        name: `Sleep Mode ${i + 1}`,
+        freq: 1 + i * 0.1,
+        mode: "sleep",
+        note: "Slow delta support.",
+      }));
+
+      const subDeltaPresets = Array.from({ length: 12 }, (_, i) => ({
+        name: `Sub-Delta ${i + 1}`,
+        freq: 0.2 + i * 0.05,
+        mode: "subdelta",
+        note: "Ultra-low sub-delta.",
+      }));
+
+      const relaxPresets = Array.from({ length: 40 }, (_, i) => ({
+        name: `Relax Mode ${i + 1}`,
+        freq: 6 + i * 0.2,
+        mode: "relax",
+        note: "Soft alpha/theta blend.",
+      }));
+
+      const thetaPresets = Array.from({ length: 40 }, (_, i) => ({
+        name: `Theta Mode ${i + 1}`,
+        freq: 4 + i * 0.15,
+        mode: "theta",
+        note: "Theta dreamy focus.",
+      }));
+
+      const betaPresets = Array.from({ length: 50 }, (_, i) => ({
+        name: `Beta Mode ${i + 1}`,
+        freq: 12 + i * 0.35,
+        mode: "beta",
+        note: "Beta alertness and clarity.",
+      }));
+
+      const highHzPresets = Array.from({ length: 40 }, (_, i) => ({
+        name: `High Hertz ${i + 1}`,
+        freq: 60 + i * 3.5,
+        mode: i % 2 === 0 ? "gamma" : "highgamma",
+        note: "Ultra-high hertz stimulation.",
+      }));
+
+      const alphaPresets = Array.from({ length: 30 }, (_, i) => ({
+        name: `Alpha Mode ${i + 1}`,
+        freq: 8 + i * 0.15,
+        mode: "relax",
+        note: "Alpha calm and clarity.",
+      }));
+
+      const focusPresets = Array.from({ length: 40 }, (_, i) => ({
+        name: `Focus Mode ${i + 1}`,
+        freq: 14 + i * 0.25,
+        mode: "beta",
+        note: "Focused beta pacing.",
+      }));
+
+      const schumannPresets = [
+        { name: "Schumann Earth (7.83 Hz)", freq: 7.83, mode: "theta", note: "Earth's fundamental resonant frequency." },
+        { name: "Schumann Peak 2 (14.3 Hz)", freq: 14.3, mode: "beta", note: "Second harmonic of Schumann resonance." },
+        { name: "Schumann Peak 3 (20.8 Hz)", freq: 20.8, mode: "beta", note: "Third harmonic of Schumann resonance." },
+        { name: "Schumann Peak 4 (27.3 Hz)", freq: 27.3, mode: "gamma", note: "Fourth harmonic of Schumann resonance." },
+        { name: "Schumann Peak 5 (33.8 Hz)", freq: 33.8, mode: "gamma", note: "Fifth harmonic of Schumann resonance." },
+      ];
+
+      const creativePresets = [
+        { name: "Creative Bridge", freq: 7.5, mode: "theta", note: "Alpha/Theta border for visualization." },
+        { name: "Insight Spark", freq: 8.0, mode: "relax", note: "Low alpha for relaxed alertness." },
+        { name: "Flow State", freq: 10.5, mode: "relax", note: "High alpha for centering." },
+        { name: "Artist's Zone", freq: 9.5, mode: "relax", note: "Balanced alpha for creative work." },
+      ];
+
+      const learningPresets = [
+        { name: "Study Aid (Low Beta)", freq: 13.0, mode: "beta", note: "Relaxed focus for reading." },
+        { name: "Active Learning", freq: 15.0, mode: "beta", note: "Engagement and retention." },
+        { name: "Cognitive Boost", freq: 18.0, mode: "beta", note: "High engagement." },
+        { name: "Memory Lock", freq: 10.0, mode: "relax", note: "Alpha state for memory consolidation." },
+      ];
+
+      const astralPresets = [
+        { name: "Lucid Gateway", freq: 6.3, mode: "theta", note: "Theta range often linked to lucid dreaming." },
+        { name: "Astral Vibration", freq: 40.0, mode: "gamma", note: "Gamma synchrony for awareness in sleep." },
+        { name: "Projection Pulse", freq: 4.0, mode: "theta", note: "Border of sleep for projection." },
+        { name: "Deep Travel", freq: 3.0, mode: "delta", note: "Deep delta for out-of-body sensation." },
+      ];
+
+      const healingPresets = [
+        { name: "Cellular Regen", freq: 111, mode: "highgamma", note: "High frequency often associated with regeneration." },
+        { name: "Pain Relief", freq: 2.5, mode: "delta", note: "Endorphin release range." },
+        { name: "Stress Dissolve", freq: 0.9, mode: "subdelta", note: "Euphoric sub-delta." },
+      ];
+
+      const meditationPresets = [
+        { name: "Zen Focus", freq: 6.0, mode: "theta", note: "Steady theta for mindfulness." },
+        { name: "Deep Om", freq: 4.5, mode: "theta", note: "Resonant theta state." },
+        { name: "Kundalini Rise", freq: 5.5, mode: "theta", note: "Awakening theta frequency." },
+      ];
+
+      const presetsByEngine = {
+        binaural: [
+          ...basePresets,
+          ...schumannPresets,
+          ...creativePresets,
+          ...learningPresets,
+          ...meditationPresets,
+          ...astralPresets,
+          ...healingPresets,
+          ...energyPresets,
+          ...subDeltaPresets,
+          ...sleepPresets,
+          ...relaxPresets,
+          ...thetaPresets,
+          ...betaPresets,
+          ...alphaPresets,
+          ...focusPresets,
+          ...highHzPresets,
+        ],
+        monaural: [
+          ...basePresets,
+          ...schumannPresets,
+          ...creativePresets,
+          ...learningPresets,
+          ...meditationPresets,
+          ...healingPresets,
+          ...energyPresets,
+          ...sleepPresets,
+          ...relaxPresets,
+          ...thetaPresets,
+          ...betaPresets,
+          ...alphaPresets,
+          ...focusPresets,
+          ...Array.from({ length: 120 }, (_, i) => ({
+            name: `Monaural Power ${i + 1}`,
+            freq: 30 + i * 3.2,
+            mode: i % 2 === 0 ? "beta" : "gamma",
+            note: "Monaural high-frequency focus.",
+          })),
+        ],
+        isochronic: [
+          ...basePresets,
+          ...schumannPresets,
+          ...creativePresets,
+          ...learningPresets,
+          ...meditationPresets,
+          ...astralPresets,
+          ...sleepPresets,
+          ...thetaPresets,
+          ...alphaPresets,
+          ...betaPresets,
+          ...Array.from({ length: 140 }, (_, i) => ({
+            name: `Isochronic Pulse ${i + 1}`,
+            freq: 10 + i * 2.5,
+            mode: i % 3 === 0 ? "relax" : i % 3 === 1 ? "beta" : "gamma",
+            note: "Isochronic pulse sequence.",
+          })),
+        ],
+        test: [
+          { name: "Ear Check", freq: 8, mode: "relax", note: "Left/right balance test." },
+        ],
+      };
+      let presets = presetsByEngine.binaural;
+      let currentPreset = presets[0];
+
+      const setMode = (value) => {
+        mode = value;
+        modeRow.querySelectorAll(".mode-btn").forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.mode === value);
+        });
+
+        if (mode === "subdelta") {
+          stage.style.filter = "hue-rotate(-20deg)";
+          modeLabel.textContent = "Sub-Delta (Ultra Slow)";
+        } else if (mode === "sleep") {
+          stage.style.filter = "hue-rotate(0deg)";
+          modeLabel.textContent = "Sleep (Delta)";
+        } else if (mode === "theta") {
+          stage.style.filter = "hue-rotate(40deg)";
+          modeLabel.textContent = "Theta (Dream)";
+        } else if (mode === "relax") {
+          stage.style.filter = "hue-rotate(90deg)";
+          modeLabel.textContent = "Relax (Alpha)";
+        } else if (mode === "beta") {
+          stage.style.filter = "hue-rotate(160deg)";
+          modeLabel.textContent = "Beta Focus";
+        } else if (mode === "highgamma") {
+          stage.style.filter = "hue-rotate(260deg)";
+          modeLabel.textContent = "High Gamma";
+        } else {
+          stage.style.filter = "hue-rotate(210deg)";
+          modeLabel.textContent = "Gamma Focus";
+        }
+      };
+
+      const initViz = () => {
+        const ctx = vizCanvas.getContext("2d");
+        let width, height;
+        const resize = () => {
+          width = stage.clientWidth;
+          height = stage.clientHeight;
+          vizCanvas.width = width * window.devicePixelRatio;
+          vizCanvas.height = height * window.devicePixelRatio;
+          ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        };
+        resize();
+        window.addEventListener("resize", resize);
+
+        // Interactive state
+        let mouse = { x: -1000, y: -1000, active: false };
+        
+        stage.addEventListener("mousemove", (e) => {
+          const rect = stage.getBoundingClientRect();
+          mouse.x = e.clientX - rect.left;
+          mouse.y = e.clientY - rect.top;
+          mouse.active = true;
+        });
+        
+        stage.addEventListener("mouseleave", () => {
+          mouse.active = false;
+        });
+
+        stage.addEventListener("click", (e) => {
+          const rect = stage.getBoundingClientRect();
+          const cx = e.clientX - rect.left;
+          const cy = e.clientY - rect.top;
+          // Burst effect
+          vizParticles.forEach(p => {
+            const dx = p.x - cx;
+            const dy = p.y - cy;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist < 250) {
+              const force = (250 - dist) * 0.08;
+              const angle = Math.atan2(dy, dx);
+              p.vx += Math.cos(angle) * force;
+              p.vy += Math.sin(angle) * force;
+            }
+          });
+        });
+
+        vizParticles = Array.from({ length: 160 }, () => ({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 1.5,
+          vy: (Math.random() - 0.5) * 1.5,
+          r: 1.5 + Math.random() * 2.5,
+          hue: Math.random() * 40 + 200 // Blue/Purple range
+        }));
+
+        const draw = () => {
+          ctx.fillStyle = "rgba(8, 10, 18, 0.2)";
+          ctx.fillRect(0, 0, width, height);
+          
+          const intensity = Number(intensityLabel.textContent.replace("%", "")) / 100;
+          const analyserBoost = analyser && frequencyData
+            ? (analyser.getByteFrequencyData(frequencyData), frequencyData[8] / 255)
+            : 0.0;
+          
+          // Draw connections first (behind particles)
+          ctx.lineWidth = 0.5;
+          for (let i = 0; i < vizParticles.length; i++) {
+            const p1 = vizParticles[i];
+            for (let j = i + 1; j < vizParticles.length; j++) {
+              const p2 = vizParticles[j];
+              const dx = p1.x - p2.x;
+              const dy = p1.y - p2.y;
+              const distSq = dx*dx + dy*dy;
+              if (distSq < 6400) { // dist < 80
+                const alpha = (1 - Math.sqrt(distSq) / 80) * 0.3;
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(125, 211, 252, ${alpha})`;
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.stroke();
+              }
+            }
+          }
+
+          vizParticles.forEach((p) => {
+            // Mouse repulsion
+            if (mouse.active) {
+              const dx = p.x - mouse.x;
+              const dy = p.y - mouse.y;
+              const dist = Math.sqrt(dx*dx + dy*dy);
+              if (dist < 150) {
+                const force = (150 - dist) * 0.0005;
+                p.vx += dx * force;
+                p.vy += dy * force;
+              }
+            }
+
+            // Physics
+            p.x += p.vx * (1 + intensity * 0.5 + analyserBoost);
+            p.y += p.vy * (1 + intensity * 0.5 + analyserBoost);
+            
+            // Damping
+            p.vx *= 0.99;
+            p.vy *= 0.99;
+            
+            // Minimum movement
+            if (Math.abs(p.vx) < 0.2) p.vx += (Math.random() - 0.5) * 0.05;
+            if (Math.abs(p.vy) < 0.2) p.vy += (Math.random() - 0.5) * 0.05;
+
+            // Bounds
+            if (p.x < 0 || p.x > width) { p.vx *= -1; p.x = Math.max(0, Math.min(width, p.x)); }
+            if (p.y < 0 || p.y > height) { p.vy *= -1; p.y = Math.max(0, Math.min(height, p.y)); }
+
+            // Draw particle
+            ctx.beginPath();
+            const hue = (p.hue + analyserBoost * 50) % 360;
+            ctx.fillStyle = `hsla(${hue}, 80%, 60%, ${0.7 + analyserBoost * 0.3})`;
+            ctx.shadowColor = `hsla(${hue}, 80%, 60%, 0.8)`;
+            ctx.shadowBlur = (p.r * 2) + (analyserBoost * 10);
+            ctx.arc(p.x, p.y, p.r * (1 + analyserBoost * 0.5), 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+          });
+          requestAnimationFrame(draw);
+        };
+        draw();
+      };
+
+      modeRow.addEventListener("click", (event) => {
+        const btn = event.target.closest(".mode-btn");
+        if (!btn) return;
+        setMode(btn.dataset.mode);
+      });
+
+      const renderPresets = () => {
+        try {
+          presetSelect.innerHTML = "";
+          const fragment = document.createDocumentFragment();
+          presets.forEach((preset, index) => {
+            const opt = document.createElement("option");
+            opt.value = String(index);
+            opt.textContent = `${preset.name} • ${preset.freq.toFixed(1)} Hz`;
+            fragment.appendChild(opt);
+          });
+          presetSelect.appendChild(fragment);
+          if (!presets.length) {
+            presetInfo.innerHTML = "<div class=\"preset-card\"><strong>No presets loaded</strong><span>Preset list is empty.</span></div>";
+            return;
+          }
+          presetSelect.value = "0";
+          updatePresetInfo(presets[0]);
+        } catch (err) {
+          presetInfo.innerHTML = `<div class="preset-card"><strong>Preset Error</strong><span>${err.message}</span></div>`;
+        }
+      };
+
+      const buildPresetArticle = (preset) => {
+        const band = preset.mode.toUpperCase();
+        const beat = preset.freq.toFixed(1);
+        return `
+          <strong>${preset.name}</strong>
+          <span>${preset.note}</span>
+          <span>Band: ${band}</span>
+          <span>Beat Frequency: ${beat} Hz</span>
+          <span>Suggested intent: ${band} support with ${beat} Hz entrainment.</span>
+          <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.1);">
+            <strong>Why this frequency?</strong>
+            <p style="margin-top:4px; font-size:0.95rem; line-height:1.5; color:var(--text);">${preset.details || "Promotes a state of " + band.toLowerCase() + " activity."}</p>
+          </div>
+        `;
+      };
+
+      const updatePresetInfo = (preset) => {
+        currentPreset = preset;
+        presetInfo.innerHTML = `
+          <div class="preset-card"><strong>${preset.name}</strong><span>${preset.note}</span></div>
+          <div class="preset-card"><strong>Beat Frequency</strong><span>${preset.freq.toFixed(1)} Hz</span></div>
+          <div class="preset-card"><strong>Mode</strong><span>${preset.mode}</span></div>
+        `;
+        presetArticle.innerHTML = buildPresetArticle(preset);
+        setMode(preset.mode);
+        leftBase = Number(leftFrequency.value || 200);
+        rightBase = leftBase + preset.freq;
+        leftFrequency.value = leftBase.toFixed(1);
+        rightFrequency.value = rightBase.toFixed(1);
+        updateBeatLabel();
+        if (audioCtx) {
+          applyBeatFrequency(preset.freq);
+          if (running && audioCtx.state === "suspended") {
+            audioCtx.resume();
+          }
+          if (running) applyToneType(toneType.value);
+        }
+      };
+
+      presetSelect.addEventListener("change", () => {
+        const preset = presets[Number(presetSelect.value)];
+        updatePresetInfo(preset);
+      });
+
+      const ensureAudio = () => {
+        if (audioCtx) return;
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        leftOsc = audioCtx.createOscillator();
+        rightOsc = audioCtx.createOscillator();
+        leftOsc2 = audioCtx.createOscillator();
+        rightOsc2 = audioCtx.createOscillator();
+        masterGain = audioCtx.createGain();
+        binauralGain = audioCtx.createGain();
+        monoGain = audioCtx.createGain();
+        isoGain = audioCtx.createGain();
+        harmonicGainL = audioCtx.createGain();
+        harmonicGainR = audioCtx.createGain();
+        testGain = audioCtx.createGain();
+        merger = audioCtx.createChannelMerger(2);
+        
+        const wave = carrierWaveform.value;
+        leftOsc.type = wave;
+        rightOsc.type = wave;
+        leftOsc2.type = wave;
+        rightOsc2.type = wave;
+
+        leftOsc.frequency.value = leftBase;
+        rightOsc.frequency.value = rightBase;
+        leftOsc2.frequency.value = leftBase * 2;
+        rightOsc2.frequency.value = rightBase * 2;
+
+        masterGain.gain.value = 0.8;
+        binauralGain.gain.value = 0.03;
+        monoGain.gain.value = 0.0;
+        isoGain.gain.value = 0.0;
+        testGain.gain.value = 0.0;
+        const hGain = harmonicToggle.checked ? 0.015 : 0.0;
+        harmonicGainL.gain.value = hGain;
+        harmonicGainR.gain.value = hGain;
+
+        leftOsc.connect(merger, 0, 0);
+        rightOsc.connect(merger, 0, 1);
+        leftOsc2.connect(harmonicGainL).connect(merger, 0, 0);
+        rightOsc2.connect(harmonicGainR).connect(merger, 0, 1);
+
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        frequencyData = new Uint8Array(analyser.frequencyBinCount);
+        timeData = new Uint8Array(analyser.frequencyBinCount);
+        masterGain.connect(analyser).connect(audioCtx.destination);
+        merger.connect(binauralGain).connect(masterGain);
+        leftOsc.start();
+        rightOsc.start();
+        leftOsc2.start();
+        rightOsc2.start();
+
+        monoOsc = audioCtx.createOscillator();
+        monoOsc.type = "sine";
+        monoOsc.frequency.value = (leftBase + rightBase) / 2;
+        monoOsc.connect(monoGain).connect(masterGain);
+        monoOsc.start();
+
+        isoOsc = audioCtx.createOscillator();
+        isoOsc.type = "sine";
+        isoOsc.frequency.value = (leftBase + rightBase) / 2;
+        isoOsc.start();
+        isoGate = audioCtx.createGain();
+        isoGate.gain.value = 0.0;
+        isoOsc.connect(isoGate).connect(isoGain).connect(masterGain);
+
+        isoLfo = audioCtx.createOscillator();
+        isoLfo.type = pulseShape.value === "sine" ? "sine" : "square";
+        isoLfo.frequency.value = Math.max(0.2, Math.abs(rightBase - leftBase));
+        isoLfoGain = audioCtx.createGain();
+        isoLfoGain.gain.value = 0.5;
+        isoBias = audioCtx.createConstantSource();
+        isoBias.offset.value = 0.5;
+        isoLfo.connect(isoLfoGain).connect(isoGate.gain);
+        isoBias.connect(isoGate.gain);
+        isoLfo.start();
+        isoBias.start();
+
+        earTestOsc = audioCtx.createOscillator();
+        earTestOsc.type = "sine";
+        earTestOsc.frequency.value = 440;
+        earTestPanner = audioCtx.createStereoPanner();
+        earTestPanner.pan.value = -1;
+        earTestOsc.connect(earTestPanner).connect(testGain).connect(masterGain);
+        earTestOsc.start();
+
+        // Dynamic ambient layer (noise + filter + LFO)
+        const bufferSize = audioCtx.sampleRate * 2;
+        const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i += 1) {
+          data[i] = (Math.random() * 2 - 1) * 0.6;
+        }
+        noiseSource = audioCtx.createBufferSource();
+        noiseSource.buffer = noiseBuffer;
+        noiseSource.loop = true;
+        noiseFilter = audioCtx.createBiquadFilter();
+        noiseFilter.type = "lowpass";
+        noiseFilter.frequency.value = 600;
+        noiseGain = audioCtx.createGain();
+        noiseGain.gain.value = 0.02;
+        noiseSource.connect(noiseFilter).connect(noiseGain).connect(masterGain);
+        noiseSource.start();
+
+        filterLfo = audioCtx.createOscillator();
+        filterLfo.type = "sine";
+        filterLfo.frequency.value = 0.08;
+        filterLfoGain = audioCtx.createGain();
+        filterLfoGain.gain.value = 220;
+        filterLfo.connect(filterLfoGain).connect(noiseFilter.frequency);
+        filterLfo.start();
+
+        breathLfo = audioCtx.createOscillator();
+        breathLfo.type = "sine";
+        breathLfo.frequency.value = 1 / Number(breath.value || 8);
+        breathGain = audioCtx.createGain();
+        breathGain.gain.value = 0.015;
+        breathLfo.connect(breathGain).connect(noiseGain.gain);
+        breathLfo.start();
+
+        // Wobble LFO
+        wobbleLfo = audioCtx.createOscillator();
+        wobbleLfo.type = "sine";
+        wobbleLfo.frequency.value = 0.1; // Slow drift
+        wobbleGain = audioCtx.createGain();
+        wobbleGain.gain.value = wobbleToggle.checked ? 2.0 : 0.0; // +/- 2Hz drift
+        wobbleLfo.connect(wobbleGain);
+        wobbleGain.connect(leftOsc.frequency);
+        wobbleGain.connect(rightOsc.frequency);
+        wobbleLfo.start();
+
+        // Noise Pulse (Entrainment)
+        noisePulseGain = audioCtx.createGain();
+        noisePulseGain.gain.value = noisePulseToggle.checked ? 0.5 : 0.0;
+        isoLfo.connect(noisePulseGain).connect(noiseGain.gain);
+
+        updateBeatLabel();
+        applyBeatFrequency(Math.abs(rightBase - leftBase));
+      };
+
+      const updateBeatLabel = () => {
+        const beat = Math.abs(rightBase - leftBase);
+        beatLabel.textContent = `Perceived beat: ${beat.toFixed(1)} Hz`;
+      };
+
+      const applyBeatFrequency = (hz) => {
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        const base = leftBase;
+        rightBase = leftBase + hz;
+        rightFrequency.value = rightBase.toFixed(1);
+        updateBeatLabel();
+        if (leftOsc && rightOsc) {
+          leftOsc.frequency.setValueAtTime(base, now);
+          rightOsc.frequency.setValueAtTime(rightBase, now);
+        }
+        if (leftOsc2 && rightOsc2) {
+          leftOsc2.frequency.setValueAtTime(base * 2, now);
+          rightOsc2.frequency.setValueAtTime(rightBase * 2, now);
+        }
+        if (monoOsc) {
+          monoOsc.frequency.setValueAtTime((leftBase + rightBase) / 2, now);
+        }
+        if (isoOsc) {
+          isoOsc.frequency.setValueAtTime((leftBase + rightBase) / 2, now);
+        }
+        if (isoLfo) {
+          isoLfo.frequency.setValueAtTime(Math.max(0.2, hz), now);
+        }
+      };
+
+      const applyManualBases = () => {
+        leftBase = Math.min(1000, Math.max(20, Number(leftFrequency.value || 200)));
+        rightBase = Math.min(1000, Math.max(20, Number(rightFrequency.value || 208)));
+        leftFrequency.value = leftBase.toFixed(1);
+        rightFrequency.value = rightBase.toFixed(1);
+        updateBeatLabel();
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        if (leftOsc && rightOsc) {
+          leftOsc.frequency.setValueAtTime(leftBase, now);
+          rightOsc.frequency.setValueAtTime(rightBase, now);
+        }
+        if (leftOsc2 && rightOsc2) {
+          leftOsc2.frequency.setValueAtTime(leftBase * 2, now);
+          rightOsc2.frequency.setValueAtTime(rightBase * 2, now);
+        }
+        if (monoOsc) {
+          monoOsc.frequency.setValueAtTime((leftBase + rightBase) / 2, now);
+        }
+        if (isoOsc) {
+          isoOsc.frequency.setValueAtTime((leftBase + rightBase) / 2, now);
+        }
+        if (isoLfo) {
+          isoLfo.frequency.setValueAtTime(Math.max(0.2, Math.abs(rightBase - leftBase)), now);
+        }
+      };
+
+      const applyToneType = (type) => {
+        if (!audioCtx) return;
+        const on = 0.03;
+        const off = 0.0;
+        binauralGain.gain.value = off;
+        monoGain.gain.value = off;
+        isoGain.gain.value = off;
+        testGain.gain.value = off;
+
+        if (type === "binaural") {
+          binauralGain.gain.value = on;
+          isoGate.gain.value = off;
+        } else if (type === "monaural") {
+          monoGain.gain.value = on;
+          isoGate.gain.value = off;
+        } else if (type === "isochronic") {
+          isoGain.gain.value = on;
+          isoGate.gain.value = on;
+        } else if (type === "test") {
+          testGain.gain.value = on;
+          isoGate.gain.value = off;
+          const now = audioCtx.currentTime;
+          earTestPanner.pan.cancelScheduledValues(now);
+          earTestPanner.pan.setValueAtTime(-1, now);
+          earTestPanner.pan.linearRampToValueAtTime(1, now + 3);
+        }
+      };
+
+      const runSequence = (steps) => {
+        ensureAudio();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const now = audioCtx.currentTime;
+        let cursor = now;
+        steps.forEach((step) => {
+          const targetHz = step.hz;
+          const duration = step.seconds;
+          if (rightOsc) {
+            rightOsc.frequency.cancelScheduledValues(cursor);
+            rightOsc.frequency.setValueAtTime(rightOsc.frequency.value, cursor);
+            rightOsc.frequency.linearRampToValueAtTime(leftBase + targetHz, cursor + duration);
+            leftOsc.frequency.setValueAtTime(leftBase, cursor);
+          }
+          if (rightOsc2) {
+            rightOsc2.frequency.cancelScheduledValues(cursor);
+            rightOsc2.frequency.setValueAtTime(rightOsc2.frequency.value, cursor);
+            rightOsc2.frequency.linearRampToValueAtTime((leftBase + targetHz) * 2, cursor + duration);
+          }
+          if (monoOsc) {
+            monoOsc.frequency.cancelScheduledValues(cursor);
+            monoOsc.frequency.setValueAtTime(monoOsc.frequency.value, cursor);
+            monoOsc.frequency.linearRampToValueAtTime(leftBase + targetHz, cursor + duration);
+          }
+          if (isoOsc) {
+            isoOsc.frequency.cancelScheduledValues(cursor);
+            isoOsc.frequency.setValueAtTime(isoOsc.frequency.value, cursor);
+            isoOsc.frequency.linearRampToValueAtTime(leftBase + targetHz, cursor + duration);
+          }
+          if (isoLfo) {
+            isoLfo.frequency.setValueAtTime(Math.max(0.2, targetHz), cursor);
+          }
+          setTimeout(() => setMode(step.mode), (cursor - now) * 1000 + 30);
+          cursor += duration;
+        });
+      };
+
+      const glideTo = (targetHz, seconds, targetMode) => {
+        ensureAudio();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const now = audioCtx.currentTime;
+        if (leftOsc && rightOsc) {
+          rightOsc.frequency.cancelScheduledValues(now);
+          rightOsc.frequency.setValueAtTime(rightOsc.frequency.value, now);
+          rightOsc.frequency.linearRampToValueAtTime(leftBase + targetHz, now + seconds);
+          leftOsc.frequency.setValueAtTime(leftBase, now);
+        }
+        if (leftOsc2 && rightOsc2) {
+          rightOsc2.frequency.cancelScheduledValues(now);
+          rightOsc2.frequency.setValueAtTime(rightOsc2.frequency.value, now);
+          rightOsc2.frequency.linearRampToValueAtTime((leftBase + targetHz) * 2, now + seconds);
+        }
+        if (monoOsc) {
+          monoOsc.frequency.cancelScheduledValues(now);
+          monoOsc.frequency.setValueAtTime(monoOsc.frequency.value, now);
+          monoOsc.frequency.linearRampToValueAtTime(leftBase + targetHz, now + seconds);
+        }
+        if (isoOsc) {
+          isoOsc.frequency.cancelScheduledValues(now);
+          isoOsc.frequency.setValueAtTime(isoOsc.frequency.value, now);
+          isoOsc.frequency.linearRampToValueAtTime(leftBase + targetHz, now + seconds);
+        }
+        setMode(targetMode);
+      };
+
+
+      const updateTimerDisplay = () => {
+        const m = Math.floor(sessionTimeLeft / 60);
+        const s = sessionTimeLeft % 60;
+        timerDisplay.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+      };
+
+      const stopSession = () => {
+        running = false;
+        stage.style.animationPlayState = "paused";
+        breathPacer.style.opacity = "0";
+        breathPacer.style.animation = "none";
+        if (audioCtx && audioCtx.state === "running") audioCtx.suspend();
+        if (sessionTimer) {
+          clearInterval(sessionTimer);
+          sessionTimer = null;
+        }
+        timerDisplay.style.display = "none";
+        startBtn.textContent = "Start Session";
+        startBtn.classList.remove("btn-ghost");
+      };
+
+      const startSessionTimer = () => {
+        if (sessionTimer) clearInterval(sessionTimer);
+        const duration = Number(sessionDuration.value);
+        if (duration > 0) {
+          sessionTimeLeft = duration * 60;
+          timerDisplay.style.display = "block";
+          updateTimerDisplay();
+          sessionTimer = setInterval(() => {
+            sessionTimeLeft--;
+            updateTimerDisplay();
+            if (sessionTimeLeft <= 0) {
+              stopSession();
+            }
+          }, 1000);
+        } else {
+          timerDisplay.style.display = "none";
+        }
+      };
+
+      intensity.addEventListener("input", () => {
+        intensityLabel.textContent = `${intensity.value}%`;
+        stage.style.opacity = `${0.6 + intensity.value / 200}`;
+        if (masterGain) masterGain.gain.value = 0.5 + intensity.value / 200;
+        if (noiseGain) noiseGain.gain.value = 0.012 + intensity.value / 5000;
+        if (filterLfoGain) filterLfoGain.gain.value = 120 + intensity.value * 2;
+      });
+
+      const updateBreathAnimation = () => {
+        const sec = Number(breath.value);
+        breathLabel.textContent = `${sec}s inhale/exhale`;
+        stage.style.animationDuration = `${sec * 1.2}s`;
+        if (breathLfo) breathLfo.frequency.value = 1 / sec;
+        
+        // Update visual pacer
+        breathPacer.style.animation = running ? `wavePulse ${sec}s ease-in-out infinite` : "none";
+      };
+
+      breath.addEventListener("input", () => {
+        updateBreathAnimation();
+      });
+
+      toneType.addEventListener("change", () => {
+        ensureAudio();
+        applyToneType(toneType.value);
+        presets = presetsByEngine[toneType.value] || presetsByEngine.binaural;
+        renderPresets();
+      });
+
+      carrierWaveform.addEventListener("change", () => {
+        if (leftOsc) leftOsc.type = carrierWaveform.value;
+        if (rightOsc) rightOsc.type = carrierWaveform.value;
+        if (leftOsc2) leftOsc2.type = carrierWaveform.value;
+        if (rightOsc2) rightOsc2.type = carrierWaveform.value;
+      });
+
+      pulseShape.addEventListener("change", () => {
+        if (isoLfo) isoLfo.type = pulseShape.value === "sine" ? "sine" : "square";
+      });
+
+      harmonicToggle.addEventListener("change", () => {
+        if (harmonicGainL && harmonicGainR) {
+          const now = audioCtx.currentTime;
+          const val = harmonicToggle.checked ? 0.015 : 0.0;
+          harmonicGainL.gain.linearRampToValueAtTime(val, now + 0.5);
+          harmonicGainR.gain.linearRampToValueAtTime(val, now + 0.5);
+        }
+      });
+
+      wobbleToggle.addEventListener("change", () => {
+        if (wobbleGain) {
+          const now = audioCtx.currentTime;
+          wobbleGain.gain.linearRampToValueAtTime(wobbleToggle.checked ? 2.0 : 0.0, now + 1.0);
+        }
+      });
+
+      noisePulseToggle.addEventListener("change", () => {
+        if (noisePulseGain) {
+          noisePulseGain.gain.value = noisePulseToggle.checked ? 0.5 : 0.0;
+        }
+      });
+
+      const updateCalculator = () => {
+        const beat = Math.abs(Number(calcBeat.value) || 0);
+        const carrier = Number(calcCarrier.value) || 200;
+        const left = carrier - beat / 2;
+        const right = carrier + beat / 2;
+        if (calcLeftDisp) calcLeftDisp.textContent = `${left.toFixed(1)} Hz`;
+        if (calcRightDisp) calcRightDisp.textContent = `${right.toFixed(1)} Hz`;
+      };
+
+      if (calcBeat && calcCarrier) {
+        calcBeat.addEventListener("input", updateCalculator);
+        calcCarrier.addEventListener("input", updateCalculator);
+        updateCalculator();
+      }
+
+      calcSuggest.addEventListener("click", () => {
+        const beat = Math.abs(Number(calcBeat.value) || 0);
+        let carrier = 200;
+        if (beat < 4) carrier = 100;
+        else if (beat < 8) carrier = 144;
+        else if (beat < 13) carrier = 200;
+        else if (beat < 30) carrier = 250;
+        else carrier = 400;
+        calcCarrier.value = carrier;
+        updateCalculator();
+      });
+
+      calcApply.addEventListener("click", () => {
+        const beat = Math.abs(Number(calcBeat.value) || 0);
+        const carrier = Number(calcCarrier.value) || 200;
+        const left = carrier - beat / 2;
+        const right = carrier + beat / 2;
+        customLeft.value = left.toFixed(1);
+        customRight.value = right.toFixed(1);
+        customTone.value = carrier;
+        customLeft.parentElement.parentElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+
+      presetRead.addEventListener("click", () => {
+        const isOpen = presetArticle.style.display === "block";
+        presetArticle.style.display = isOpen ? "none" : "block";
+      });
+
+      const initSoundGrid = () => {
+        soundGrid.innerHTML = "";
+        const tiles = [
+          { name: "Balanced Noise", type: "white", low: 6, high: 70 },
+          { name: "Dark Noise", type: "brown", low: 2, high: 30 },
+          { name: "Bright Noise", type: "blue", low: 30, high: 200 },
+          { name: "Ocean", type: "pink", low: 2, high: 50, lfo: 0.08 },
+          { name: "Rain", type: "white", low: 500, high: 3000, lfo: 0.6 },
+          { name: "Stream", type: "pink", low: 120, high: 1000, lfo: 0.2 },
+          { name: "Night", type: "brown", low: 1, high: 25, lfo: 0.04 },
+          { name: "Fire", type: "white", low: 80, high: 1200, lfo: 1.2 },
+          { name: "Babble", type: "pink", low: 200, high: 800, lfo: 0.35 },
+          { name: "Steam", type: "white", low: 300, high: 1400, lfo: 0.45 },
+          { name: "Airplane", type: "brown", low: 20, high: 120, lfo: 0.1 },
+          { name: "Boat", type: "brown", low: 10, high: 90, lfo: 0.12 },
+          { name: "Bus", type: "brown", low: 40, high: 180, lfo: 0.18 },
+          { name: "Train", type: "brown", low: 30, high: 160, lfo: 0.22 },
+          { name: "Rain Roof", type: "white", low: 600, high: 3500, lfo: 0.7 },
+          { name: "Quiet Night", type: "pink", low: 1, high: 15, lfo: 0.03 },
+          { name: "Wind", type: "white", low: 80, high: 400, lfo: 0.12 },
+          { name: "Forest", type: "pink", low: 40, high: 500, lfo: 0.15 },
+          { name: "Cafe", type: "pink", low: 200, high: 1200, lfo: 0.2 },
+          { name: "Library", type: "brown", low: 5, high: 40, lfo: 0.05 },
+          { name: "Thunder", type: "brown", low: 5, high: 80, lfo: 0.08 },
+          { name: "Snow", type: "white", low: 300, high: 2000, lfo: 0.5 },
+          { name: "Space", type: "blue", low: 10, high: 120, lfo: 0.06 },
+          { name: "Vent", type: "white", low: 150, high: 700, lfo: 0.25 },
+          { name: "Neon", type: "blue", low: 200, high: 1200, lfo: 0.3 },
+          { name: "Temple", type: "pink", low: 60, high: 300, lfo: 0.1 },
+          { name: "Harbor", type: "pink", low: 30, high: 200, lfo: 0.15 },
+          { name: "City", type: "brown", low: 80, high: 400, lfo: 0.2 },
+          { name: "Hearth", type: "brown", low: 50, high: 500, lfo: 0.3 },
+          { name: "Pink Noise", type: "pink", low: 6, high: 100 },
+          { name: "Blue Noise", type: "blue", low: 60, high: 600 },
+          { name: "Violet Noise", type: "violet", low: 120, high: 1200 },
+        ];
+
+        tiles.forEach((tile) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "sound-tile";
+          btn.textContent = tile.name;
+          btn.addEventListener("click", () => {
+            ensureAudio();
+            if (audioCtx && audioCtx.state === "suspended") {
+              audioCtx.resume();
+            }
+            setAmbientProfile(tile);
+            soundGrid.querySelectorAll(".sound-tile").forEach((t) => t.classList.remove("active"));
+            btn.classList.add("active");
+          });
+          soundGrid.appendChild(btn);
+        });
+      };
+
+      leftFrequency.addEventListener("input", () => {
+        applyManualBases();
+      });
+
+      rightFrequency.addEventListener("input", () => {
+        applyManualBases();
+      });
+
+      soundCancel.addEventListener("click", () => {
+        soundDepth = 0;
+        soundGrid.querySelectorAll(".sound-tile").forEach((t) => t.classList.remove("active"));
+        if (noiseGain) noiseGain.gain.value = 0.02;
+        if (filterLfoGain) filterLfoGain.gain.value = 220;
+        if (filterLfo) filterLfo.frequency.value = 0.08;
+      });
+
+      soundStop.addEventListener("click", () => {
+        if (ambientSource) {
+          ambientSource.stop();
+          ambientSource.disconnect();
+          ambientSource = null;
+        }
+      });
+
+      startBtn.addEventListener("click", () => {
+        running = true;
+        stage.style.animationPlayState = "running";
+        breathPacer.style.opacity = "1";
+        updateBreathAnimation();
+        ensureAudio();
+        if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+        if (currentPreset) {
+          applyBeatFrequency(currentPreset.freq);
+        }
+        applyToneType(toneType.value);
+        startSessionTimer();
+        startBtn.textContent = "Running...";
+        startBtn.classList.add("btn-ghost");
+      });
+
+      zenToggle.addEventListener("click", () => {
+        document.body.classList.add("zen-mode");
+        window.dispatchEvent(new Event('resize'));
+      });
+
+      zenExit.addEventListener("click", () => {
+        document.body.classList.remove("zen-mode");
+        window.dispatchEvent(new Event('resize'));
+      });
+
+      pauseBtn.addEventListener("click", () => {
+        stopSession();
+      });
+
+      ascendBtn.addEventListener("click", () => {
+        glideTo(120, 18, "gamma");
+      });
+
+      descendBtn.addEventListener("click", () => {
+        glideTo(2.5, 18, "sleep");
+      });
+
+      breathingBtn.addEventListener("click", () => {
+        runSequence([
+          { hz: 6.0, seconds: 6, mode: "theta" },
+          { hz: 8.5, seconds: 6, mode: "relax" },
+          { hz: 6.0, seconds: 6, mode: "theta" },
+        ]);
+      });
+
+      sleepDriftsBtn.addEventListener("click", () => {
+        runSequence([
+          { hz: 3.5, seconds: 8, mode: "sleep" },
+          { hz: 2.0, seconds: 10, mode: "sleep" },
+          { hz: 0.8, seconds: 10, mode: "subdelta" },
+        ]);
+      });
+
+      calmDescentsBtn.addEventListener("click", () => {
+        runSequence([
+          { hz: 10.0, seconds: 6, mode: "relax" },
+          { hz: 7.0, seconds: 8, mode: "theta" },
+          { hz: 3.0, seconds: 10, mode: "sleep" },
+        ]);
+      });
+
+      wakeAscendBtn.addEventListener("click", () => {
+        runSequence([
+          { hz: 2.5, seconds: 6, mode: "sleep" },
+          { hz: 8.0, seconds: 6, mode: "relax" },
+          { hz: 16.0, seconds: 8, mode: "beta" },
+        ]);
+      });
+
+      focusGlideBtn.addEventListener("click", () => {
+        runSequence([
+          { hz: 8.5, seconds: 6, mode: "relax" },
+          { hz: 14.0, seconds: 8, mode: "beta" },
+          { hz: 26.0, seconds: 8, mode: "gamma" },
+        ]);
+      });
+
+      powerNapBtn.addEventListener("click", () => {
+        runSequence([
+          { hz: 4.0, seconds: 6, mode: "theta" },
+          { hz: 2.2, seconds: 8, mode: "sleep" },
+          { hz: 6.0, seconds: 6, mode: "theta" },
+        ]);
+      });
+
+      setMode("sleep");
+      initViz();
+      updateBeatLabel();
+      initSoundGrid();
+      renderPresets();
+
+      const drawWave = () => {
+        const ctx = waveCanvas.getContext("2d");
+        ctx.clearRect(0, 0, waveCanvas.width, waveCanvas.height);
+        ctx.fillStyle = "rgba(8, 12, 22, 0.8)";
+        ctx.fillRect(0, 0, waveCanvas.width, waveCanvas.height);
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.8)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        if (analyser && timeData) {
+          analyser.getByteTimeDomainData(timeData);
+          const slice = waveCanvas.width / timeData.length;
+          let x = 0;
+          timeData.forEach((v, i) => {
+            const y = (v / 255) * waveCanvas.height;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+            x += slice;
+          });
+        } else {
+          ctx.moveTo(0, waveCanvas.height / 2);
+          ctx.lineTo(waveCanvas.width, waveCanvas.height / 2);
+        }
+        ctx.stroke();
+        requestAnimationFrame(drawWave);
+      };
+      drawWave();
+
+      const createNoiseBuffer = (type, duration = 6) => {
+        if (!audioCtx) return null;
+        const length = audioCtx.sampleRate * duration;
+        const buffer = audioCtx.createBuffer(2, length, audioCtx.sampleRate);
+        const left = buffer.getChannelData(0);
+        const right = buffer.getChannelData(1);
+        let lastOutL = 0;
+        let lastOutR = 0;
+        let lastOut2L = 0;
+        let lastOut2R = 0;
+        // Voss-like smoother for pink/brown feel
+        let pinkL = 0;
+        let pinkR = 0;
+        for (let i = 0; i < length; i += 1) {
+          const whiteL = Math.random() * 2 - 1;
+          const whiteR = Math.random() * 2 - 1;
+          if (type === "pink") {
+            pinkL = 0.98 * pinkL + 0.02 * whiteL;
+            pinkR = 0.98 * pinkR + 0.02 * whiteR;
+            left[i] = pinkL;
+            right[i] = pinkR;
+          } else if (type === "brown") {
+            lastOutL = (lastOutL + 0.02 * whiteL) / 1.02;
+            lastOutR = (lastOutR + 0.02 * whiteR) / 1.02;
+            left[i] = lastOutL * 3.5;
+            right[i] = lastOutR * 3.5;
+          } else if (type === "blue") {
+            left[i] = whiteL - lastOutL;
+            right[i] = whiteR - lastOutR;
+            lastOutL = whiteL;
+            lastOutR = whiteR;
+          } else if (type === "violet") {
+            left[i] = whiteL - lastOut2L;
+            right[i] = whiteR - lastOut2R;
+            lastOut2L = whiteL;
+            lastOut2R = whiteR;
+          } else {
+            left[i] = whiteL;
+            right[i] = whiteR;
+          }
+        }
+        return buffer;
+      };
+
+      const setAmbientProfile = (profile) => {
+        ambientType = profile.type;
+        if (!audioCtx) return;
+        if (ambientSource) {
+          ambientSource.stop();
+          ambientSource.disconnect();
+        }
+        ambientSource = audioCtx.createBufferSource();
+        ambientSource.buffer = createNoiseBuffer(profile.type, 3);
+        ambientSource.loop = true;
+        const lowpass = audioCtx.createBiquadFilter();
+        const highpass = audioCtx.createBiquadFilter();
+        lowpass.type = "lowpass";
+        highpass.type = "highpass";
+        const low = profile.low || 6;
+        const high = profile.high || 70;
+        const center = Math.max(1, (low + high) / 2);
+        lowpass.frequency.value = high;
+        highpass.frequency.value = low;
+        ambientFilter = lowpass;
+        ambientHighpass = highpass;
+        ambientGain = audioCtx.createGain();
+        const intensity = Number(noiseIntensity.value) / 100;
+        ambientGain.gain.value = 0.015 + intensity * 0.08;
+
+        ambientLfo = audioCtx.createOscillator();
+        ambientLfo.type = "sine";
+        ambientLfo.frequency.value = profile.lfo || 0.1;
+        ambientLfoGain = audioCtx.createGain();
+        ambientLfoGain.gain.value = Math.max(20, center * 0.15);
+        ambientLfo.connect(ambientLfoGain).connect(lowpass.frequency);
+        ambientLfo.start();
+
+        if (hifiEnabled) {
+          if (!stereoDelayL) {
+            stereoDelayL = audioCtx.createDelay(0.05);
+            stereoDelayR = audioCtx.createDelay(0.05);
+            stereoDelayL.delayTime.value = 0.012;
+            stereoDelayR.delayTime.value = 0.018;
+            stereoGainL = audioCtx.createGain();
+            stereoGainR = audioCtx.createGain();
+            stereoGainL.gain.value = 0.7;
+            stereoGainR.gain.value = 0.7;
+            convolver = audioCtx.createConvolver();
+            convolver.buffer = createImpulseResponse(2.2, 2.5);
+          }
+          const splitter = audioCtx.createChannelSplitter(2);
+          const merger2 = audioCtx.createChannelMerger(2);
+          ambientSource.connect(highpass).connect(lowpass).connect(ambientGain).connect(splitter);
+          splitter.connect(stereoDelayL, 0);
+          splitter.connect(stereoDelayR, 1);
+          stereoDelayL.connect(stereoGainL).connect(merger2, 0, 0);
+          stereoDelayR.connect(stereoGainR).connect(merger2, 0, 1);
+          merger2.connect(convolver).connect(masterGain);
+        } else {
+          ambientSource.connect(highpass).connect(lowpass).connect(ambientGain).connect(masterGain);
+        }
+        ambientSource.start();
+      };
+
+      const updateAmbientFilter = () => {
+        if (!ambientFilter || !ambientHighpass) return;
+        const low = Number(noiseLow.value);
+        const high = Number(noiseHigh.value);
+        ambientHighpass.frequency.value = low;
+        ambientFilter.frequency.value = high;
+      };
+
+      noiseIntensity.addEventListener("input", () => {
+        if (ambientGain) ambientGain.gain.value = 0.01 + (Number(noiseIntensity.value) / 100) * 0.06;
+      });
+
+      noiseLow.addEventListener("input", updateAmbientFilter);
+      noiseHigh.addEventListener("input", updateAmbientFilter);
+
+      hifiToggle.addEventListener("change", () => {
+        hifiEnabled = hifiToggle.checked;
+        if (soundGrid.querySelector(".sound-tile.active")) {
+          const activeName = soundGrid.querySelector(".sound-tile.active").textContent;
+          const tile = Array.from(soundGrid.querySelectorAll(".sound-tile")).find((t) => t.textContent === activeName);
+          if (tile) tile.click();
+        }
+      });
+
+      noiseDownload.addEventListener("click", async () => {
+        const low = Number(noiseLow.value);
+        const high = Number(noiseHigh.value);
+        const duration = 8;
+        const sampleRate = 44100;
+        const offline = new OfflineAudioContext(1, sampleRate * duration, sampleRate);
+        const source = offline.createBufferSource();
+        const buffer = (() => {
+          const len = sampleRate * duration;
+          const buf = offline.createBuffer(1, len, sampleRate);
+          const data = buf.getChannelData(0);
+          let last = 0;
+          let last2 = 0;
+          for (let i = 0; i < len; i += 1) {
+            const white = Math.random() * 2 - 1;
+            if (ambientType === "pink") {
+              last = 0.98 * last + 0.02 * white;
+              data[i] = last;
+            } else if (ambientType === "brown") {
+              last = (last + 0.02 * white) / 1.02;
+              data[i] = last * 3.5;
+            } else if (ambientType === "blue") {
+              data[i] = white - last;
+              last = white;
+            } else if (ambientType === "violet") {
+              data[i] = white - last2;
+              last2 = white;
+            } else {
+              data[i] = white;
+            }
+          }
+          return buf;
+        })();
+        source.buffer = buffer;
+        source.loop = false;
+        const filter = offline.createBiquadFilter();
+        filter.type = "bandpass";
+        const center = Math.max(1, (low + high) / 2);
+        const q = Math.max(0.2, center / Math.max(1, high - low));
+        filter.frequency.value = center;
+        filter.Q.value = q;
+        const gain = offline.createGain();
+        gain.gain.value = 0.6;
+        source.connect(filter).connect(gain).connect(offline.destination);
+        source.start();
+        const rendered = await offline.startRendering();
+        const wav = encodeWav(rendered.getChannelData(0), sampleRate);
+        const blob = new Blob([wav], { type: "audio/wav" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `noise-${ambientType}-${low}-${high}.wav`;
+        link.click();
+        URL.revokeObjectURL(url);
+      });
+
+      customPlay.addEventListener("click", toggleCustomTone);
+      customDownload.addEventListener("click", downloadTone);
+      customSave.addEventListener("click", addCustomPreset);
+
+      const toneDescriptions = {
+        "174": "Pain Relief and Security.",
+        "285": "Healing Tissues and Organs.",
+        "332": "Often linked to creativity and breaking mental barriers.",
+        "432": "Natural tuning, mathematically consistent with the universe.",
+        "491": "Associated with adrenal support and regeneration.",
+        "528": "The 'Miracle' tone, associated with transformation and DNA repair.",
+        "639": "Harmonizes relationships and connects with others.",
+        "741": "Awakens intuition and aids in problem solving.",
+        "852": "Returns spiritual order and balances energy.",
+        "963": "Frequency of the Gods, associated with pineal gland activation and oneness."
+      };
+
+      tryToneButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const hz = btn.dataset.hz;
+          customTone.value = hz;
+          if (toneExplanation) {
+             toneExplanation.textContent = toneDescriptions[hz] || `Custom frequency: ${hz} Hz`;
+          }
+          startCustomTone(Number(hz));
+        });
+      });
+
+      const encodeWav = (samples, sampleRate) => {
+        const buffer = new ArrayBuffer(44 + samples.length * 2);
+        const view = new DataView(buffer);
+        const writeString = (offset, str) => {
+          for (let i = 0; i < str.length; i += 1) {
+            view.setUint8(offset + i, str.charCodeAt(i));
+          }
+        };
+        writeString(0, "RIFF");
+        view.setUint32(4, 36 + samples.length * 2, true);
+        writeString(8, "WAVE");
+        writeString(12, "fmt ");
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, 1, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * 2, true);
+        view.setUint16(32, 2, true);
+        view.setUint16(34, 16, true);
+        writeString(36, "data");
+        view.setUint32(40, samples.length * 2, true);
+        let offset = 44;
+        for (let i = 0; i < samples.length; i += 1) {
+          const s = Math.max(-1, Math.min(1, samples[i]));
+          view.setInt16(offset, s * 0x7fff, true);
+          offset += 2;
+        }
+        return buffer;
+      };
+
+      function stopCustomTone() {
+        if (customOsc) {
+          customOsc.stop();
+          customOsc.disconnect();
+          customOsc = null;
+          customPlay.textContent = "Play Tone";
+        }
+      }
+
+      function startCustomTone(freq) {
+        ensureAudio();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        stopCustomTone();
+        
+        customOsc = audioCtx.createOscillator();
+        customOsc.type = "sine";
+        customOsc.frequency.value = freq;
+        const gain = audioCtx.createGain();
+        gain.gain.value = 0.06;
+        customOsc.connect(gain).connect(masterGain);
+        customOsc.start();
+        customPlay.textContent = "Stop Tone";
+      }
+
+      function toggleCustomTone() {
+        if (customOsc) {
+          stopCustomTone();
+        } else {
+          startCustomTone(Number(customTone.value || 432));
+        }
+      }
+
+      function downloadTone() {
+        const freq = Number(customTone.value || 432);
+        const duration = 8;
+        const sampleRate = 44100;
+        const offline = new OfflineAudioContext(1, sampleRate * duration, sampleRate);
+        const osc = offline.createOscillator();
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        const gain = offline.createGain();
+        gain.gain.value = 0.6;
+        osc.connect(gain).connect(offline.destination);
+        osc.start();
+        osc.stop(duration);
+        offline.startRendering().then((buffer) => {
+          const wav = encodeWav(buffer.getChannelData(0), sampleRate);
+          const blob = new Blob([wav], { type: "audio/wav" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `tone-${freq.toFixed(1)}.wav`;
+          link.click();
+          URL.revokeObjectURL(url);
+        });
+      }
+
+      function addCustomPreset() {
+        const left = Number(customLeft.value || 200);
+        const right = Number(customRight.value || 208);
+        const beat = Math.abs(right - left);
+        const name = customName.value.trim() || "Custom Binaural";
+        const preset = {
+          name,
+          freq: Math.min(200, beat),
+          mode: "relax",
+          note: `Custom binaural: L ${left.toFixed(1)} Hz / R ${right.toFixed(1)} Hz`,
+        };
+        presetsByEngine.binaural.unshift(preset);
+        if (toneType.value === "binaural") {
+          presets = presetsByEngine.binaural;
+          renderPresets();
+          presetSelect.value = "0";
+          updatePresetInfo(preset);
+        }
+      }
+
+      const createImpulseResponse = (duration, decay) => {
+        const length = audioCtx.sampleRate * duration;
+        const impulse = audioCtx.createBuffer(2, length, audioCtx.sampleRate);
+        for (let ch = 0; ch < 2; ch += 1) {
+          const data = impulse.getChannelData(ch);
+          for (let i = 0; i < length; i += 1) {
+            data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+          }
+        }
+        return impulse;
+      };
+    </script>
+  </body>
+</html>

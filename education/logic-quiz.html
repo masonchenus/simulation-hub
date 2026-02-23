@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Logic Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/mini-apps.css" />
+    <link rel="stylesheet" href="../css/lock.css" />
+  </head>
+  <body data-app-id="logic-quiz" style="--accent: #a78bfa; --accent-2: #6366f1;">
+    <main class="app-shell layout-stack">
+      <header class="app-header">
+        <div class="eyebrow">Education</div>
+        <h1>Logic Quiz</h1>
+        <p class="subhead">Short logic puzzles designed to train reasoning skills.</p>
+        <div class="chip-row">
+          <span class="chip">Logic</span><span class="chip">Reasoning</span><span class="chip">Quiz</span>
+        </div>
+      </header>
+      <section class="app-panel">
+        <div class="app-card">
+          <div id="app" data-app="quiz"></div>
+        </div>
+      </section>
+      <aside class="app-aside">
+        <strong>Tips</strong>
+        <div>- Think before you tap.</div><div>- Cycle through each question.</div>
+        <div style="margin-top:10px">Return to <a href="../index.html" style="color:inherit">Simulation Hub</a></div>
+      </aside>
+    </main>
+    <script>
+      window.APP_CONFIG = {"questions":[{"prompt":"If all bloops are razzies, and all razzies are lazzies, are all bloops lazzies?","options":["Yes","No"],"answer":"Yes"},{"prompt":"A is taller than B, B taller than C. Who is tallest?","options":["A","B","C"],"answer":"A"},{"prompt":"Which is the odd one out?","options":["Circle","Square","Triangle","Blue"],"answer":"Blue"}]};
+    </script>
+    <script src="../js/lock.js"></script>
+    <script src="../js/mini-apps.js"></script>
+  </body>
+</html>

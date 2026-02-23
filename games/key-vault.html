@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Key Vault</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0f18;
+        --panel: rgba(255, 255, 255, 0.08);
+        --text: #f8fafc;
+        --muted: rgba(248, 250, 252, 0.65);
+        --accent: #f59e0b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(900px 600px at 10% 10%, rgba(245, 158, 11, 0.25), transparent 60%),
+          radial-gradient(700px 500px at 90% 20%, rgba(56, 189, 248, 0.2), transparent 62%),
+          linear-gradient(180deg, #0b0f18 0%, #111827 60%, #0b1220 100%);
+      }
+
+      .vault {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 50px 24px 70px;
+        display: grid;
+        gap: 24px;
+      }
+
+      header {
+        display: grid;
+        gap: 10px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 3.2rem);
+      }
+
+      .subhead {
+        margin: 0;
+        color: var(--muted);
+        max-width: 70ch;
+      }
+
+      .stats {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .stat {
+        background: var(--panel);
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-weight: 600;
+      }
+
+      .panel {
+        background: var(--panel);
+        border-radius: 20px;
+        padding: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .key-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(28px, 1fr));
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .key {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(245, 158, 11, 0.7);
+        cursor: pointer;
+        transition: transform 120ms ease, opacity 120ms ease;
+        padding: 0;
+      }
+
+      .key:hover {
+        transform: translateY(-2px);
+      }
+
+      .key.is-collected {
+        opacity: 0.2;
+        background: rgba(255, 255, 255, 0.1);
+        cursor: default;
+      }
+
+      canvas {
+        width: 100%;
+        height: 520px;
+        border-radius: 16px;
+        background: rgba(6, 10, 20, 0.9);
+      }
+
+      .controls {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .controls button {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 18px;
+        font-weight: 700;
+        background: var(--accent);
+        color: #1f1300;
+        cursor: pointer;
+      }
+
+      .controls .ghost {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .unlock-banner {
+        display: none;
+        background: rgba(245, 158, 11, 0.15);
+        border: 1px solid rgba(245, 158, 11, 0.4);
+        border-radius: 16px;
+        padding: 14px 18px;
+        color: var(--text);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body data-app-id="key-vault">
+    <main class="vault">
+      <header>
+        <div style="letter-spacing:0.3em;text-transform:uppercase;font-size:0.7rem;color:var(--muted)">Key Vault</div>
+        <h1>Collect 300 keys to unlock the locked apps.</h1>
+        <p class="subhead">
+          Move with WASD or arrow keys. Every key you touch is counted. When you reach 300, unlock the apps that are locked because of bugs.
+        </p>
+      </header>
+
+      <div class="stats">
+        <div class="stat" id="key-count">Keys: 0 / 300</div>
+        <div class="stat" id="status">Status: Locked</div>
+      </div>
+
+      <div class="panel">
+        <canvas id="vault-canvas" width="1100" height="520"></canvas>
+        <div class="key-grid" id="key-grid" aria-label="Key collection grid"></div>
+      </div>
+
+      <div class="unlock-banner" id="unlock-banner">
+        You found 300 keys. Press unlock to open every locked app.
+      </div>
+
+      <div class="controls">
+        <button id="unlock-all" disabled>Keys Ready</button>
+        <button class="ghost" id="reset-keys">Reset Keys</button>
+        <a class="ghost" href="../index.html" style="text-decoration:none;padding:10px 18px;border-radius:999px">Back to Hub</a>
+      </div>
+    </main>
+
+    <script>
+      const canvas = document.getElementById("vault-canvas");
+      const ctx = canvas.getContext("2d");
+      const keyCount = document.getElementById("key-count");
+      const statusEl = document.getElementById("status");
+      const unlockBtn = document.getElementById("unlock-all");
+      const keyGrid = document.getElementById("key-grid");
+      const unlockBanner = document.getElementById("unlock-banner");
+      const resetBtn = document.getElementById("reset-keys");
+
+      const totalKeys = 300;
+      const keys = Array.from({ length: totalKeys }, () => ({
+        x: Math.random() * (canvas.width - 40) + 20,
+        y: Math.random() * (canvas.height - 40) + 20,
+        collected: false,
+      }));
+
+      const player = { x: canvas.width / 2, y: canvas.height / 2, r: 10, speed: 3 };
+      const pressed = new Set();
+      let collectedCount = Number(localStorage.getItem("simhub-keys") || "0");
+      if (collectedCount >= totalKeys) collectedCount = totalKeys;
+
+      const updateStatus = () => {
+        keyCount.textContent = `Keys: ${collectedCount} / ${totalKeys}`;
+        const unlocked = localStorage.getItem("simhub-unlocked-all") === "true";
+        statusEl.textContent = unlocked ? "Status: Unlocked" : "Status: Locked";
+        if (collectedCount >= totalKeys) {
+          unlockBtn.disabled = false;
+          unlockBanner.style.display = "block";
+        }
+      };
+
+      const updatePlayer = () => {
+        if (pressed.has("ArrowUp") || pressed.has("w")) player.y -= player.speed;
+        if (pressed.has("ArrowDown") || pressed.has("s")) player.y += player.speed;
+        if (pressed.has("ArrowLeft") || pressed.has("a")) player.x -= player.speed;
+        if (pressed.has("ArrowRight") || pressed.has("d")) player.x += player.speed;
+        player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x));
+        player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y));
+      };
+
+      const checkKeys = () => {
+        keys.forEach((key) => {
+          if (key.collected) return;
+          const dx = key.x - player.x;
+          const dy = key.y - player.y;
+          if (Math.hypot(dx, dy) < 14) {
+            key.collected = true;
+            collectedCount += 1;
+            localStorage.setItem("simhub-keys", String(collectedCount));
+            updateStatus();
+          }
+        });
+      };
+
+      const draw = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "rgba(245, 158, 11, 0.9)";
+        keys.forEach((key) => {
+          if (key.collected) return;
+          ctx.beginPath();
+          ctx.arc(key.x, key.y, 4, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.beginPath();
+        ctx.fillStyle = "#38bdf8";
+        ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        ctx.fillText("Collect keys", 14, canvas.height - 14);
+      };
+
+      const loop = () => {
+        updatePlayer();
+        checkKeys();
+        draw();
+        requestAnimationFrame(loop);
+      };
+
+      window.addEventListener("keydown", (event) => pressed.add(event.key));
+      window.addEventListener("keyup", (event) => pressed.delete(event.key));
+
+      unlockBtn.addEventListener("click", () => {
+        if (collectedCount < totalKeys) return;
+        updateStatus();
+      });
+
+      resetBtn.addEventListener("click", () => {
+        localStorage.removeItem("simhub-keys");
+        localStorage.removeItem("simhub-unlocked-all");
+        collectedCount = 0;
+        keys.forEach((k) => (k.collected = false));
+        unlockBtn.disabled = true;
+        unlockBanner.style.display = "none";
+        updateStatus();
+        renderKeyGrid();
+      });
+
+      const renderKeyGrid = () => {
+        keyGrid.innerHTML = "";
+        for (let i = 0; i < totalKeys; i += 1) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "key";
+          if (i < collectedCount) {
+            btn.classList.add("is-collected");
+            btn.disabled = true;
+          }
+          btn.addEventListener("click", () => {
+            if (btn.classList.contains("is-collected")) return;
+            btn.classList.add("is-collected");
+            btn.disabled = true;
+            collectedCount = Math.min(totalKeys, collectedCount + 1);
+            localStorage.setItem("simhub-keys", String(collectedCount));
+            updateStatus();
+          });
+          keyGrid.appendChild(btn);
+        }
+      };
+
+      updateStatus();
+      renderKeyGrid();
+      loop();
+    </script>
+  </body>
+</html>
