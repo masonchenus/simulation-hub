@@ -1,12 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script>
+      window.onerror = function (message, source, lineno, colno, error) {
+        console.error("An error occurred: ", {
+          message: message,
+          source: source,
+          lineno: lineno,
+          colno: colno,
+          error: error,
+        });
+        return true; // Prevents the default browser error handling
+      };
+
+      window.addEventListener("unhandledrejection", function (event) {
+        console.error("Unhandled promise rejection: ", event.reason);
+      });
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Brainwave Suite Full</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Space+Grotesk:wght@400;600;700&display=swap"/>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Space+Grotesk:wght@400;600;700&display=swap"
+    />
     <style>
       :root {
         --bg: #0b0b15;
@@ -708,15 +727,24 @@
             <label for="breath">Breath Cycle (seconds)</label>
             <input type="range" id="breath" min="4" max="14" value="8" />
           </div>
-
-          <div class="control-row">
+          <div class="control-row"> 
             <label for="session-duration">Session Timer</label>
             <select id="session-duration">
               <option value="0">Infinite</option>
               <option value="10">10 Minutes</option>
-              <option value="20" selected>20 Minutes</option>
+              <option value="20">20 Minutes</option>
               <option value="30">30 Minutes</option>
               <option value="60">60 Minutes</option>
+              <option value="90">90 Minutes</option>
+              <option value="120">120 Minutes</option>
+              <option value="150">150 Minutes</option>
+              <option value="180">180 Minutes</option>
+              <option value="210">210 Minutes</option>
+              <option value="240">240 Minutes</option>
+              <option value="270">270 Minutes</option>
+              <option value="300">300 Minutes</option>
+              <option value="330">330 Minutes</option>
+              <option value="360">360 Minutes</option>
             </select>
             <div id="timer-display" style="display:none">00:00</div>
           </div>
@@ -731,7 +759,7 @@
             <select id="tone-type">
               <option value="binaural">Binaural (L/R split)</option>
               <option value="monaural">Monaural (beat in one channel)</option>
-              <option value="isochronic">Isochronic (pulsed tone)</option>
+              <option value="isochronic">Isochronic (pulsed & panned)</option>
               <option value="test">Ear Check (Left/Right)</option>
             </select>
           </div>
@@ -783,9 +811,13 @@
             <button class="btn btn-ghost" id="calm-descents">Calm Descents</button>
             <button class="btn btn-ghost" id="wake-ascend">Wake-up Ascend</button>
             <button class="btn btn-ghost" id="focus-glide">Focus Glide</button>
+            <button class="btn btn-ghost" id="flow-bridge">Flow Bridge (30Hz)</button>
             <button class="btn btn-ghost" id="power-nap">Power Nap</button>
             <button class="btn btn-ghost" id="focus-sleep">Focus → Sleep</button>
             <button class="btn btn-ghost" id="pin-sleep">Pin-Sleep Protocol</button>
+            <button class="btn btn-ghost" id="gamma-reset">Gamma Reset</button>
+            <button class="btn btn-ghost" id="smr-study">SMR Study</button>
+            <button class="btn btn-ghost" id="void-state">Void State (0.1Hz)</button>
           </div>
 
           <div class="sound-grid" id="sound-grid" aria-label="Dynamic sound tiles"></div>
@@ -864,14 +896,14 @@
               <input type="number" id="calc-carrier" min="40" max="1000" step="1" value="200" />
             </div>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:8px;">
-               <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; text-align:center;">
-                 <div style="font-size:0.75rem; color:var(--muted); margin-bottom:4px;">Left Ear</div>
-                 <div id="calc-left-disp" style="font-size:1.1rem; font-weight:700;">195.0 Hz</div>
-               </div>
-               <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; text-align:center;">
-                 <div style="font-size:0.75rem; color:var(--muted); margin-bottom:4px;">Right Ear</div>
-                 <div id="calc-right-disp" style="font-size:1.1rem; font-weight:700;">205.0 Hz</div>
-               </div>
+              <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; text-align:center;">
+                <div style="font-size:0.75rem; color:var(--muted); margin-bottom:4px;">Left Ear</div>
+                <div id="calc-left-disp" style="font-size:1.1rem; font-weight:700;">195.0 Hz</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; text-align:center;">
+                <div style="font-size:0.75rem; color:var(--muted); margin-bottom:4px;">Right Ear</div>
+                <div id="calc-right-disp" style="font-size:1.1rem; font-weight:700;">205.0 Hz</div>
+              </div>
             </div>
             <div class="sound-actions">
               <button class="btn btn-ghost" id="calc-suggest">Suggest Carrier</button>
@@ -962,9 +994,14 @@
       const calmDescentsBtn = document.getElementById("calm-descents");
       const wakeAscendBtn = document.getElementById("wake-ascend");
       const focusGlideBtn = document.getElementById("focus-glide");
+      const flowBridgeBtn = document.getElementById("flow-bridge");
       const powerNapBtn = document.getElementById("power-nap");
       const focusSleepBtn = document.getElementById("focus-sleep");
       const pinSleepBtn = document.getElementById("pin-sleep");
+      const gammaResetBtn = document.getElementById("gamma-reset");
+      const smrStudyBtn = document.getElementById("smr-study");
+      const voidStateBtn = document.getElementById("void-state");
+      const emergencyResetBtn = document.getElementById("emergencyResetBtn");
       const carrierWaveform = document.getElementById("carrier-waveform");
       const pulseShape = document.getElementById("pulse-shape");
       const harmonicToggle = document.getElementById("harmonic-toggle");
@@ -994,6 +1031,8 @@
       let isoLfo = null;
       let isoLfoGain = null;
       let isoBias = null;
+      let isoPanner = null;
+      let isoPanLfo = null;
       let earTestOsc = null;
       let earTestPanner = null;
       let masterGain = null;
@@ -1039,6 +1078,7 @@
       let panGain = null;
 
       const basePresets = [
+        { name: "Delta Profound Sleep", freq: 0.1, mode: "delta", note: "Insonmia support", details: "At 0.1 Hz, This frequency promotes a state of near-unconsiousness, promoting growth hormones, and profound recovery."},
         { name: "Sub-Delta Drift", freq: 0.6, mode: "subdelta", note: "Ultra-slow sub-delta downshift.", details: "At 0.6 Hz, this preset targets the sub-delta range, often associated with deep unconsciousness and the glymphatic system's waste clearance in the brain. Ideal for profound rest." },
         { name: "Sub-Delta Deep", freq: 0.9, mode: "subdelta", note: "Deepest sub-delta support.", details: "0.9 Hz encourages a state of suspended animation, helping to quiet the mind completely and disconnect from sensory input for total regeneration." },
         { name: "Pin-Sleep Deep", freq: 0.1, mode: "subdelta", note: "Pin-point deep sleep.", details: "0.1 Hz frequency for deepest possible entrainment." },
@@ -1078,7 +1118,7 @@
         { name: "Lambda State", freq: 200.0, mode: "highgamma", note: "Tibetan monk state.", details: "200 Hz Lambda waves are associated with advanced meditation states." },
       ];
 
-      const energyPresets = Array.from({ length: 65 }, (_, i) => {
+      const energyPresets = Array.from({ length: 100 }, (_, i) => {
         const freq = 18 + i * 0.4;
         const isGamma = freq >= 30;
         return {
@@ -1096,9 +1136,9 @@
         note: "Slow delta support.",
       }));
 
-      const subDeltaPresets = Array.from({ length: 12 }, (_, i) => ({
+      const subDeltaPresets = Array.from({ length: 20 }, (_, i) => ({
         name: `Sub-Delta ${i + 1}`,
-        freq: 0.2 + i * 0.05,
+        freq: 0.2 + i * 0.04,
         mode: "subdelta",
         note: "Ultra-low sub-delta.",
       }));
@@ -1117,14 +1157,14 @@
         note: "Theta dreamy focus.",
       }));
 
-      const betaPresets = Array.from({ length: 50 }, (_, i) => ({
+      const betaPresets = Array.from({ length: 55 }, (_, i) => ({
         name: `Beta Mode ${i + 1}`,
-        freq: 12 + i * 0.35,
+        freq: 12 + i * 0.3,
         mode: "beta",
         note: "Beta alertness and clarity.",
       }));
 
-      const highHzPresets = Array.from({ length: 140 }, (_, i) => ({
+      const highHzPresets = Array.from({ length: 200 }, (_, i) => ({
         name: `High Hertz ${i + 1}`,
         freq: 60 + i * 3.5,
         mode: i % 2 === 0 ? "gamma" : "highgamma",
@@ -1235,11 +1275,40 @@
         };
       });
 
+      const planetaryPresets = [
+        { name: "Sun (126.22 Hz base)", freq: 7.83, base: 126.22, mode: "theta", note: "Transcendence (Schumann beat)." },
+        { name: "Mercury (141.27 Hz base)", freq: 12.0, base: 141.27, mode: "beta", note: "Intellect (SMR beat)." },
+        { name: "Venus (221.23 Hz base)", freq: 10.0, base: 221.23, mode: "relax", note: "Harmony (Alpha beat)." },
+        { name: "Earth Year (136.10 Hz base)", freq: 7.83, base: 136.10, mode: "theta", note: "Om / Soothing (Schumann beat)." },
+        { name: "Mars (144.72 Hz base)", freq: 14.0, base: 144.72, mode: "beta", note: "Willpower (Focus beat)." },
+        { name: "Jupiter (183.58 Hz base)", freq: 6.0, base: 183.58, mode: "theta", note: "Growth (Theta beat)." },
+        { name: "Saturn (147.85 Hz base)", freq: 4.0, base: 147.85, mode: "theta", note: "Concentration (Deep Theta)." },
+        { name: "Uranus (207.36 Hz base)", freq: 8.0, base: 207.36, mode: "relax", note: "Renewal (Low Alpha)." },
+        { name: "Neptune (211.44 Hz base)", freq: 5.0, base: 211.44, mode: "theta", note: "Intuition (Theta beat)." },
+        { name: "Pluto (140.25 Hz base)", freq: 3.0, base: 140.25, mode: "delta", note: "Transformation (Delta beat)." },
+        { name: "Moon (210.42 Hz base)", freq: 9.0, base: 210.42, mode: "relax", note: "Connection (Alpha beat)." }
+      ];
+
+      const bioPresets = [
+        { name: "Endorphin (2.5 Hz)", freq: 2.5, mode: "delta", note: "Pain relief / Pleasure." },
+        { name: "Serotonin (10 Hz)", freq: 10.0, mode: "relax", note: "Mood elevation." },
+        { name: "Catecholamines (15 Hz)", freq: 15.0, mode: "beta", note: "Alertness / Memory." },
+        { name: "Acetylcholine (12 Hz)", freq: 12.0, mode: "beta", note: "Creativity / Learning." },
+        { name: "Dopamine (38 Hz)", freq: 38.0, mode: "gamma", note: "Focus / Reward." }
+      ];
+
+      const monauralMixPresets = [
+        { name: "Interference Mix (Alpha)", freq: 10.0, mode: "relax", note: "Frequencies mixed before ear.", details: "This preset relies on physical wave interference (Monaural) rather than brainstem processing. Great for speakers." },
+        { name: "Interference Mix (Theta)", freq: 5.5, mode: "theta", note: "Frequencies mixed before ear.", details: "This preset relies on physical wave interference (Monaural) rather than brainstem processing. Great for speakers." },
+      ];
+
       const presetsByEngine = {
         binaural: [
           ...basePresets,
           ...schumannPresets,
           ...solfeggioPresets,
+          ...planetaryPresets,
+          ...bioPresets,
           ...creativePresets,
           ...learningPresets,
           ...meditationPresets,
@@ -1258,21 +1327,27 @@
           ...extraPresets,
         ],
         monaural: [
+          ...monauralMixPresets,
           ...basePresets,
           ...schumannPresets,
-          ...creativePresets,
           ...solfeggioPresets,
+          ...planetaryPresets,
+          ...bioPresets,
+          ...creativePresets,
           ...learningPresets,
           ...meditationPresets,
+          ...astralPresets,
           ...healingPresets,
           ...namedEnergyPresets,
           ...energyPresets,
+          ...subDeltaPresets,
           ...sleepPresets,
           ...relaxPresets,
           ...thetaPresets,
           ...betaPresets,
           ...alphaPresets,
           ...focusPresets,
+          ...highHzPresets,
           ...extraPresets,
           ...Array.from({ length: 120 }, (_, i) => ({
             name: `Monaural Power ${i + 1}`,
@@ -1284,6 +1359,8 @@
         isochronic: [
           ...basePresets,
           ...schumannPresets,
+          ...planetaryPresets,
+          ...bioPresets,
           ...creativePresets,
           ...solfeggioPresets,
           ...learningPresets,
@@ -1595,19 +1672,25 @@
         leftOsc2.start();
         rightOsc2.start();
 
-        monoOsc = audioCtx.createOscillator();
-        monoOsc.type = "sine";
-        monoOsc.frequency.value = (leftBase + rightBase) / 2;
-        monoOsc.connect(monoGain).connect(masterGain);
-        monoOsc.start();
+        leftOsc.connect(monoGain).connect(masterGain);
+        rightOsc.connect(monoGain).connect(masterGain);
 
         isoOsc = audioCtx.createOscillator();
-        isoOsc.type = "sine";
+        isoOsc.type = carrierWaveform.value;
         isoOsc.frequency.value = (leftBase + rightBase) / 2;
         isoOsc.start();
         isoGate = audioCtx.createGain();
         isoGate.gain.value = 0.0;
-        isoOsc.connect(isoGate).connect(isoGain).connect(masterGain);
+
+        // Add a gentle auto-pan to isochronic tones for a better speaker experience.
+        isoPanner = audioCtx.createStereoPanner();
+        isoPanLfo = audioCtx.createOscillator();
+        isoPanLfo.type = 'sine';
+        isoPanLfo.frequency.value = 0.12; // A slow, gentle pan
+        isoPanLfo.connect(isoPanner.pan);
+        isoPanLfo.start();
+
+        isoOsc.connect(isoGate).connect(isoGain).connect(isoPanner).connect(masterGain);
 
         isoLfo = audioCtx.createOscillator();
         isoLfo.type = pulseShape.value === "sine" ? "sine" : "square";
@@ -1711,9 +1794,6 @@
           leftOsc2.frequency.setValueAtTime(base * 2, now);
           rightOsc2.frequency.setValueAtTime(rightBase * 2, now);
         }
-        if (monoOsc) {
-          monoOsc.frequency.setValueAtTime((leftBase + rightBase) / 2, now);
-        }
         if (isoOsc) {
           isoOsc.frequency.setValueAtTime((leftBase + rightBase) / 2, now);
         }
@@ -1737,9 +1817,6 @@
         if (leftOsc2 && rightOsc2) {
           leftOsc2.frequency.setValueAtTime(leftBase * 2, now);
           rightOsc2.frequency.setValueAtTime(rightBase * 2, now);
-        }
-        if (monoOsc) {
-          monoOsc.frequency.setValueAtTime((leftBase + rightBase) / 2, now);
         }
         if (isoOsc) {
           isoOsc.frequency.setValueAtTime((leftBase + rightBase) / 2, now);
@@ -1796,15 +1873,10 @@
             rightOsc2.frequency.setValueAtTime(rightOsc2.frequency.value, cursor);
             rightOsc2.frequency.linearRampToValueAtTime((leftBase + targetHz) * 2, cursor + duration);
           }
-          if (monoOsc) {
-            monoOsc.frequency.cancelScheduledValues(cursor);
-            monoOsc.frequency.setValueAtTime(monoOsc.frequency.value, cursor);
-            monoOsc.frequency.linearRampToValueAtTime(leftBase + targetHz, cursor + duration);
-          }
           if (isoOsc) {
             isoOsc.frequency.cancelScheduledValues(cursor);
             isoOsc.frequency.setValueAtTime(isoOsc.frequency.value, cursor);
-            isoOsc.frequency.linearRampToValueAtTime(leftBase + targetHz, cursor + duration);
+            isoOsc.frequency.linearRampToValueAtTime(leftBase + targetHz / 2, cursor + duration);
           }
           if (isoLfo) {
             isoLfo.frequency.setValueAtTime(Math.max(0.2, targetHz), cursor);
@@ -1829,15 +1901,10 @@
           rightOsc2.frequency.setValueAtTime(rightOsc2.frequency.value, now);
           rightOsc2.frequency.linearRampToValueAtTime((leftBase + targetHz) * 2, now + seconds);
         }
-        if (monoOsc) {
-          monoOsc.frequency.cancelScheduledValues(now);
-          monoOsc.frequency.setValueAtTime(monoOsc.frequency.value, now);
-          monoOsc.frequency.linearRampToValueAtTime(leftBase + targetHz, now + seconds);
-        }
         if (isoOsc) {
           isoOsc.frequency.cancelScheduledValues(now);
           isoOsc.frequency.setValueAtTime(isoOsc.frequency.value, now);
-          isoOsc.frequency.linearRampToValueAtTime(leftBase + targetHz, now + seconds);
+          isoOsc.frequency.linearRampToValueAtTime(leftBase + targetHz / 2, now + seconds);
         }
         setMode(targetMode);
       };
@@ -1930,6 +1997,7 @@
         if (rightOsc) rightOsc.type = carrierWaveform.value;
         if (leftOsc2) leftOsc2.type = carrierWaveform.value;
         if (rightOsc2) rightOsc2.type = carrierWaveform.value;
+        if (isoOsc) isoOsc.type = carrierWaveform.value;
       });
 
       pulseShape.addEventListener("change", () => {
@@ -2170,6 +2238,15 @@
         ]);
       });
 
+      if (flowBridgeBtn) {
+        flowBridgeBtn.addEventListener("click", () => {
+          runSequence([
+            { hz: 14.0, seconds: 30, mode: "beta" },   // Start at SMR (Focus)
+            { hz: 30.0, seconds: 120, mode: "gamma" }  // Ramp to Beta-Gamma Bridge
+          ]);
+        });
+      }
+
       powerNapBtn.addEventListener("click", () => {
         runSequence([
           { hz: 4.0, seconds: 6, mode: "theta" },
@@ -2199,6 +2276,45 @@
           { hz: 0.1, seconds: 300, mode: "subdelta" }
         ]);
       });
+
+      if (gammaResetBtn) {
+        gammaResetBtn.addEventListener("click", () => {
+          runSequence([
+            { hz: 12.0, seconds: 10, mode: "beta" },   // Quick step down to SMR
+            { hz: 10.0, seconds: 300, mode: "relax" }, // 5 min drift in Alpha
+            { hz: 7.83, seconds: 300, mode: "theta" }  // 5 min grounding in Theta
+          ]);
+        });
+      }
+
+      if (smrStudyBtn) {
+        smrStudyBtn.addEventListener("click", () => {
+          runSequence([
+            { hz: 10.0, seconds: 10, mode: "relax" }, // Center in Alpha
+            { hz: 14.0, seconds: 60, mode: "beta" }   // Shift to SMR
+          ]);
+        });
+      }
+
+      if (voidStateBtn) {
+        voidStateBtn.addEventListener("click", () => {
+          runSequence([
+            { hz: 4.0, seconds: 30, mode: "theta" },   // Bridge: Theta
+            { hz: 1.0, seconds: 30, mode: "sleep" },   // Bridge: Delta
+            { hz: 0.1, seconds: 300, mode: "subdelta" } // Target: Epsilon (Void)
+          ]);
+        });
+      }
+
+      if (emergencyResetBtn) {
+        emergencyResetBtn.addEventListener("click", () => {
+          runSequence([
+            { hz: 10.0, seconds: 60, mode: "relax" },  // Immediate Alpha stabilization
+            { hz: 6.0, seconds: 120, mode: "theta" },  // Drop to Theta to disengage active thought
+            { hz: 7.83, seconds: 300, mode: "theta" }  // Long Schumann grounding
+          ]);
+        });
+      }
 
       setMode("sleep");
       initViz();

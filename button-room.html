@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Button Room</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Space+Grotesk:wght@400;600;700&display=swap"
+    />
+    <style>
+      :root {
+        --bg: #0b0b15;
+        --panel: rgba(20, 20, 35, 0.6);
+        --panel-strong: rgba(255, 255, 255, 0.08);
+        --text: #f8fafc;
+        --muted: rgba(248, 250, 252, 0.6);
+        --accent: #7c3aed;
+        --accent-2: #38bdf8;
+        --accent-3: #f472b6;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(900px 600px at 10% 10%, rgba(124, 58, 237, 0.25), transparent 60%),
+          radial-gradient(700px 500px at 90% 15%, rgba(56, 189, 248, 0.22), transparent 62%),
+          radial-gradient(650px 450px at 50% 85%, rgba(244, 114, 182, 0.2), transparent 60%),
+          linear-gradient(180deg, #05050a 0%, #0b0b15 100%);
+      }
+
+      .app-shell {
+        width: 100%;
+        max-width: 1800px;
+        margin: 0 auto;
+        padding: 32px 24px 64px;
+        display: grid;
+        gap: 40px;
+      }
+
+      .app-header {
+        display: grid;
+        gap: 16px;
+        text-align: center;
+        justify-items: center;
+      }
+      
+      .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.4em;
+        font-size: 0.68rem;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      h1 {
+        font-family: "Fraunces", "Times New Roman", serif;
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin: 0;
+        text-shadow: 0 0 40px rgba(124, 58, 237, 0.3);
+      }
+
+      .button-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 24px;
+        padding: 40px;
+        justify-items: center;
+      }
+
+      #emergencyResetBtn {
+        background-color: #dc2626; /* red-600 */
+        color: white;
+        border-radius: 9999px;
+        width: 120px;
+        height: 120px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        line-height: 1.25rem;
+        text-align: center;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      #emergencyResetBtn:hover {
+        background-color: #b91c1c; /* red-700 */
+        box-shadow: 0 8px 25px rgba(220, 38, 38, 0.5);
+        transform: translateY(-2px);
+      }
+      
+      .btn-ghost {
+        border: none;
+        border-radius: 999px;
+        padding: 14px 24px;
+        font-weight: 700;
+        font-size: 1rem;
+        background: transparent;
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: none;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      
+      .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+    </style>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <div class="eyebrow">Brainwave Suite</div>
+        <h1>Button Room</h1>
+      </header>
+      <div class="button-grid">
+        <button id="emergencyResetBtn">Emergency<br>Reset</button>
+      </div>
+       <a class="btn-ghost" href="brainwave-suite.html" style="justify-self: center;">Back to Brainwave Suite</a>
+    </main>
+    <script>
+      // The emergency reset button doesn't do anything on its own.
+      // The logic is in brainwave-suite.html and is applied when this button is clicked.
+      // This is not ideal, but it's how the user wants it.
+    </script>
+  </body>
+</html>

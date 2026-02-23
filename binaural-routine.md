@@ -9,17 +9,17 @@ This routine leverages the comprehensive binaural beat presets to optimize your 
 *   **06:00 - 06:30 | Waking Up**
     *   **Preset:** `Morning Ignition` (22.0 Hz - Beta)
     *   **Description:** High-beta frequency to immediately stimulate alertness and clear fog.
-    *   **Alternative:** `High Beta Drive` (20.0 Hz)
+    *   **Alternatives:** `High Beta Drive` (20.0 Hz), `Ascend` (Deep Sleep → Gamma Focus) `Peformance` (23.0 hz)
 
 *   **06:30 - 07:30 | Morning Workout / Movement**
     *   **Preset:** `Workout Prime` (38.0 Hz - Gamma)
     *   **Description:** Increases physical energy and coordination.
-    *   **Alternative:** `Energy Boost 30` (29.6 Hz)
+    *   **Alternatives:** `Energy Boost 30` (29.6 Hz), `Cognitive Fuel` (30.0 hz) `Energy Boost 65` (43.6 hz, In small bursts, After you play it, step down to Alpha/theta)
 
 *   **07:30 - 08:30 | Breakfast & Planning**
     *   **Preset:** `SMR Focus` (14.0 Hz - Beta)
     *   **Description:** Sensory Motor Rhythm for calm, physical stillness combined with mental alertness. Perfect for reviewing goals.
-    *   **Alternative:** `Mental Stability` (11.0 Hz)
+    *   **Alternative:** `Mental Stability` (11.0 Hz), `Energy Boost 31` (30.0 hz), `Energy Boost 6` (20.0 hz)
 
 ## 🚀 Late Morning: Deep Work & High Performance (09:00 - 12:00)
 
@@ -28,16 +28,17 @@ This routine leverages the comprehensive binaural beat presets to optimize your 
 *   **09:00 - 10:30 | Deep Work Block 1**
     *   **Preset:** `Cognitive Fuel` (30.0 Hz - Gamma)
     *   **Description:** Low-gamma for fueling sustained mental effort.
-    *   **Alternative:** `Beta Focus` (16.0 Hz) for steady analytical work.
+    *   **Alternative:** `Beta Focus` (16.0 Hz) for steady analytical work. Also consider using `SMR Focus` (14.0 hz) for a relaxed, but focused state.
 
 *   **10:30 - 10:45 | Micro-Break**
     *   **Preset:** `Alpha Ease` (9.0 Hz - Alpha)
     *   **Description:** Quick detachment to reset neurotransmitters without falling asleep.
+    *   **Alternative**: `Epsilon stillness` (0.2 hz) if you need a micro-break on the go, `Theta Calm` (6 hz) or `Theta Restore` (4.5 hz) for medium-term breaks, `Stress Dissolve` if during the break you need stress relief.
 
 *   **10:45 - 12:00 | Deep Work Block 2 (High Intensity)**
     *   **Preset:** `Gamma Peak` (41.6 Hz - Gamma) or `Deadline Drive` (45.0 Hz)
     *   **Description:** Intense focus for binding information and "Eureka" moments.
-    *   **Alternative:** `Quantum Focus` (70.0 Hz - High Gamma) for abstract concepts.
+    *   **Alternative:** `Quantum Focus` (70.0 Hz - High Gamma) for abstract concepts. Short bursts of **Frequencies above 100 hz** for insane focus, BUT you would need to relax after doing this frequency, and IMMEDIEATELY HYDRATE as it is demanding glucose, and **water**.
 
 ## 🥗 Mid-Day: Reset & Grounding (12:00 - 13:30)
 
@@ -65,11 +66,11 @@ This routine leverages the comprehensive binaural beat presets to optimize your 
 *   **15:00 - 17:00 | Study & Routine Tasks**
     *   **Preset:** `Active Learning` (15.0 Hz - Beta)
     *   **Description:** Engagement and retention for reading or processing emails.
-    *   **Alternative:** `Memory Lock` (10.0 Hz) for consolidating what you've learned.
+    *   **Alternative:** `Memory Lock` (10.0 Hz) for consolidating what you've learned. `SMR Focus` (14.0 hz) for maintaining a relaxed state, while focusing on studying.
 
 ## 🧘 Evening: Decompression & Healing (17:00 - 21:00)
 
-**Goal:** Lowering cortisol, emotional processing, and physical relaxation.
+**Goal:** Lowering cortisol / Stress, Promoting emotional processing, and physical relaxation.
 
 *   **17:00 - 18:00 | Transition from Work**
     *   **Preset:** `Stress Relief` (8.3 Hz - Alpha)

@@ -1596,30 +1596,189 @@
   };
 
   const colorMixerApp = () => {
-    setHTML(`
-      <div class="control-row">
-        <label>R <input type="range" min="0" max="255" value="120" id="col-r" /></label>
-        <label>G <input type="range" min="0" max="255" value="120" id="col-g" /></label>
-        <label>B <input type="range" min="0" max="255" value="200" id="col-b" /></label>
-      </div>
-      <div class="app-card" id="col-preview" style="height:160px"></div>
-    `);
-
-    const r = mount.querySelector("#col-r");
-    const g = mount.querySelector("#col-g");
-    const b = mount.querySelector("#col-b");
-    const preview = mount.querySelector("#col-preview");
-
-    const update = () => {
-      const color = `rgb(${r.value}, ${g.value}, ${b.value})`;
-      preview.style.background = color;
-      preview.textContent = color;
-      preview.style.display = "grid";
-      preview.style.placeItems = "center";
+    const hsvToRgb = (h, s, v) => {
+      s /= 100;
+      v /= 100;
+      const c = v * s;
+      const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+      const m = v - c;
+      let r = 0, g = 0, b = 0;
+      if (0 <= h && h < 60) { r = c; g = x; b = 0; }
+      else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
+      else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
+      else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
+      else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
+      else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
+      return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
     };
 
-    [r, g, b].forEach((el) => el.addEventListener("input", update));
-    update();
+    let stops = [
+      { id: 1, pos: 0, h: 200, s: 80, v: 90, a: 100, t: 0, c: 100, k: 0 },
+      { id: 2, pos: 100, h: 260, s: 70, v: 80, a: 100, t: 0, c: 100, k: 0 }
+    ];
+    let selectedId = 1;
+    let type = 'linear-gradient';
+    let angle = 90;
+
+    const resolveColor = (stop) => {
+      let { h, s, v, t, c, k, a } = stop;
+      let s2 = Math.min(100, s * (c / 100));
+      let [r, g, b] = hsvToRgb(h, s2, v);
+
+      if (t !== 0) {
+        const amount = Math.abs(t) / 100;
+        const target = t > 0 ? [255, 190, 120] : [170, 205, 255];
+        r = r * (1 - amount) + target[0] * amount;
+        g = g * (1 - amount) + target[1] * amount;
+        b = b * (1 - amount) + target[2] * amount;
+      }
+      
+      if (k !== 0) {
+        const factor = (259 * (k + 255)) / (255 * (259 - k));
+        r = factor * (r - 128) + 128;
+        g = factor * (g - 128) + 128;
+        b = factor * (b - 128) + 128;
+      }
+
+      r = Math.max(0, Math.min(255, Math.round(r)));
+      g = Math.max(0, Math.min(255, Math.round(g)));
+      b = Math.max(0, Math.min(255, Math.round(b)));
+      
+      return `rgba(${r}, ${g}, ${b}, ${a/100})`;
+    };
+
+    const render = () => {
+        const sorted = [...stops].sort((a, b) => a.pos - b.pos);
+        const cssStops = sorted.map(s => `${resolveColor(s)} ${s.pos}%`).join(', ');
+        const gradientCss = type === 'linear-gradient' 
+            ? `linear-gradient(${angle}deg, ${cssStops})`
+            : `radial-gradient(circle, ${cssStops})`;
+
+        const selected = stops.find(s => s.id === selectedId) || stops[0];
+
+        setHTML(`
+          <div class="app-card" style="height:180px; background: ${gradientCss}; border:1px solid rgba(0,0,0,0.1); border-radius:12px; margin-bottom:1.5rem; position:relative; overflow:hidden;">
+            <div style="position:absolute; bottom:0; left:0; right:0; height:32px; background:rgba(255,255,255,0.8); display:flex; align-items:center; padding:0 10px;">
+               ${stops.map(s => `
+                  <button class="stop-handle ${s.id === selectedId ? 'is-active' : ''}" data-id="${s.id}" style="
+                    position:absolute; left:${s.pos}%; transform:translateX(-50%); width:16px; height:16px; border-radius:50%; 
+                    background:${resolveColor(s)}; border:2px solid ${s.id === selectedId ? '#000' : '#fff'}; box-shadow:0 2px 4px rgba(0,0,0,0.2); cursor:pointer;
+                  "></button>
+               `).join('')}
+            </div>
+          </div>
+
+          <div class="control-row" style="gap:1rem; margin-bottom:1rem; flex-wrap:wrap;">
+             <select id="gf-type" class="input" style="width:auto;">
+                <option value="linear-gradient" ${type === 'linear-gradient' ? 'selected' : ''}>Linear</option>
+                <option value="radial-gradient" ${type === 'radial-gradient' ? 'selected' : ''}>Radial</option>
+             </select>
+             ${type === 'linear-gradient' ? `<input type="number" id="gf-angle" value="${angle}" class="input" style="width:60px"> <span style="font-size:0.8rem;color:var(--muted)">deg</span>` : ''}
+             <button id="gf-add" class="btn btn-ghost" style="font-size:0.8rem;">+ Stop</button>
+             <button id="gf-remove" class="btn btn-ghost" style="font-size:0.8rem;" ${stops.length <= 2 ? 'disabled' : ''}>- Stop</button>
+             <button id="gf-random" class="btn btn-ghost" style="font-size:0.8rem;">Randomize</button>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:1rem; padding:1rem; background:rgba(0,0,0,0.02); border-radius:12px; border:1px solid rgba(0,0,0,0.05);">
+             <div style="grid-column:1/-1; font-weight:600; font-size:0.8rem; color:var(--muted); margin-bottom:0.5rem;">Selected Stop Parameters</div>
+             
+             <div><label style="font-size:0.75rem; display:block; color:var(--muted);">Position ${selected.pos}%</label>
+             <input type="range" id="gf-pos" min="0" max="100" value="${selected.pos}" style="width:100%"></div>
+
+             <div><label style="font-size:0.75rem; display:block; color:var(--muted);">Hue ${selected.h}°</label>
+             <input type="range" id="gf-h" min="0" max="360" value="${selected.h}" style="width:100%; background:linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%); height:6px; border-radius:4px; appearance:none;"></div>
+
+             <div><label style="font-size:0.75rem; display:block; color:var(--muted);">Saturation ${selected.s}%</label>
+             <input type="range" id="gf-s" min="0" max="100" value="${selected.s}" style="width:100%"></div>
+
+             <div><label style="font-size:0.75rem; display:block; color:var(--muted);">Value ${selected.v}%</label>
+             <input type="range" id="gf-v" min="0" max="100" value="${selected.v}" style="width:100%"></div>
+
+             <div><label style="font-size:0.75rem; display:block; color:var(--muted);">Alpha ${selected.a}%</label>
+             <input type="range" id="gf-a" min="0" max="100" value="${selected.a}" style="width:100%"></div>
+
+             <div><label style="font-size:0.75rem; display:block; color:var(--muted);">Temp ${selected.t}</label>
+             <input type="range" id="gf-t" min="-100" max="100" value="${selected.t}" style="width:100%"></div>
+
+             <div><label style="font-size:0.75rem; display:block; color:var(--muted);">Chroma ${selected.c}%</label>
+             <input type="range" id="gf-c" min="0" max="200" value="${selected.c}" style="width:100%"></div>
+
+             <div><label style="font-size:0.75rem; display:block; color:var(--muted);">Contrast ${selected.k}</label>
+             <input type="range" id="gf-k" min="-100" max="100" value="${selected.k}" style="width:100%"></div>
+          </div>
+
+          <div style="margin-top:1rem; padding:10px; background:#fff; border:1px solid #eee; border-radius:8px; font-family:monospace; font-size:0.75rem; color:var(--muted); word-break:break-all; cursor:pointer;" id="gf-copy">
+             ${gradientCss};
+          </div>
+        `);
+
+        mount.querySelectorAll('.stop-handle').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectedId = parseInt(btn.dataset.id);
+                render();
+            });
+        });
+
+        const bindInput = (id, key) => {
+            const el = mount.querySelector(`#gf-${id}`);
+            if(!el) return;
+            el.addEventListener('input', () => {
+                const stop = stops.find(s => s.id === selectedId);
+                if(stop) {
+                    stop[key] = parseInt(el.value);
+                    render();
+                }
+            });
+        };
+
+        bindInput('pos', 'pos');
+        bindInput('h', 'h');
+        bindInput('s', 's');
+        bindInput('v', 'v');
+        bindInput('a', 'a');
+        bindInput('t', 't');
+        bindInput('c', 'c');
+        bindInput('k', 'k');
+
+        mount.querySelector('#gf-type').addEventListener('change', (e) => { type = e.target.value; render(); });
+        if(mount.querySelector('#gf-angle')) mount.querySelector('#gf-angle').addEventListener('input', (e) => { angle = parseInt(e.target.value); render(); });
+
+        mount.querySelector('#gf-add').addEventListener('click', () => {
+            const newId = Math.max(...stops.map(s => s.id)) + 1;
+            stops.push({ id: newId, pos: 50, h: Math.floor(Math.random()*360), s: 80, v: 90, a: 100, t: 0, c: 100, k: 0 });
+            selectedId = newId;
+            render();
+        });
+
+        mount.querySelector('#gf-remove').addEventListener('click', () => {
+            if(stops.length > 2) {
+                stops = stops.filter(s => s.id !== selectedId);
+                selectedId = stops[0].id;
+                render();
+            }
+        });
+
+        mount.querySelector('#gf-random').addEventListener('click', () => {
+            stops.forEach(s => {
+                s.h = Math.floor(Math.random() * 360);
+                s.s = Math.floor(50 + Math.random() * 50);
+                s.v = Math.floor(50 + Math.random() * 50);
+                s.t = Math.floor((Math.random() - 0.5) * 100);
+            });
+            render();
+        });
+        
+        mount.querySelector('#gf-copy').addEventListener('click', () => {
+             if (navigator.clipboard) navigator.clipboard.writeText(gradientCss);
+             const el = mount.querySelector('#gf-copy');
+             const old = el.textContent;
+             el.textContent = "Copied to clipboard!";
+             setTimeout(() => el.textContent = old, 1000);
+        });
+    };
+
+    render();
   };
 
   const orbitApp = () => {

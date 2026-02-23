@@ -7378,6 +7378,90 @@
             function savePresets(presets) {
                 try { localStorage.setItem(PRESETS_KEY, JSON.stringify(presets)); } catch (e) {}
             }
+            function getBuiltInPresets() {
+                return [
+                    {
+                        id: 'builtin_binary',
+                        name: 'Binary Tree',
+                        state: { genMode: 'factor', seed: '1', depth: '10', layout: 'binary', spread: '45', scale: '100' }
+                    },
+                    {
+                        id: 'builtin_phyllotaxis',
+                        name: 'Golden Spiral',
+                        state: { genMode: 'custom', customFn: 'n=>n+1', seed: '1', depth: '500', layout: 'phyllotaxis', scale: '8', sizeMap: 'depth' }
+                    },
+                    {
+                        id: 'builtin_collatz27',
+                        name: 'Collatz (27)',
+                        state: { genMode: 'collatz', seed: '27', depth: '100', layout: 'tree', scale: '30', spacing: '10' }
+                    },
+                    {
+                        id: 'builtin_ulam',
+                        name: 'Ulam Prime Spiral',
+                        state: { genMode: 'custom', customFn: 'n=>n+1', seed: '1', depth: '1000', layout: 'ulam', scale: '15', prime: true, lines: false }
+                    },
+                    {
+                        id: 'builtin_hilbert',
+                        name: 'Hilbert Curve',
+                        state: { genMode: 'custom', customFn: 'n=>n+1', seed: '1', depth: '1024', layout: 'hilbert', scale: '200', lines: true }
+                    },
+                    {
+                        id: 'builtin_galaxy',
+                        name: 'Number Galaxy',
+                        state: { genMode: 'factor', seed: '12', depth: '12', layout: 'galaxy', theme: 'magma', scale: '80' }
+                    },
+                    {
+                        id: 'builtin_circuit',
+                        name: 'Circuit Board',
+                        state: { genMode: 'factor', seed: '60', depth: '10', layout: 'circuit', theme: 'circuit', scale: '100' }
+                    },
+                    {
+                        id: 'builtin_snowflake',
+                        name: 'Snowflake Factor',
+                        state: { genMode: 'factor', seed: '12', depth: '8', layout: 'snowflake', theme: 'ocean', scale: '100' }
+                    },
+                    {
+                        id: 'builtin_city',
+                        name: 'City Block',
+                        state: { genMode: 'factor', seed: '120', depth: '10', layout: 'city', theme: 'mono', scale: '120' }
+                    },
+                    {
+                        id: 'builtin_dna',
+                        name: 'DNA Strand',
+                        state: { genMode: 'factor', seed: '12', depth: '20', layout: 'dna', theme: 'heatmap', scale: '100' }
+                    },
+                    {
+                        id: 'builtin_pythagoras',
+                        name: 'Pythagorean Tree',
+                        state: { genMode: 'factor', seed: '1', depth: '10', layout: 'pythagorean', scale: '80' }
+                    },
+                    {
+                        id: 'builtin_lsys_dragon',
+                        name: 'Dragon Curve (L-Sys)',
+                        state: { genMode: 'lsystem', lsys: { axiom: 'FX', rules: 'X->X+YF+\\nY->-FX-Y', iter: '10' }, spread: '90', layout: 'tree', scale: '10' }
+                    },
+                    {
+                        id: 'builtin_lsys_plant',
+                        name: 'Digital Plant (L-Sys)',
+                        state: { genMode: 'lsystem', lsys: { axiom: 'X', rules: 'X->F+[[X]-X]-F[-FX]+X\\nF->FF', iter: '5' }, spread: '25', layout: 'tree', scale: '5' }
+                    },
+                    {
+                        id: 'builtin_gol_grid',
+                        name: 'Game of Life (Grid)',
+                        state: { genMode: 'custom', customFn: 'n=>n+1', seed: '1', depth: '900', layout: 'grid', gol: true, golTopology: 'grid', scale: '20', lines: false }
+                    },
+                    {
+                        id: 'builtin_lattice',
+                        name: 'Prime Lattice',
+                        state: { genMode: 'factor', seed: '1', depth: '12', layout: 'lattice', theme: 'omega', scale: '150' }
+                    },
+                    {
+                        id: 'builtin_vtree',
+                        name: 'V-Tree',
+                        state: { genMode: 'factor', seed: '12', depth: '12', layout: 'v-tree', scale: '100' }
+                    }
+                ];
+            }
             function captureThumbnailDataUrl() {
                 const w = 320, h = 180;
                 const c = document.createElement('canvas');
@@ -7407,7 +7491,10 @@
             }
             function renderPresetsGrid() {
                 const q = (presetsSearch.value || '').trim().toLowerCase();
-                const presets = loadPresets().filter(p => {
+                const userPresets = loadPresets();
+                const builtIn = getBuiltInPresets();
+                const allPresets = [...userPresets, ...builtIn];
+                const presets = allPresets.filter(p => {
                     if (!q) return true;
                     return (p.name || '').toLowerCase().includes(q);
                 });
@@ -7424,6 +7511,7 @@
                     card.className = 'bg-slate-950/40 border border-slate-800 rounded-xl overflow-hidden';
                     const thumb = p.thumb || '';
                     const created = p.createdAt ? new Date(p.createdAt).toLocaleString() : '';
+                    const isBuiltIn = p.id.startsWith('builtin_');
                     card.innerHTML = `
                         <div class="aspect-video bg-slate-950 border-b border-slate-800 overflow-hidden">
                             ${thumb ? `<img src="${thumb}" alt="" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-slate-600 text-xs">No preview</div>`}
@@ -7432,16 +7520,16 @@
                             <div class="flex items-start justify-between gap-2">
                                 <div>
                                     <div class="font-semibold text-slate-200 text-sm truncate">${(p.name || 'Untitled').replace(/</g,'&lt;')}</div>
-                                    <div class="text-[10px] text-slate-500 font-mono">${created}</div>
+                                    <div class="text-[10px] text-slate-500 font-mono">${isBuiltIn ? 'Built-in' : created}</div>
                                 </div>
-                                <button class="btn-preset-del text-slate-400 hover:text-red-400 text-sm" title="Delete">✕</button>
+                                ${!isBuiltIn ? `<button class="btn-preset-del text-slate-400 hover:text-red-400 text-sm" title="Delete">✕</button>` : ''}
                             </div>
                             <div class="flex gap-2">
                                 <button class="btn-preset-load flex-1 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-bold">Load</button>
-                                <button class="btn-preset-rename flex-1 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-xs border border-slate-700">Rename</button>
+                                ${!isBuiltIn ? `<button class="btn-preset-rename flex-1 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-xs border border-slate-700">Rename</button>` : ''}
                             </div>
                             <div class="flex gap-2">
-                                <button class="btn-preset-copy flex-1 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-xs border border-slate-700">Copy Link</button>
+                                <button class="btn-preset-copy flex-1 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-xs border border-slate-700">Link</button>
                                 <button class="btn-preset-save flex-1 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-xs border border-slate-700">Overwrite</button>
                             </div>
                         </div>
@@ -7450,19 +7538,21 @@
                         if (p.state) restoreFullState(p.state);
                         presetsModal.classList.add('hidden');
                     };
-                    card.querySelector('.btn-preset-rename').onclick = () => {
-                        const name = prompt('Preset name:', p.name || '');
-                        if (name === null) return;
-                        const all = loadPresets();
-                        const idx = all.findIndex(x => x && x.id === p.id);
-                        if (idx !== -1) { all[idx].name = name.trim() || 'Untitled'; savePresets(all); renderPresetsGrid(); }
-                    };
-                    card.querySelector('.btn-preset-del').onclick = () => {
-                        if (!confirm('Delete this preset?')) return;
-                        const all = loadPresets().filter(x => x && x.id !== p.id);
-                        savePresets(all);
-                        renderPresetsGrid();
-                    };
+                    if (!isBuiltIn) {
+                        card.querySelector('.btn-preset-rename').onclick = () => {
+                            const name = prompt('Preset name:', p.name || '');
+                            if (name === null) return;
+                            const all = loadPresets();
+                            const idx = all.findIndex(x => x && x.id === p.id);
+                            if (idx !== -1) { all[idx].name = name.trim() || 'Untitled'; savePresets(all); renderPresetsGrid(); }
+                        };
+                        card.querySelector('.btn-preset-del').onclick = () => {
+                            if (!confirm('Delete this preset?')) return;
+                            const all = loadPresets().filter(x => x && x.id !== p.id);
+                            savePresets(all);
+                            renderPresetsGrid();
+                        };
+                    }
                     card.querySelector('.btn-preset-copy').onclick = async () => {
                         const url = presetToUrl(p);
                         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -7473,6 +7563,10 @@
                         }
                     };
                     card.querySelector('.btn-preset-save').onclick = () => {
+                        if (isBuiltIn) {
+                            alert('Cannot overwrite built-in presets. Use "Save Preset" to create a copy.');
+                            return;
+                        }
                         const all = loadPresets();
                         const idx = all.findIndex(x => x && x.id === p.id);
                         if (idx !== -1) {
