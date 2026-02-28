@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cipher Scramble</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/mini-apps.css" />
+    <link rel="stylesheet" href="../css/lock.css" />
+  </head>
+  <body data-app-id="cipher-scramble" style="--accent: #f97316; --accent-2: #facc15;">
+    <main class="app-shell layout-grid">
+      <header class="app-header">
+        <div class="eyebrow">Game</div>
+        <h1>Cipher Scramble</h1>
+        <p class="subhead">Unscramble secret-leaning words and strengthen pattern recognition.</p>
+        <div class="chip-row">
+          <span class="chip">Cipher</span><span class="chip">Puzzle</span><span class="chip">Word</span>
+        </div>
+      </header>
+      <section class="app-panel">
+        <div class="app-card">
+          <div id="app" data-app="scramble"></div>
+        </div>
+      </section>
+      <aside class="app-aside">
+        <strong>Tips</strong>
+        <div>- Look for letter pairs.</div><div>- Keep a steady rhythm.</div>
+        <div style="margin-top:10px">Return to <a href="../index.html" style="color:inherit">Simulation Hub</a></div>
+      </aside>
+    </main>
+    <script>
+      window.APP_CONFIG = {"words":["cipher","decode","signal","matrix","vector"]};
+    </script>
+    <script src="../js/lock.js"></script>
+    <script src="../js/mini-apps.js"></script>
+  </body>
+</html>

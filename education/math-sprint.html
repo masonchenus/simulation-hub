@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Math Sprint</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/mini-apps.css" />
+    <link rel="stylesheet" href="../css/lock.css" />
+  </head>
+  <body data-app-id="math-sprint" style="--accent: #facc15; --accent-2: #f59e0b;">
+    <main class="app-shell layout-split">
+      <header class="app-header">
+        <div class="eyebrow">Education</div>
+        <h1>Math Sprint</h1>
+        <p class="subhead">Rapid arithmetic prompts to build quick calculation skill.</p>
+        <div class="chip-row">
+          <span class="chip">Math</span><span class="chip">Speed</span><span class="chip">Practice</span>
+        </div>
+      </header>
+      <section class="app-panel">
+        <div class="app-card">
+          <div id="app" data-app="math"></div>
+        </div>
+      </section>
+      <aside class="app-aside">
+        <strong>Tips</strong>
+        <div>- Keep a steady pace.</div><div>- Try to beat your score.</div>
+        <div style="margin-top:10px">Return to <a href="../index.html" style="color:inherit">Simulation Hub</a></div>
+      </aside>
+    </main>
+    <script>
+      window.APP_CONFIG = {};
+    </script>
+    <script src="../js/lock.js"></script>
+    <script src="../js/mini-apps.js"></script>
+  </body>
+</html>

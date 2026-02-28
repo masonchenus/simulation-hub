@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Unit Converter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/mini-apps.css" />
+    <link rel="stylesheet" href="../css/lock.css" />
+  </head>
+  <body data-app-id="unit-converter" style="--accent: #38bdf8; --accent-2: #22d3ee;">
+    <main class="app-shell layout-split">
+      <header class="app-header">
+        <div class="eyebrow">Tool</div>
+        <h1>Unit Converter</h1>
+        <p class="subhead">Convert between meters, kilometers, and centimeters on the fly.</p>
+        <div class="chip-row">
+          <span class="chip">Math</span><span class="chip">Tools</span><span class="chip">Units</span>
+        </div>
+      </header>
+      <section class="app-panel">
+        <div class="app-card">
+          <div id="app" data-app="converter"></div>
+        </div>
+      </section>
+      <aside class="app-aside">
+        <strong>Tips</strong>
+        <div>- Switch units for quick checks.</div><div>- Use decimals for precision.</div>
+        <div style="margin-top:10px">Return to <a href="../index.html" style="color:inherit">Simulation Hub</a></div>
+      </aside>
+    </main>
+    <script>
+      window.APP_CONFIG = {"units":{"m":1,"km":1000,"cm":0.01,"mm":0.001}};
+    </script>
+    <script src="../js/lock.js"></script>
+    <script src="../js/mini-apps.js"></script>
+  </body>
+</html>

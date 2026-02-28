@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Flashcard Deck</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/mini-apps.css" />
+    <link rel="stylesheet" href="../css/lock.css" />
+  </head>
+  <body data-app-id="flashcard-deck" style="--accent: #38bdf8; --accent-2: #60a5fa;">
+    <main class="app-shell layout-split">
+      <header class="app-header">
+        <div class="eyebrow">Education</div>
+        <h1>Flashcard Deck</h1>
+        <p class="subhead">Flip through short prompts and definitions for fast study loops.</p>
+        <div class="chip-row">
+          <span class="chip">Flashcards</span><span class="chip">Study</span><span class="chip">Recall</span>
+        </div>
+      </header>
+      <section class="app-panel">
+        <div class="app-card">
+          <div id="app" data-app="flashcards"></div>
+        </div>
+      </section>
+      <aside class="app-aside">
+        <strong>Tips</strong>
+        <div>- Flip for the answer.</div><div>- Cycle to drill memory.</div>
+        <div style="margin-top:10px">Return to <a href="../index.html" style="color:inherit">Simulation Hub</a></div>
+      </aside>
+    </main>
+    <script>
+      const baseWords = [
+        "abandon","ability","about","absorb","access","active","adapt","advice","affect","again",
+        "agency","agree","air","alert","align","alive","allow","almost","already","amazing",
+        "amount","answer","appear","apply","approve","area","arrive","artist","aspect","assist",
+        "assume","attack","attempt","attend","author","avoid","balance","basic","battery","beauty",
+        "begin","belief","benefit","beyond","biology","boundary","bright","budget","build","business",
+        "camera","canvas","career","center","chance","change","charge","choice","circle","clarity",
+        "classic","climate","collect","comfort","command","comment","compact","compare","compete","complex",
+        "concept","connect","consider","control","convert","corner","current","custom","damage","data",
+        "decide","define","deliver","demand","design","detail","develop","device","differ","digital",
+        "direct","discover","display","diverse","document","double","draft","dynamic","eager","effect",
+        "effort","energy","engine","enhance","enjoy","enough","equal","escape","estimate","ethics",
+        "event","exact","expand","expect","expert","explore","extend","factor","feature","feedback",
+        "filter","focus","follow","force","format","future","galaxy","general","generate","gentle",
+        "global","goal","graphic","growth","handle","harmony","health","history","honor","human",
+        "idea","impact","improve","include","increase","index","industry","inform","initial","input",
+        "insight","inspire","instance","interact","interest","invent","invest","invite","island","journey",
+        "judge","keep","kernel","kind","knowledge","launch","layer","learn","legacy","legend",
+        "limit","linear","listen","logic","lunar","machine","manage","margin","market","master",
+        "matrix","measure","memory","method","mirror","moment","monitor","motion","music","nature",
+        "network","neutral","notice","object","observe","ocean","offer","option","orbit","origin",
+        "output","pattern","people","perfect","perform","phase","planet","player","policy","position",
+        "power","predict","prepare","present","prevent","process","project","proof","protect","purpose",
+        "quality","quick","random","range","reason","record","reduce","reflect","region","release",
+        "remain","remote","render","repeat","rescue","research","resolve","result","review","reward",
+        "rhythm","route","sample","scale","scene","school","science","screen","search","secure",
+        "select","sense","series","shadow","signal","silent","simple","simulate","skill","solution",
+        "source","space","spark","stable","standard","status","stream","studio","subject","success",
+        "support","symbol","system","target","team","texture","theory","thread","timing","tool",
+        "topic","track","transform","travel","trend","trust","tutor","unique","update","value",
+        "vector","vision","visual","volume","wave","window","wonder","world","yield","zenith"
+      ];
+      const prefixes = ["neo","hyper","micro","macro","meta","ultra","astro","bio","geo","nano","proto","quant","cyber","solar","luma","terra"];
+      const suffixes = ["lab","flow","shift","core","craft","pulse","logic","field","scope","spark","drive","stream","grid","mark","signal","works","form","link","path","wave"];
+
+      const cards = Array.from({ length: 9000 }, (_, i) => {
+        const base = baseWords[i % baseWords.length];
+        const pref = prefixes[Math.floor(i / baseWords.length) % prefixes.length];
+        const suff = suffixes[Math.floor(i / (baseWords.length * prefixes.length)) % suffixes.length];
+        const word = `${pref}${base}${suff}`;
+        return {
+          front: word,
+          back: `Use: ${word} is a key idea in this deck.`,
+        };
+      });
+
+      window.APP_CONFIG = { cards };
+    </script>
+    <script src="../js/lock.js"></script>
+    <script src="../js/mini-apps.js"></script>
+  </body>
+</html>
