@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Dot Art Physics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #050505; color: white; font-family: 'Courier New', Courier, monospace; }
+        #ui-layer { position: absolute; top: 20px; left: 20px; z-index: 10; background: rgba(10, 10, 10, 0.85); padding: 20px; border-radius: 12px; border: 1px solid #333; width: 320px; backdrop-filter: blur(5px); max-height: 90vh; overflow-y: auto; }
+        .btn { background: #222; border: 1px solid #444; color: #eee; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .btn:hover { background: #444; border-color: #666; }
+        .btn.active { background: #2563eb; border-color: #3b82f6; color: white; }
+        .control-group { margin-bottom: 16px; }
+        .control-label { display: block; font-size: 10px; color: #888; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+        input[type=range] { width: 100%; accent-color: #2563eb; }
+    </style>
+</head>
+
+<body>
+    <div id="ui-layer">
+        <h1 class="text-xl font-bold mb-4 text-blue-400 tracking-wider">DOT PHYSICS</h1>
+        
+        <div class="control-group">
+            <span class="control-label">Point of View</span>
+            <div class="grid grid-cols-3 gap-2">
+                <button class="btn active" id="pov1" onclick="setPOV(1)">1 Mile</button>
+                <button class="btn" id="pov20" onclick="setPOV(20)">20 Miles</button>
+                <button class="btn" id="pov100" onclick="setPOV(100)">100 Miles</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <span class="control-label">Simulation Speed</span>
+            <input type="range" id="timeStep" min="0" max="3" step="0.1" value="1">
+        </div>
+
+        <div class="control-group">
+            <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-white/5 transition">
+                <input type="checkbox" id="fireworksMode" class="w-4 h-4 accent-pink-500">
+                <span class="text-xs uppercase tracking-wider text-gray-300">Fireworks Mode</span>
+            </label>
+        </div>
+
+        <div class="control-group">
+            <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-white/5 transition">
+                <input type="checkbox" id="fireToggle" class="w-4 h-4 accent-red-500">
+                <span class="text-xs uppercase tracking-wider text-gray-300">Fires & Explosions</span>
+            </label>
+        </div>
+
+        <div class="control-group">
+            <span class="control-label">Generation Mode</span>
+            <select id="genMode" class="w-full bg-[#222] border border-[#444] text-white p-1 rounded text-xs mb-2 outline-none">
+                <option value="random">Random Cloud</option>
+                <option value="tower">Tower Structure</option>
+                <option value="deathray">Death Ray Stream</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <span class="control-label">Dot Size</span>
+            <input type="range" id="dotSize" min="0.1" max="5" step="0.1" value="1.5">
+        </div>
+
+        <div class="control-group">
+            <span class="control-label">Spread (Density)</span>
+            <input type="range" id="spreadVal" min="50" max="2000" step="50" value="400">
+        </div>
+
+        <div class="control-group border-t border-gray-700 pt-4">
+            <span class="control-label text-yellow-500">Force Sensor</span>
+            <span class="control-label">Range: <span id="radiusDisplay">100</span>m</span>
+            <input type="range" id="measureRadius" min="0" max="1000" step="10" value="100">
+            <div class="mt-1 text-xs font-mono text-yellow-400 tracking-wider">READING: <span id="forceDisplay">0</span> N</div>
+        </div>
+
+        <div class="control-group">
+            <span class="control-label">Wind Force</span>
+            <input type="range" id="windForce" min="-50" max="50" step="1" value="0">
+        </div>
+
+        <div class="control-group">
+            <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-white/5 transition">
+                <input type="checkbox" id="velColor" class="w-4 h-4 accent-blue-500">
+                <span class="text-xs uppercase tracking-wider text-gray-300">Velocity Color</span>
+            </label>
+        </div>
+
+        <div class="control-group">
+            <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-white/5 transition">
+                <input type="checkbox" id="zeroGrav" class="w-4 h-4 accent-blue-500">
+                <span class="text-xs uppercase tracking-wider text-gray-300">Zero Gravity</span>
+            </label>
+        </div>
+
+        <div class="control-group">
+            <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-white/5 transition">
+                <input type="checkbox" id="vortex" class="w-4 h-4 accent-purple-500">
+                <span class="text-xs uppercase tracking-wider text-gray-300">Vortex Field</span>
+            </label>
+        </div>
+
+        <div class="control-group">
+            <span class="control-label text-green-500">Obstacle Manager</span>
+            <div class="grid grid-cols-2 gap-2 mb-2">
+                <button id="addObstacleBtn" class="btn">Add New</button>
+                <button id="clearObstaclesBtn" class="btn">Clear All</button>
+            </div>
+            <select id="obstacleList" class="w-full bg-[#222] border border-[#444] text-white p-1 rounded text-xs mb-2 outline-none">
+                <option value="-1">None Selected</option>
+            </select>
+            
+            <div id="obstacleProperties" class="hidden border-l-2 border-green-500 pl-2 mt-2">
+                <div class="control-group">
+                    <span class="control-label">Shape</span>
+                    <select id="obsShape" class="w-full bg-[#222] border border-[#444] text-white p-1 rounded text-xs outline-none">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+                <div class="control-group">
+                    <span class="control-label">Size: <span id="obsSizeDisplay">30</span></span>
+                    <input type="range" id="obsSize" min="5" max="150" step="1" value="30">
+                </div>
+                <div class="control-group">
+                    <span class="control-label">Position X/Y/Z</span>
+                    <div class="grid grid-cols-3 gap-1">
+                        <input type="number" id="obsPosX" class="bg-[#222] border border-[#444] text-white text-xs p-1 w-full" placeholder="X">
+                        <input type="number" id="obsPosY" class="bg-[#222] border border-[#444] text-white text-xs p-1 w-full" placeholder="Y">
+                        <input type="number" id="obsPosZ" class="bg-[#222] border border-[#444] text-white text-xs p-1 w-full" placeholder="Z">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <span class="control-label">Particle Shape</span>
+            <select id="shapeSelect" class="w-full bg-[#222] border border-[#444] text-white p-1 rounded text-xs mb-2 outline-none">
+                <!-- Populated by JS -->
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-white/5 transition">
+                <input type="checkbox" id="autoRotate" class="w-4 h-4 accent-green-500">
+                <span class="text-xs uppercase tracking-wider text-gray-300">Auto Rotate</span>
+            </label>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mb-4">
+            <button id="slowMo" class="btn">Slow Mo</button>
+            <button id="revGrav" class="btn">Rev Gravity</button>
+        </div>
+
+        <div class="control-group">
+            <span class="control-label">Base Color</span>
+            <input type="color" id="baseColor" value="#3b82f6" class="w-full h-6 bg-transparent border-none cursor-pointer">
+        </div>
+
+        <div id="towerControls" class="hidden mb-4 border-l-2 border-blue-500 pl-2">
+             <div class="control-group">
+                 <span class="control-label">Base Size: <span id="baseDisplay">2</span>x<span id="baseDisplay2">2</span></span>
+                 <input type="range" id="towerBase" min="2" max="12" step="1" value="2">
+             </div>
+             <div class="control-group">
+                 <span class="control-label">Height: <span id="heightDisplay">114</span></span>
+                 <input type="range" id="towerHeight" min="20" max="175" step="1" value="114">
+             </div>
+        </div>
+
+        <div class="control-group" id="randomControls">
+             <span class="control-label">Dot Count: <span id="countDisplay">5000</span></span>
+             <input type="range" id="dotCount" min="100" max="20000" step="100" value="5000">
+        </div>
+
+        <button onclick="resetSimulation()" class="btn w-full bg-red-900/50 border-red-800 hover:bg-red-800 text-red-100">Reset Simulation</button>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        const CONFIG = {
+            gravity: -9.8 * 2, // Enhanced gravity for visual effect
+            bounce: 0.6,
+            friction: 0.98,
+            groundY: 0,
+            spread: 400,
+            height: 600
+        };
+
+        // --- Scene Setup ---
+        const scene = new THREE.Scene();
+        
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 10000000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // --- Lighting ---
+        const ambientLight = new THREE.AmbientLight(0x404040);
+        scene.add(ambientLight);
+        
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        dirLight.position.set(100, 500, 100);
+        scene.add(dirLight);
+
+        const pointLight = new THREE.PointLight(0x3b82f6, 1, 1000);
+        pointLight.position.set(0, 200, 0);
+        scene.add(pointLight);
+
+        // --- Ground ---
+        const groundGeo = new THREE.PlaneGeometry(20000, 20000);
+        const groundMat = new THREE.MeshStandardMaterial({ 
+            color: 0x111111, 
+            roughness: 0.6, 
+            metalness: 0.2 
+        });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = CONFIG.groundY;
+        scene.add(ground);
+
+        // Grid Helper
+        const grid = new THREE.GridHelper(20000, 200, 0x333333, 0x111111);
+        grid.position.y = CONFIG.groundY + 0.1;
+        scene.add(grid);
+
+        // --- Dots System (InstancedMesh) ---
+        let dotMesh;
+        let dotData = []; // { x, y, z, vx, vy, vz, color }
+        const dummy = new THREE.Object3D();
+        const color = new THREE.Color();
+
+        // --- Shape Library ---
+        const shapeLibrary = [];
+        
+        // Helpers
+        function stellate(geo, height) {
+            const nonIndexed = geo.toNonIndexed();
+            const pos = nonIndexed.attributes.position;
+            const newPos = [];
+            for(let i=0; i<pos.count; i+=3) {
+                const v1 = new THREE.Vector3().fromBufferAttribute(pos, i);
+                const v2 = new THREE.Vector3().fromBufferAttribute(pos, i+1);
+                const v3 = new THREE.Vector3().fromBufferAttribute(pos, i+2);
+                const normal = new THREE.Vector3().crossVectors(new THREE.Vector3().subVectors(v2, v1), new THREE.Vector3().subVectors(v3, v1)).normalize();
+                const center = new THREE.Vector3().add(v1).add(v2).add(v3).divideScalar(3);
+                const tip = center.clone().add(normal.multiplyScalar(height));
+                newPos.push(v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, tip.x, tip.y, tip.z);
+                newPos.push(v2.x, v2.y, v2.z, v3.x, v3.y, v3.z, tip.x, tip.y, tip.z);
+                newPos.push(v3.x, v3.y, v3.z, v1.x, v1.y, v1.z, tip.x, tip.y, tip.z);
+            }
+            const newGeo = new THREE.BufferGeometry();
+            newGeo.setAttribute('position', new THREE.Float32BufferAttribute(newPos, 3));
+            newGeo.computeVertexNormals();
+            return newGeo;
+        }
+
+        function createStar(points) {
+            const shape = new THREE.Shape();
+            const outer = 1.2; const inner = 0.6; const step = Math.PI / points;
+            shape.moveTo(0, outer);
+            for(let i=0; i<2*points; i++) {
+                const r = (i%2 !== 0) ? outer : inner;
+                const a = i * step;
+                shape.lineTo(Math.sin(a)*r, Math.cos(a)*r);
+            }
+            shape.closePath();
+            const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.4, bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.1, bevelSegments: 1 });
+            geo.center();
+            return geo;
+        }
+
+        function createAsteroid(seed) {
+            const geo = new THREE.DodecahedronGeometry(1.2, 1);
+            const pos = geo.attributes.position;
+            const v = new THREE.Vector3();
+            for(let i=0; i<pos.count; i++) {
+                v.fromBufferAttribute(pos, i);
+                const noise = Math.sin(v.x*3 + seed) * Math.cos(v.y*3 + seed) * Math.sin(v.z*3 + seed);
+                v.multiplyScalar(1 + noise * 0.3);
+                pos.setXYZ(i, v.x, v.y, v.z);
+            }
+            geo.computeVertexNormals();
+            return geo;
+        }
+
+        // Populate Library
+        shapeLibrary.push({ name: "Sphere", gen: () => new THREE.SphereGeometry(1, 16, 16) });
+        shapeLibrary.push({ name: "Cube", gen: () => new THREE.BoxGeometry(1.5, 1.5, 1.5) });
+        shapeLibrary.push({ name: "Tetrahedron", gen: () => new THREE.TetrahedronGeometry(1.5), flat: true });
+        shapeLibrary.push({ name: "Octahedron", gen: () => new THREE.OctahedronGeometry(1.5), flat: true });
+        shapeLibrary.push({ name: "Dodecahedron", gen: () => new THREE.DodecahedronGeometry(1.5), flat: true });
+        shapeLibrary.push({ name: "Icosahedron", gen: () => new THREE.IcosahedronGeometry(1.5), flat: true });
+        shapeLibrary.push({ name: "Cone", gen: () => new THREE.CylinderGeometry(0, 1, 2, 32) });
+        shapeLibrary.push({ name: "Cylinder", gen: () => new THREE.CylinderGeometry(1, 1, 2, 32) });
+        shapeLibrary.push({ name: "Torus", gen: () => new THREE.TorusGeometry(1, 0.4, 16, 32) });
+
+        for(let i=3; i<=12; i++) shapeLibrary.push({ name: `Prism ${i}-gon`, gen: () => new THREE.CylinderGeometry(1, 1, 1.5, i), flat: true });
+        for(let i=3; i<=12; i++) shapeLibrary.push({ name: `Pyramid ${i}-gon`, gen: () => new THREE.CylinderGeometry(0, 1, 1.5, i), flat: true });
+        for(let i=3; i<=12; i++) shapeLibrary.push({ name: `Ring ${i}-gon`, gen: () => new THREE.TorusGeometry(1, 0.3, 8, i), flat: true });
+        for(let i=3; i<=10; i++) shapeLibrary.push({ name: `Star ${i}-point`, gen: () => createStar(i), flat: true });
+        
+        const knots = [[2,3], [3,4], [4,5], [5,6], [2,5], [3,5], [4,7], [5,8], [3,7], [2,7]];
+        knots.forEach(([p,q]) => shapeLibrary.push({ name: `Torus Knot (${p},${q})`, gen: () => new THREE.TorusKnotGeometry(0.8, 0.25, 64, 8, p, q) }));
+
+        const platonic = [
+            { n: "Tetrahedron", g: () => new THREE.TetrahedronGeometry(1) }, { n: "Cube", g: () => new THREE.BoxGeometry(1,1,1) },
+            { n: "Octahedron", g: () => new THREE.OctahedronGeometry(1) }, { n: "Dodecahedron", g: () => new THREE.DodecahedronGeometry(1) },
+            { n: "Icosahedron", g: () => new THREE.IcosahedronGeometry(1) }
+        ];
+        platonic.forEach(p => {
+            shapeLibrary.push({ name: `Stellated ${p.n} (Short)`, gen: () => stellate(p.g(), 0.5), flat: true });
+            shapeLibrary.push({ name: `Stellated ${p.n} (Long)`, gen: () => stellate(p.g(), 1.5), flat: true });
+        });
+        for(let i=1; i<=5; i++) shapeLibrary.push({ name: `Asteroid ${i}`, gen: () => createAsteroid(i), flat: true });
+        shapeLibrary.push({ name: "Geodesic Sphere", gen: () => new THREE.IcosahedronGeometry(1.5, 2), flat: true });
+        shapeLibrary.push({ name: "Faceted Sphere", gen: () => new THREE.SphereGeometry(1.5, 8, 6), flat: true });
+
+        // Init Select
+        const shapeSelect = document.getElementById('shapeSelect');
+        const obsShapeSelect = document.getElementById('obsShape');
+        shapeLibrary.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.name;
+            opt.innerText = s.name;
+            shapeSelect.appendChild(opt);
+            
+            const opt2 = document.createElement('option');
+            opt2.value = s.name;
+            opt2.innerText = s.name;
+            obsShapeSelect.appendChild(opt2);
+        });
+
+        function initDots(preserveData = false) {
+            const mode = document.getElementById('genMode').value;
+            if (dotMesh) {
+                scene.remove(dotMesh);
+                dotMesh.geometry.dispose();
+                dotMesh.material.dispose();
+            }
+
+            const shapeName = document.getElementById('shapeSelect').value;
+            const shapeEntry = shapeLibrary.find(s => s.name === shapeName) || shapeLibrary[0];
+            const geometry = shapeEntry.gen();
+
+            const material = new THREE.MeshStandardMaterial({ 
+                roughness: 0.4, 
+                metalness: 0.6,
+                flatShading: !!shapeEntry.flat
+            });
+            
+            let maxCount = 20000;
+            if (mode === 'random') maxCount = parseInt(document.getElementById('dotCount').value);
+            else if (mode === 'tower') {
+                const b = parseInt(document.getElementById('towerBase').value);
+                const h = parseInt(document.getElementById('towerHeight').value);
+                maxCount = b * b * h;
+            } else if (mode === 'deathray') {
+                maxCount = 30000;
+            }
+
+            dotMesh = new THREE.InstancedMesh(geometry, material, maxCount);
+            dotMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+            dotMesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(maxCount * 3), 3);
+
+            if (preserveData && dotData.length > 0) {
+                dotMesh.count = dotData.length;
+                for(let i=0; i<dotData.length; i++) {
+                    const d = dotData[i];
+                    color.setRGB(d.r, d.g, d.b);
+                    dotMesh.setColorAt(i, color);
+                }
+                dotMesh.instanceColor.needsUpdate = true;
+                scene.add(dotMesh);
+                return;
+            }
+
+            dotData = [];
+            
+            if (mode === 'random') {
+                const spread = parseInt(document.getElementById('spreadVal').value);
+                for (let i = 0; i < maxCount; i++) {
+                const x = (Math.random() - 0.5) * spread;
+                const y = Math.random() * CONFIG.height + 50;
+                const z = (Math.random() - 0.5) * spread;
+                
+                // Initial velocity
+                const vx = (Math.random() - 0.5) * 20;
+                const vy = (Math.random() - 0.5) * 20;
+                const vz = (Math.random() - 0.5) * 20;
+
+                // Color gradient based on height
+                const hue = (y / CONFIG.height) * 0.2 + 0.5; // Blue to Purple
+                color.setHSL(hue, 0.8, 0.5);
+                
+                dummy.position.set(x, y, z);
+                dummy.updateMatrix();
+                dotMesh.setMatrixAt(i, dummy.matrix);
+                dotMesh.setColorAt(i, color);
+
+                dotData.push({ x, y, z, vx, vy, vz, r: color.r, g: color.g, b: color.b });
+                }
+                dotMesh.count = maxCount;
+            } else if (mode === 'tower') {
+                const b = parseInt(document.getElementById('towerBase').value);
+                const h = parseInt(document.getElementById('towerHeight').value);
+                const spacing = parseInt(document.getElementById('spreadVal').value) / 100;
+                let idx = 0;
+                for (let y = 0; y < h; y++) {
+                    for (let x = 0; x < b; x++) {
+                        for (let z = 0; z < b; z++) {
+                            const px = (x - b/2 + 0.5) * spacing;
+                            const py = y * spacing + 2;
+                            const pz = (z - b/2 + 0.5) * spacing;
+                            
+                            const hue = (y / h) * 0.2 + 0.5;
+                            color.setHSL(hue, 0.8, 0.5);
+                            
+                            dummy.position.set(px, py, pz);
+                            dummy.updateMatrix();
+                            dotMesh.setMatrixAt(idx, dummy.matrix);
+                            dotMesh.setColorAt(idx, color);
+                            dotData.push({ x: px, y: py, z: pz, vx: 0, vy: 0, vz: 0, r: color.r, g: color.g, b: color.b });
+                            idx++;
+                        }
+                    }
+                }
+                dotMesh.count = idx;
+            } else if (mode === 'deathray') {
+                dotMesh.count = 0;
+            }
+
+            scene.add(dotMesh);
+        }
+
+        // --- Obstacles ---
+        const obstacleGroup = new THREE.Group();
+        scene.add(obstacleGroup);
+        let obstacles = []; // { id, mesh, type, size, x, y, z }
+        let nextObsId = 1;
+
+        // --- Explosion System ---
+        const explosions = [];
+        const explosionGeo = new THREE.BufferGeometry();
+        const explosionMat = new THREE.PointsMaterial({
+            size: 4,
+            vertexColors: true,
+            transparent: true,
+            opacity: 1,
+            blending: THREE.AdditiveBlending
+        });
+
+        function spawnExplosion(x, y, z, magnitude, colorRGB) {
+            const particleCount = Math.floor(magnitude * 5);
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+            const velocities = [];
+            
+            const baseColor = colorRGB || { r: 1, g: 0.5, b: 0 };
+
+            for(let i=0; i<particleCount; i++) {
+                positions[i*3] = x;
+                positions[i*3+1] = y;
+                positions[i*3+2] = z;
+                
+                colors[i*3] = baseColor.r;
+                colors[i*3+1] = baseColor.g;
+                colors[i*3+2] = baseColor.b;
+
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.random() * Math.PI;
+                const speed = Math.random() * magnitude * 2;
+                
+                velocities.push({
+                    x: Math.sin(phi) * Math.cos(theta) * speed,
+                    y: Math.cos(phi) * speed,
+                    z: Math.sin(phi) * Math.sin(theta) * speed
+                });
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            
+            const points = new THREE.Points(geometry, explosionMat.clone());
+            scene.add(points);
+            
+            explosions.push({
+                mesh: points,
+                velocities: velocities,
+                age: 0,
+                maxAge: 1.0 + Math.random() * 0.5
+            });
+        }
+
+        function updateExplosions(dt) {
+            for (let i = explosions.length - 1; i >= 0; i--) {
+                const ex = explosions[i];
+                ex.age += dt;
+                
+                if (ex.age >= ex.maxAge) {
+                    scene.remove(ex.mesh);
+                    ex.mesh.geometry.dispose();
+                    explosions.splice(i, 1);
+                    continue;
+                }
+
+                const positions = ex.mesh.geometry.attributes.position.array;
+                for(let j=0; j<ex.velocities.length; j++) {
+                    const v = ex.velocities[j];
+                    positions[j*3] += v.x * dt;
+                    positions[j*3+1] += v.y * dt;
+                    positions[j*3+2] += v.z * dt;
+                    
+                    // Gravity on particles
+                    v.y += CONFIG.gravity * dt * 0.5;
+                    
+                    // Ground collision for particles
+                    if (positions[j*3+1] < 0) {
+                        positions[j*3+1] = 0;
+                        v.y *= -0.5;
+                    }
+                }
+                
+                ex.mesh.geometry.attributes.position.needsUpdate = true;
+                ex.mesh.material.opacity = 1 - (ex.age / ex.maxAge);
+            }
+        }
+
+        // --- Main Loop ---
+        const clock = new THREE.Clock();
+        let isSlowMo = false;
+        let isRevGrav = false;
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const rawDt = clock.getDelta();
+            const timeScale = parseFloat(document.getElementById('timeStep').value);
+            let dt = rawDt * timeScale;
+            if (isSlowMo) dt *= 0.1;
+
+            const fireworksMode = document.getElementById('fireworksMode').checked;
+            const fireEnabled = document.getElementById('fireToggle').checked;
+            const mode = document.getElementById('genMode').value;
+            const currentSize = parseFloat(document.getElementById('dotSize').value);
+            const measureRadius = parseFloat(document.getElementById('measureRadius').value);
+            let currentFrameForce = 0;
+
+            const windForce = parseFloat(document.getElementById('windForce').value);
+            const velColor = document.getElementById('velColor').checked;
+            const zeroGrav = document.getElementById('zeroGrav').checked;
+            const vortex = document.getElementById('vortex').checked;
+            const autoRotate = document.getElementById('autoRotate').checked;
+            const baseColorHex = document.getElementById('baseColor').value;
+            const baseColorObj = new THREE.Color(baseColorHex);
+
+            if (autoRotate) {
+                controls.autoRotate = true;
+                controls.autoRotateSpeed = 2.0;
+            } else {
+                controls.autoRotate = false;
+            }
+
+            if (mode === 'deathray' && dotMesh && dotData.length < 30000) {
+                const spawnRate = 2; 
+                for(let k=0; k<spawnRate; k++) {
+                    if (dotData.length >= 30000) break;
+                    const x = (Math.random() - 0.5) * 5;
+                    const y = CONFIG.height;
+                    const z = (Math.random() - 0.5) * 5;
+                    const vx = (Math.random() - 0.5) * 10;
+                    const vy = -150;
+                    const vz = (Math.random() - 0.5) * 10;
+                    
+                    const hue = (performance.now() * 0.0005) % 1;
+                    color.setHSL(hue, 1.0, 0.5);
+                    
+                    const idx = dotData.length;
+                    dummy.position.set(x, y, z);
+                    dummy.scale.set(currentSize, currentSize, currentSize);
+                    dummy.updateMatrix();
+                    dotMesh.setMatrixAt(idx, dummy.matrix);
+                    dotMesh.setColorAt(idx, color);
+                    dotData.push({ x, y, z, vx, vy, vz, r: color.r, g: color.g, b: color.b });
+                }
+                dotMesh.count = dotData.length;
+                dotMesh.instanceColor.needsUpdate = true;
+            }
+
+            if (dotMesh && dotData.length > 0 && dt > 0) {
+                for (let i = 0; i < dotData.length; i++) {
+                    const d = dotData[i];
+                    
+                    // Physics
+                    if (!zeroGrav) {
+                        const g = isRevGrav ? -CONFIG.gravity : CONFIG.gravity;
+                        d.vy += g * dt;
+                    }
+                    
+                    // Wind
+                    if (windForce !== 0) {
+                        d.vx += windForce * dt * 0.5;
+                    }
+
+                    // Vortex
+                    if (vortex) {
+                        const dist = Math.sqrt(d.x*d.x + d.z*d.z);
+                        if (dist > 1) {
+                            const force = 5000 / (dist * dist + 100);
+                            d.vx += -d.z * force * dt;
+                            d.vz += d.x * force * dt;
+                            // Pull to center slightly
+                            d.vx -= d.x * force * 0.5 * dt;
+                            d.vz -= d.z * force * 0.5 * dt;
+                        }
+                    }
+
+                    d.x += d.vx * dt;
+                    d.y += d.vy * dt;
+                    d.z += d.vz * dt;
+
+                    // Ground Collision
+                    if (d.y <= 1.5) { // 1.5 is radius
+                        d.y = 1.5;
+                        
+                        // Impact logic
+                        const impactSpeed = Math.abs(d.vy);
+
+                        // Measure Force
+                        const distSq = d.x * d.x + d.z * d.z;
+                        if (distSq <= measureRadius * measureRadius) {
+                            // Approximate force as impact impulse * mass (size^3)
+                            currentFrameForce += impactSpeed * Math.pow(currentSize, 3) * 0.1;
+                        }
+                        
+                        d.vy *= -CONFIG.bounce;
+                        d.vx *= CONFIG.friction;
+                        d.vz *= CONFIG.friction;
+
+                        // Explosion trigger
+                        if ((fireEnabled || fireworksMode) && impactSpeed > 15) {
+                            let exColor = { r: 1, g: 0.3, b: 0 }; // Default fire
+                            if (fireworksMode) {
+                                // Use particle color for fireworks
+                                exColor = { r: d.r, g: d.g, b: d.b };
+                            }
+                            spawnExplosion(d.x, d.y, d.z, impactSpeed * (fireworksMode ? 0.8 : 0.5), exColor);
+                        }
+                    }
+
+                    // Obstacle Collision
+                    if (obstacles.length > 0) {
+                        for (const obs of obstacles) {
+                            const dx = d.x - obs.x;
+                            const dy = d.y - obs.y;
+                            const dz = d.z - obs.z;
+                            
+                            if (obs.type !== 'Cube') {
+                                const distSq = dx*dx + dy*dy + dz*dz;
+                                const minDist = obs.size + 1.5;
+                                if (distSq < minDist * minDist) {
+                                    const dist = Math.sqrt(distSq);
+                                    const nx = dx / dist;
+                                    const ny = dy / dist;
+                                    const nz = dz / dist;
+                                    
+                                    const dot = d.vx * nx + d.vy * ny + d.vz * nz;
+                                    d.vx -= 2 * dot * nx;
+                                    d.vy -= 2 * dot * ny;
+                                    d.vz -= 2 * dot * nz;
+                                    
+                                    const push = minDist - dist;
+                                    d.x += nx * push;
+                                    d.y += ny * push;
+                                    d.z += nz * push;
+                                    
+                                    d.vx *= 0.8; d.vy *= 0.8; d.vz *= 0.8;
+
+                                    if (fireworksMode && Math.abs(dot) > 20) {
+                                        spawnExplosion(d.x, d.y, d.z, Math.abs(dot) * 0.5, { r: d.r, g: d.g, b: d.b });
+                                    }
+                                }
+                            } else if (obs.type === 'Cube') {
+                                // AABB check (assuming no rotation for simplicity in physics loop)
+                                const half = obs.size * 0.75 + 1.5;
+                                if (Math.abs(dx) < half && Math.abs(dy) < half && Math.abs(dz) < half) {
+                                    // Determine collision normal based on max overlap
+                                    const ox = half - Math.abs(dx);
+                                    const oy = half - Math.abs(dy);
+                                    const oz = half - Math.abs(dz);
+                                    
+                                    let nx=0, ny=0, nz=0;
+                                    if (ox < oy && ox < oz) nx = Math.sign(dx);
+                                    else if (oy < ox && oy < oz) ny = Math.sign(dy);
+                                    else nz = Math.sign(dz);
+
+                                    const dot = d.vx * nx + d.vy * ny + d.vz * nz;
+                                    d.vx -= 2 * dot * nx;
+                                    d.vy -= 2 * dot * ny;
+                                    d.vz -= 2 * dot * nz;
+
+                                    if (nx !== 0) d.x += nx * ox;
+                                    if (ny !== 0) d.y += ny * oy;
+                                    if (nz !== 0) d.z += nz * oz;
+                                    
+                                    d.vx *= 0.8; d.vy *= 0.8; d.vz *= 0.8;
+                                    
+                                    if (fireworksMode && Math.abs(dot) > 20) {
+                                        spawnExplosion(d.x, d.y, d.z, Math.abs(dot) * 0.5, { r: d.r, g: d.g, b: d.b });
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Update Instance
+                    dummy.position.set(d.x, d.y, d.z);
+                    dummy.scale.set(currentSize, currentSize, currentSize);
+                    dummy.updateMatrix();
+                    dotMesh.setMatrixAt(i, dummy.matrix);
+                    
+                    // Color Update
+                    if (velColor) {
+                        const speed = Math.sqrt(d.vx*d.vx + d.vy*d.vy + d.vz*d.vz);
+                        const hue = Math.max(0, 0.6 - (speed / 150) * 0.6); // Blue (slow) to Red (fast)
+                        color.setHSL(hue, 1.0, 0.5);
+                        dotMesh.setColorAt(i, color);
+                    } else {
+                        if (baseColorHex !== '#3b82f6') {
+                             dotMesh.setColorAt(i, baseColorObj);
+                        } else {
+                             color.setRGB(d.r, d.g, d.b);
+                             dotMesh.setColorAt(i, color);
+                        }
+                    }
+                }
+                dotMesh.instanceMatrix.needsUpdate = true;
+                if (velColor || baseColorHex !== '#3b82f6') dotMesh.instanceColor.needsUpdate = true;
+            }
+            
+            document.getElementById('forceDisplay').innerText = Math.floor(currentFrameForce).toLocaleString();
+
+            updateExplosions(dt);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // --- UI Functions ---
+        function setPOV(miles) {
+            // Mapping miles to simulation units (approx 1 mile = 300 units for visual scale)
+            const units = miles * 300;
+            
+            // Smooth transition could be added, but direct set for now
+            const targetPos = new THREE.Vector3(0, units * 0.4, units);
+            
+            // Animate camera
+            const startPos = camera.position.clone();
+            const startTime = performance.now();
+            const duration = 1000;
+
+            function animateCam() {
+                const now = performance.now();
+                const t = Math.min(1, (now - startTime) / duration);
+                // Ease out cubic
+                const ease = 1 - Math.pow(1 - t, 3);
+                
+                camera.position.lerpVectors(startPos, targetPos, ease);
+                controls.target.set(0, 0, 0);
+                
+                if (t < 1) requestAnimationFrame(animateCam);
+            }
+            animateCam();
+
+            // Update buttons
+            document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`pov${miles}`).classList.add('active');
+        }
+
+        function resetSimulation() {
+            initDots();
+            
+            // Clear explosions
+            explosions.forEach(ex => {
+                scene.remove(ex.mesh);
+                ex.mesh.geometry.dispose();
+            });
+            explosions.length = 0;
+        }
+
+        // --- Initialization ---
+        document.getElementById('dotCount').addEventListener('input', (e) => {
+            document.getElementById('countDisplay').innerText = e.target.value;
+        });
+        
+        document.getElementById('dotCount').addEventListener('change', () => {
+            resetSimulation();
+        });
+        document.getElementById('spreadVal').addEventListener('change', resetSimulation);
+        document.getElementById('measureRadius').addEventListener('input', (e) => {
+            document.getElementById('radiusDisplay').innerText = e.target.value;
+        });
+        
+        // Obstacle UI Logic
+        const obsList = document.getElementById('obstacleList');
+        const obsProps = document.getElementById('obstacleProperties');
+        let selectedObstacleId = -1;
+        
+        function updateObstacleList() {
+            obsList.innerHTML = '<option value="-1">None Selected</option>';
+            obstacles.forEach((o, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.innerText = `Obs ${o.id} (${o.type})`;
+                obsList.appendChild(opt);
+            });
+            obsList.value = obstacles.findIndex(o => o.id === selectedObstacleId);
+            if (obsList.value === "-1") obsProps.classList.add('hidden');
+            else {
+                obsProps.classList.remove('hidden');
+                loadObstacleValues(obstacles[obsList.value]);
+            }
+        }
+
+        function loadObstacleValues(o) {
+            document.getElementById('obsShape').value = o.type;
+            document.getElementById('obsSize').value = o.size;
+            document.getElementById('obsSizeDisplay').innerText = o.size;
+            document.getElementById('obsPosX').value = o.x;
+            document.getElementById('obsPosY').value = o.y;
+            document.getElementById('obsPosZ').value = o.z;
+        }
+
+        document.getElementById('addObstacleBtn').addEventListener('click', () => {
+            const id = nextObsId++;
+            const size = 30;
+            const shapeName = "Sphere";
+            const shapeEntry = shapeLibrary.find(s => s.name === shapeName);
+            const geo = shapeEntry.gen();
+            const mat = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.2, metalness: 0.5, flatShading: !!shapeEntry.flat });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(0, 100, 0);
+            mesh.scale.set(size, size, size);
+            mesh.userData.shapeName = shapeName;
+            obstacleGroup.add(mesh);
+            const obs = { id, mesh, type: shapeName, size, x: 0, y: 100, z: 0 };
+            obstacles.push(obs);
+            selectedObstacleId = id;
+            updateObstacleList();
+        });
+
+        document.getElementById('clearObstaclesBtn').addEventListener('click', () => {
+            obstacleGroup.clear();
+            obstacles = [];
+            selectedObstacleId = -1;
+            updateObstacleList();
+        });
+
+        obsList.addEventListener('change', (e) => {
+            const idx = parseInt(e.target.value);
+            selectedObstacleId = idx >= 0 ? obstacles[idx].id : -1;
+            updateObstacleList();
+        });
+
+        function updateSelectedObstacle() {
+            const idx = obstacles.findIndex(o => o.id === selectedObstacleId);
+            if (idx === -1) return;
+            const o = obstacles[idx];
+            o.type = document.getElementById('obsShape').value;
+            o.size = parseFloat(document.getElementById('obsSize').value);
+            o.x = parseFloat(document.getElementById('obsPosX').value);
+            o.y = parseFloat(document.getElementById('obsPosY').value);
+            o.z = parseFloat(document.getElementById('obsPosZ').value);
+            
+            const shapeEntry = shapeLibrary.find(s => s.name === o.type) || shapeLibrary[0];
+            
+            if (o.mesh.userData.shapeName !== o.type) {
+                o.mesh.geometry.dispose();
+                o.mesh.geometry = shapeEntry.gen();
+                o.mesh.userData.shapeName = o.type;
+                o.mesh.material.flatShading = !!shapeEntry.flat;
+                o.mesh.material.needsUpdate = true;
+            }
+            
+            o.mesh.scale.set(o.size, o.size, o.size);
+            
+            o.mesh.position.set(o.x, o.y, o.z);
+            document.getElementById('obsSizeDisplay').innerText = o.size;
+        }
+
+        ['obsShape', 'obsSize', 'obsPosX', 'obsPosY', 'obsPosZ'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateSelectedObstacle);
+        });
+        
+        document.getElementById('shapeSelect').addEventListener('change', () => {
+            initDots(true);
+        });
+        
+        document.getElementById('slowMo').addEventListener('click', (e) => {
+            isSlowMo = !isSlowMo;
+            e.target.classList.toggle('active', isSlowMo);
+        });
+        
+        document.getElementById('revGrav').addEventListener('click', (e) => {
+            isRevGrav = !isRevGrav;
+            e.target.classList.toggle('active', isRevGrav);
+        });
+        
+        const genMode = document.getElementById('genMode');
+        genMode.addEventListener('change', () => {
+            const mode = genMode.value;
+            document.getElementById('towerControls').classList.toggle('hidden', mode !== 'tower');
+            document.getElementById('randomControls').classList.toggle('hidden', mode !== 'random');
+            resetSimulation();
+        });
+        
+        document.getElementById('towerBase').addEventListener('input', (e) => {
+            document.getElementById('baseDisplay').innerText = e.target.value;
+            document.getElementById('baseDisplay2').innerText = e.target.value;
+        });
+        document.getElementById('towerHeight').addEventListener('input', (e) => {
+            document.getElementById('heightDisplay').innerText = e.target.value;
+        });
+        document.getElementById('towerBase').addEventListener('change', resetSimulation);
+        document.getElementById('towerHeight').addEventListener('change', resetSimulation);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Initial setup
+        setPOV(1); // Start close
+        resetSimulation();
+        animate();
+
+    </script>
+<script src="../js/app-guardian.js"></script>
+</body>
+</html>

@@ -1,0 +1,1270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Internet &amp; Wi‑Fi Tester</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050a14;
+      --panel: rgba(15, 23, 42, 0.72);
+      --panel2: rgba(2, 6, 23, 0.65);
+      --border: rgba(148, 163, 184, 0.22);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --good: #34d399;
+      --warn: #fbbf24;
+      --bad: #fb7185;
+      --accent: #22d3ee;
+      --accent2: #a78bfa;
+      --accent3: #60a5fa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(34, 211, 238, 0.12), transparent 55%),
+        radial-gradient(900px 600px at 90% 20%, rgba(167, 139, 250, 0.10), transparent 60%),
+        radial-gradient(900px 700px at 50% 100%, rgba(34, 197, 94, 0.07), transparent 60%),
+        radial-gradient(1200px 900px at 50% 45%, rgba(96, 165, 250, 0.06), transparent 62%),
+        var(--bg);
+      color: var(--text);
+    }
+    .wrap { max-width: 980px; margin: 28px auto; padding: 0 16px 40px; }
+    .top {
+      display: flex; gap: 14px; align-items: baseline; justify-content: space-between; flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    h1 { margin: 0; font-size: 22px; letter-spacing: .2px; }
+    .sub { color: var(--muted); font-size: 12px; }
+    .grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 14px; }
+    @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+      backdrop-filter: blur(10px);
+    }
+    .card h2 { margin: 0 0 10px; font-size: 14px; color: #cbd5e1; }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    button {
+      appearance: none;
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      background: linear-gradient(180deg, rgba(34, 211, 238, 0.22), rgba(34, 211, 238, 0.10));
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .04s ease, border-color .2s ease, background .2s ease;
+    }
+    button:hover { border-color: rgba(34, 211, 238, 0.55); }
+    button:active { transform: translateY(1px); }
+    button[disabled] { opacity: .55; cursor: not-allowed; }
+    .btn2 {
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      background: linear-gradient(180deg, rgba(167, 139, 250, 0.22), rgba(167, 139, 250, 0.10));
+    }
+    .btnGhost {
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(2, 6, 23, 0.25);
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+    .btnGhost:hover { border-color: rgba(148, 163, 184, 0.35); }
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    input, select {
+      width: 100%;
+      padding: 10px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(2, 6, 23, 0.40);
+      color: var(--text);
+      outline: none;
+    }
+    input:focus, select:focus { border-color: rgba(34, 211, 238, 0.55); }
+    .kv {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 520px) { .kv { grid-template-columns: 1fr; } }
+    .metric {
+      background: var(--panel2);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .metric .k { color: var(--muted); font-size: 11px; }
+    .metric .v { font-size: 26px; font-weight: 900; letter-spacing: .2px; margin-top: 2px; }
+    .metric .u { color: #cbd5e1; font-size: 11px; margin-left: 6px; font-weight: 700; }
+    .metric .h { margin-top: 6px; color: #cbd5e1; font-size: 11px; }
+    .bar {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.16);
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+    }
+    .bar > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(34, 211, 238, 0.90), rgba(96, 165, 250, 0.90), rgba(167, 139, 250, 0.90));
+      transition: width .12s ease;
+    }
+    .log {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+      color: #cbd5e1;
+      background: rgba(2, 6, 23, 0.55);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 12px;
+      padding: 10px;
+      height: 210px;
+      overflow: auto;
+      white-space: pre-wrap;
+      line-height: 1.35;
+      width: 100%;
+      resize: vertical;
+      outline: none;
+    }
+    .pill {
+      display: inline-flex; gap: 8px; align-items: center;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(2, 6, 23, 0.30);
+      padding: 8px 10px;
+      border-radius: 999px;
+      color: #cbd5e1;
+      font-size: 12px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--warn); }
+    .dot.good { background: var(--good); }
+    .dot.bad { background: var(--bad); }
+    .muted { color: var(--muted); }
+    .small { font-size: 12px; }
+    details summary { cursor: pointer; color: #cbd5e1; font-weight: 700; }
+    details .inner { margin-top: 10px; display: grid; gap: 10px; }
+
+    .badge {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(2, 6, 23, 0.36);
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+    .badge strong { letter-spacing: .2px; }
+    .badge.good { border-color: rgba(52, 211, 153, 0.35); background: rgba(52, 211, 153, 0.08); }
+    .badge.warn { border-color: rgba(251, 191, 36, 0.35); background: rgba(251, 191, 36, 0.08); }
+    .badge.bad { border-color: rgba(251, 113, 133, 0.35); background: rgba(251, 113, 133, 0.08); }
+
+    .insights {
+      margin-top: 8px;
+      display: grid;
+      gap: 10px;
+    }
+    .canvasWrap {
+      background: rgba(2, 6, 23, 0.40);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 14px;
+      padding: 10px;
+    }
+    canvas { display: block; width: 100%; height: 260px; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>Internet &amp; Wi‑Fi Tester</h1>
+        <div class="sub">Tests a chosen server and your Wi‑Fi/router under load (ping, stability, download, upload).</div>
+      </div>
+      <div class="pill" id="statusPill"><span class="dot" id="statusDot"></span><span id="statusText">Idle</span></div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Results</h2>
+        <div class="kv">
+          <div class="metric">
+            <div class="k">Server Latency</div>
+            <div class="v"><span id="pingVal">—</span><span class="u">ms</span></div>
+            <div class="h">Avg: <span id="pingAvgVal">—</span> ms • Jitter: <span id="jitterVal">—</span> ms • Loss: <span id="lossVal">—</span>% • Min/Max: <span id="pingMinVal">—</span>/<span id="pingMaxVal">—</span> ms</div>
+          </div>
+          <div class="metric">
+            <div class="k">Download</div>
+            <div class="v"><span id="downVal">—</span><span class="u">Mbps</span></div>
+            <div class="h">Average: <span id="downAvgVal">—</span> Mbps • Peak: <span id="downPeakVal">—</span> Mbps • Data: <span id="downDataVal">—</span> MB</div>
+          </div>
+          <div class="metric">
+            <div class="k">Upload</div>
+            <div class="v"><span id="upVal">—</span><span class="u">Mbps</span></div>
+            <div class="h">Average: <span id="upAvgVal">—</span> Mbps • Peak: <span id="upPeakVal">—</span> Mbps • Data: <span id="upDataVal">—</span> MB</div>
+          </div>
+          <div class="metric">
+            <div class="k">Wi‑Fi / Router</div>
+            <div class="v" style="display:flex; gap:10px; align-items: baseline; flex-wrap: wrap;">
+              <span class="badge" id="wifiBadge"><strong id="wifiQuality">—</strong><span class="muted" id="wifiHint">—</span></span>
+            </div>
+            <div class="h">Bufferbloat: <span id="bloatVal">—</span> ms • Loaded ping: <span id="loadedPingVal">—</span> ms • Loaded loss: <span id="loadedLossVal">—</span>%</div>
+          </div>
+          <div class="metric">
+            <div class="k">Data Used</div>
+            <div class="v"><span id="dataVal">0</span><span class="u">MB</span></div>
+            <div class="h muted" id="connInfo">—</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px; display:grid; gap:10px;">
+          <div class="row" style="gap:12px;">
+            <div style="flex:1; min-width: 280px;">
+              <label for="testTargetSel">Internet test target</label>
+              <select id="testTargetSel">
+                <option value="public" selected>Public test server (recommended)</option>
+                <option value="this_site">This site</option>
+                <option value="custom">Custom URL…</option>
+              </select>
+              <div class="sub">Public target measures your internet speed. “This site” is useful for testing your own server/CDN.</div>
+            </div>
+            <div style="flex:1; min-width: 280px;" id="customTargetWrap" hidden>
+              <label for="customTestUrl">Custom test URL</label>
+              <input id="customTestUrl" spellcheck="false" placeholder="https://example.com/path" />
+              <div class="sub">Must allow CORS. For best results, use a dedicated speed endpoint.</div>
+            </div>
+          </div>
+          <div class="row" style="gap:12px;">
+            <div style="flex:1; min-width: 280px;">
+              <label for="resultsServer">Save results to server</label>
+              <input id="resultsServer" spellcheck="false" value="{default}" />
+              <div class="sub">Uses <span class="muted">{default}</span> → <span class="muted" id="defaultHost">this site</span> (POSTs to <span class="muted">/speedtest-results</span>).</div>
+            </div>
+            <div class="row" style="align-self: end;">
+              <button class="btnGhost" id="previewGraphBtn" disabled>Preview graph</button>
+              <button class="btnGhost" id="downloadGraphBtn" disabled>Download graph</button>
+              <button class="btnGhost" id="downloadResultsBtn" disabled>Download results</button>
+              <button class="btn2" id="sendResultsBtn" disabled>Send to server</button>
+            </div>
+          </div>
+          <div>
+            <div class="row" style="justify-content: space-between;">
+              <div class="small muted">Progress</div>
+              <div class="small muted" id="phaseText">—</div>
+            </div>
+            <div class="bar"><div id="barFill"></div></div>
+          </div>
+
+          <div class="row">
+            <button id="startBtn">Start Test</button>
+            <button id="stopBtn" class="btn2" disabled>Stop</button>
+            <button id="resetBtn" class="btnGhost">Reset</button>
+          </div>
+
+          <details>
+            <summary>Advanced</summary>
+            <div class="inner">
+              <div class="row" style="gap:12px;">
+                <div style="flex:1; min-width: 180px;">
+                  <label for="durationSec">Test duration (seconds)</label>
+                  <input id="durationSec" type="number" min="1" max="300" step="1" value="12" />
+                  <div class="sub">Min 1s • Max 300s (5 min)</div>
+                </div>
+                <div style="flex:1; min-width: 180px;">
+                  <label for="parallelSel">Parallel downloads</label>
+                  <select id="parallelSel">
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="4">4</option>
+                    <option value="6">6</option>
+                  </select>
+                </div>
+                <div style="flex:1; min-width: 180px;">
+                  <label for="chunkSel">Chunk size (MB)</label>
+                  <select id="chunkSel">
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="4">4</option>
+                    <option value="8">8</option>
+                  </select>
+                </div>
+              </div>
+              <div class="sub">Note: Custom servers must allow cross‑origin requests (CORS) to measure accurately. If blocked, use <span class="muted">{default}</span>.</div>
+            </div>
+          </details>
+
+          <details class="insights" id="insightsDetails" hidden>
+            <summary>Insights</summary>
+            <div class="canvasWrap">
+              <canvas id="insightsCanvas"></canvas>
+              <div class="sub" style="margin-top:8px;">Charts show speed and stability over time during the test.</div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Log</h2>
+        <div class="row" style="justify-content: space-between; margin-bottom: 8px;">
+          <div class="sub">Tip: Copy the log for sharing/debugging.</div>
+          <div class="row">
+            <button class="btnGhost" id="downloadLogBtn">Download</button>
+            <button class="btnGhost" id="copyLogBtn">Copy</button>
+          </div>
+        </div>
+        <textarea class="log" id="log" readonly></textarea>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const el = (id) => document.getElementById(id);
+    const logEl = el("log");
+    const barFill = el("barFill");
+    const phaseText = el("phaseText");
+    const statusPill = el("statusPill");
+    const statusDot = el("statusDot");
+    const statusText = el("statusText");
+    const pingVal = el("pingVal");
+    const pingAvgVal = el("pingAvgVal");
+    const jitterVal = el("jitterVal");
+    const lossVal = el("lossVal");
+    const pingMinVal = el("pingMinVal");
+    const pingMaxVal = el("pingMaxVal");
+    const downVal = el("downVal");
+    const downAvgVal = el("downAvgVal");
+    const downPeakVal = el("downPeakVal");
+    const downDataVal = el("downDataVal");
+    const upVal = el("upVal");
+    const upAvgVal = el("upAvgVal");
+    const upPeakVal = el("upPeakVal");
+    const upDataVal = el("upDataVal");
+    const dataVal = el("dataVal");
+    const connInfo = el("connInfo");
+    const bloatVal = el("bloatVal");
+    const loadedPingVal = el("loadedPingVal");
+    const loadedLossVal = el("loadedLossVal");
+    const wifiQuality = el("wifiQuality");
+    const wifiHint = el("wifiHint");
+    const wifiBadge = el("wifiBadge");
+
+    const startBtn = el("startBtn");
+    const stopBtn = el("stopBtn");
+    const resetBtn = el("resetBtn");
+    const copyLogBtn = el("copyLogBtn");
+    const downloadLogBtn = el("downloadLogBtn");
+    const defaultHost = el("defaultHost");
+    const testTargetSel = el("testTargetSel");
+    const customTargetWrap = el("customTargetWrap");
+    const customTestUrlInput = el("customTestUrl");
+    const resultsServerInput = el("resultsServer");
+    const previewGraphBtn = el("previewGraphBtn");
+    const downloadGraphBtn = el("downloadGraphBtn");
+    const downloadResultsBtn = el("downloadResultsBtn");
+    const sendResultsBtn = el("sendResultsBtn");
+    const insightsDetails = el("insightsDetails");
+    const insightsCanvas = el("insightsCanvas");
+    const durationSecInput = el("durationSec");
+    const parallelSel = el("parallelSel");
+    const chunkSel = el("chunkSel");
+
+    let aborter = null;
+    let running = false;
+
+    function setStatus(kind, text) {
+      statusDot.className = "dot" + (kind === "good" ? " good" : kind === "bad" ? " bad" : "");
+      statusText.textContent = text;
+    }
+
+    function setPhase(text, pct) {
+      phaseText.textContent = text;
+      barFill.style.width = Math.max(0, Math.min(100, pct)) + "%";
+    }
+
+    function log(line) {
+      const ts = new Date().toLocaleTimeString();
+      logEl.value += `[${ts}] ${line}\n`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function mbps(bytes, ms) {
+      const bits = bytes * 8;
+      const seconds = ms / 1000;
+      return seconds > 0 ? (bits / 1e6) / seconds : 0;
+    }
+
+    async function fetchWithTimeout(url, opts = {}, timeoutMs = 8000) {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, { ...opts, cache: "no-store", signal: ctrl.signal, mode: "cors" });
+        return res;
+      } finally {
+        clearTimeout(t);
+      }
+    }
+
+    function median(values) {
+      const v = values.filter((x) => typeof x === "number" && Number.isFinite(x)).slice().sort((a, b) => a - b);
+      if (!v.length) return null;
+      return v[Math.floor(v.length / 2)];
+    }
+
+    function calcJitter(values) {
+      const v = values.filter((x) => typeof x === "number" && Number.isFinite(x));
+      if (!v.length) return null;
+      const avg = v.reduce((a, b) => a + b, 0) / v.length;
+      return v.reduce((a, b) => a + Math.abs(b - avg), 0) / v.length;
+    }
+
+    async function measurePingStats({ url, samples = 12, intervalMs = 120, timeoutMs = 6000 }) {
+      const times = [];
+      for (let i = 0; i < samples; i++) {
+        if (!running) break;
+        const t0 = performance.now();
+        try {
+          const res = await fetchWithTimeout(url + (url.includes("?") ? "&" : "?") + "r=" + Math.random(), { method: "GET" }, timeoutMs);
+          await res.text().catch(() => {});
+          times.push(performance.now() - t0);
+        } catch {
+          times.push(null);
+        }
+        await new Promise((r) => setTimeout(r, intervalMs));
+      }
+      const good = times.filter((t) => typeof t === "number");
+      const lossPct = times.length ? Math.round((1 - good.length / times.length) * 100) : null;
+      const med = median(times);
+      const jit = calcJitter(times);
+      const avg = good.length ? (good.reduce((a, b) => a + b, 0) / good.length) : null;
+      const min = good.length ? Math.min(...good) : null;
+      const max = good.length ? Math.max(...good) : null;
+      return {
+        median: med === null ? null : Math.round(med),
+        avg: avg === null ? null : Math.round(avg),
+        min: min === null ? null : Math.round(min),
+        max: max === null ? null : Math.round(max),
+        jitter: jit === null ? null : Math.round(jit),
+        lossPct
+      };
+    }
+
+    function createPingMonitor({ url, intervalMs = 350, timeoutMs = 4000, onUpdate }) {
+      let stopped = false;
+      const times = [];
+
+      const loop = (async () => {
+        while (running && !stopped) {
+          const t0 = performance.now();
+          try {
+            const res = await fetchWithTimeout(url + (url.includes("?") ? "&" : "?") + "r=" + Math.random(), { method: "GET" }, timeoutMs);
+            await res.text().catch(() => {});
+            times.push(performance.now() - t0);
+          } catch {
+            times.push(null);
+          }
+          const lastMs = times.length ? times[times.length - 1] : null;
+          const med = median(times);
+          const lossPct = times.length ? Math.round((1 - times.filter((t) => typeof t === "number").length / times.length) * 100) : null;
+          onUpdate?.({ median: med === null ? null : Math.round(med), lossPct, lastMs: typeof lastMs === "number" ? Math.round(lastMs) : null });
+          await new Promise((r) => setTimeout(r, intervalMs));
+        }
+      })();
+
+      return {
+        stop: () => { stopped = true; },
+        done: loop,
+        stats: () => {
+          const med = median(times);
+          const jit = calcJitter(times);
+          const good = times.filter((t) => typeof t === "number");
+          const lossPct = times.length ? Math.round((1 - good.length / times.length) * 100) : null;
+          return { median: med === null ? null : Math.round(med), jitter: jit === null ? null : Math.round(jit), lossPct };
+        }
+      };
+    }
+
+    async function downloadTest({ downUrlTemplate, durationSec, parallel, chunkBytes, onProgress }) {
+      const endAt = performance.now() + durationSec * 1000;
+      let totalBytes = 0;
+      let peakMbps = 0;
+      const samples = [];
+      let lastReportAt = 0;
+
+      const worker = async (idx) => {
+        while (running && performance.now() < endAt) {
+          const url = makeDownloadUrl(downUrlTemplate, chunkBytes, idx);
+          const t0 = performance.now();
+          try {
+            const res = await fetch(url, { cache: "no-store", mode: "cors", signal: aborter.signal });
+            const reader = res.body && res.body.getReader ? res.body.getReader() : null;
+            if (!reader) {
+              // fallback
+              const buf = await res.arrayBuffer();
+              totalBytes += buf.byteLength;
+              const now = performance.now();
+              samples.push({ t: now, b: totalBytes });
+              while (samples.length > 2 && samples[0].t < now - 1000) samples.shift();
+              let windowMbps = null;
+              if (samples.length >= 2) {
+                const winBytes = samples[samples.length - 1].b - samples[0].b;
+                const winMs = samples[samples.length - 1].t - samples[0].t;
+                windowMbps = mbps(winBytes, winMs);
+                peakMbps = Math.max(peakMbps, windowMbps);
+              }
+              if (now - lastReportAt > 140) { lastReportAt = now; onProgress(totalBytes, peakMbps, windowMbps); }
+              continue;
+            }
+            while (running && performance.now() < endAt) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              totalBytes += value.byteLength;
+              const now = performance.now();
+              samples.push({ t: now, b: totalBytes });
+              while (samples.length > 2 && samples[0].t < now - 1000) samples.shift();
+              let windowMbps = null;
+              if (samples.length >= 2) {
+                const winBytes = samples[samples.length - 1].b - samples[0].b;
+                const winMs = samples[samples.length - 1].t - samples[0].t;
+                windowMbps = mbps(winBytes, winMs);
+                peakMbps = Math.max(peakMbps, windowMbps);
+              }
+              if (now - lastReportAt > 140) { lastReportAt = now; onProgress(totalBytes, peakMbps, windowMbps); }
+            }
+          } catch {
+            // ignore and continue
+            await new Promise((r) => setTimeout(r, 200));
+          }
+        }
+      };
+
+      const start = performance.now();
+      await Promise.all(Array.from({ length: parallel }, (_, i) => worker(i)));
+      const elapsed = performance.now() - start;
+      return { mbps: mbps(totalBytes, elapsed), peakMbps, bytes: totalBytes };
+    }
+
+    async function uploadTest({ upUrl, durationSec, chunkBytes, onProgress }) {
+      const endAt = performance.now() + durationSec * 1000;
+      let totalBytes = 0;
+      let peakMbps = 0;
+      const payload = new Uint8Array(chunkBytes);
+      // Some browsers cap getRandomValues to 65536 bytes per call.
+      if (globalThis.crypto && typeof globalThis.crypto.getRandomValues === "function") {
+        const MAX = 65536;
+        for (let off = 0; off < payload.byteLength; off += MAX) {
+          globalThis.crypto.getRandomValues(payload.subarray(off, Math.min(payload.byteLength, off + MAX)));
+        }
+      }
+
+      const start = performance.now();
+      while (running && performance.now() < endAt) {
+        const t0 = performance.now();
+        try {
+          const res = await fetch(upUrl + `?r=${Date.now()}_${Math.random()}`, {
+            method: "POST",
+            body: payload,
+            cache: "no-store",
+            mode: "cors",
+            signal: aborter.signal,
+            headers: { "content-type": "application/octet-stream" }
+          });
+          await res.text().catch(() => {});
+          const t1 = performance.now();
+          totalBytes += chunkBytes;
+          const cur = mbps(chunkBytes, t1 - t0);
+          peakMbps = Math.max(peakMbps, cur);
+          onProgress(totalBytes, peakMbps, cur);
+        } catch {
+          // Many networks block cross-site upload; treat as blocked.
+          break;
+        }
+      }
+      const elapsed = performance.now() - start;
+      if (totalBytes === 0) return { mbps: null, peakMbps: null, bytes: 0, blocked: true };
+      return { mbps: mbps(totalBytes, elapsed), peakMbps, bytes: totalBytes, blocked: false };
+    }
+
+    function fmt(n, digits = 1) {
+      if (n === null || n === undefined || Number.isNaN(n)) return "—";
+      return Number(n).toFixed(digits);
+    }
+
+    function setConnInfo() {
+      const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      if (!c) { connInfo.textContent = "Connection info not available."; return; }
+      const parts = [];
+      if (c.effectiveType) parts.push(`Type: ${c.effectiveType}`);
+      if (typeof c.downlink === "number") parts.push(`Downlink hint: ${c.downlink} Mbps`);
+      if (typeof c.rtt === "number") parts.push(`RTT hint: ${c.rtt} ms`);
+      if (c.saveData) parts.push("Save-Data: on");
+      connInfo.textContent = parts.join(" • ") || "—";
+    }
+
+    function setWifiBadge({ quality, hint, kind }) {
+      wifiQuality.textContent = quality;
+      wifiHint.textContent = hint || "";
+      wifiBadge.className = "badge" + (kind ? " " + kind : "");
+    }
+
+    const DEFAULT_TARGET = "{default}";
+    let defaultEndpointsPromise = null;
+
+    // Public "internet speed" endpoints (automatic; no endpoint fields in UI).
+    // If blocked by CORS/network policy, the UI will show blocked/failed.
+    const PUBLIC_ENDPOINTS = {
+      pingUrl: "https://speed.cloudflare.com/__down?bytes=1000",
+      downUrlTemplate: "https://speed.cloudflare.com/__down?bytes={BYTES}",
+      upUrl: "https://speed.cloudflare.com/__up"
+    };
+
+    function normalizeServerTarget(raw) {
+      const s = (raw || "").trim();
+      if (!s || s === DEFAULT_TARGET) return { kind: "default", value: DEFAULT_TARGET };
+      try {
+        // Ensure absolute URL.
+        const url = new URL(s.includes("://") ? s : `https://${s}`);
+        return { kind: "custom", value: url.toString() };
+      } catch {
+        return { kind: "invalid", value: s };
+      }
+    }
+
+    function isLikelyLocalHost(hostname) {
+      const h = String(hostname || "").toLowerCase();
+      if (!h) return false;
+      if (h === "localhost") return true;
+      if (h.endsWith(".local")) return true;
+      if (h === "127.0.0.1" || h === "::1") return true;
+      if (/^10\.\d+\.\d+\.\d+$/.test(h)) return true;
+      if (/^192\.168\.\d+\.\d+$/.test(h)) return true;
+      if (/^172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+$/.test(h)) return true;
+      return false;
+    }
+
+    function urlWithoutHash(u) {
+      const s = String(u || "");
+      const hashIdx = s.indexOf("#");
+      return hashIdx >= 0 ? s.slice(0, hashIdx) : s;
+    }
+
+    async function probeContentLength(url) {
+      try {
+        const res = await fetch(url, { method: "HEAD", cache: "no-store", mode: "same-origin" });
+        if (!res.ok) return null;
+        const len = res.headers.get("content-length");
+        const n = len ? parseInt(len, 10) : NaN;
+        return Number.isFinite(n) ? n : null;
+      } catch {
+        return null;
+      }
+    }
+
+    async function computeDefaultEndpoints() {
+      const base = new URL(urlWithoutHash(location.href));
+      const samePage = base.toString();
+      const candidates = [
+        samePage,
+        new URL("/tower-collapse-sim.html", base).toString(),
+        new URL("/binaural-presets-detailed.json", base).toString(),
+        new URL("/binaural-presets.json", base).toString(),
+        new URL("/package-lock.json", base).toString(),
+        new URL("/index.html", base).toString()
+      ];
+
+      let bestUrl = samePage;
+      let bestLen = await probeContentLength(bestUrl);
+      for (const u of candidates) {
+        const len = await probeContentLength(u);
+        if (len !== null && (bestLen === null || len > bestLen)) {
+          bestLen = len;
+          bestUrl = u;
+        }
+      }
+
+      // NOTE: Upload on "your server" requires a POST handler; we try same-origin anyway and treat failures as blocked.
+      return {
+        pingUrl: samePage,
+        downUrlTemplate: bestUrl,
+        upUrl: samePage
+      };
+    }
+
+    async function getDefaultEndpoints() {
+      if (!defaultEndpointsPromise) defaultEndpointsPromise = computeDefaultEndpoints();
+      return defaultEndpointsPromise;
+    }
+
+    async function endpointsForTestTarget() {
+      const mode = String(testTargetSel.value || "public");
+      if (mode === "public") return { ...PUBLIC_ENDPOINTS, targetKind: "public", targetValue: "public" };
+      if (mode === "this_site") {
+        const eps = await getDefaultEndpoints();
+        return { ...eps, targetKind: "this_site", targetValue: location.origin };
+      }
+      if (mode === "custom") {
+        const t = normalizeServerTarget(customTestUrlInput.value);
+        if (t.kind === "custom") return { pingUrl: t.value, downUrlTemplate: t.value, upUrl: t.value, targetKind: "custom", targetValue: t.value };
+        return { ...PUBLIC_ENDPOINTS, targetKind: "invalid", targetValue: customTestUrlInput.value };
+      }
+      return { ...PUBLIC_ENDPOINTS, targetKind: "public", targetValue: "public" };
+    }
+
+    function makeDownloadUrl(downUrlTemplate, chunkBytes, idx) {
+      const base = (downUrlTemplate || "").trim();
+      const urlBase = base.includes("{BYTES}") ? base.replace("{BYTES}", String(chunkBytes)) : base;
+      const sep = urlBase.includes("?") ? "&" : "?";
+      // cb is a hint only; many servers ignore it. r busts caches.
+      return urlBase + `${sep}r=${Date.now()}_${idx}_${Math.random()}&cb=${chunkBytes}`;
+    }
+
+    function resetUi() {
+      pingVal.textContent = "—";
+      pingAvgVal.textContent = "—";
+      jitterVal.textContent = "—";
+      lossVal.textContent = "—";
+      pingMinVal.textContent = "—";
+      pingMaxVal.textContent = "—";
+      downVal.textContent = "—";
+      downAvgVal.textContent = "—";
+      downPeakVal.textContent = "—";
+      downDataVal.textContent = "—";
+      upVal.textContent = "—";
+      upAvgVal.textContent = "—";
+      upPeakVal.textContent = "—";
+      upDataVal.textContent = "—";
+      dataVal.textContent = "0";
+      bloatVal.textContent = "—";
+      loadedPingVal.textContent = "—";
+      loadedLossVal.textContent = "—";
+      logEl.value = "";
+      setStatus("", "Idle");
+      setPhase("—", 0);
+      setConnInfo();
+      const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      const hint = c && c.effectiveType ? `(${c.effectiveType})` : "";
+      setWifiBadge({ quality: "—", hint, kind: "" });
+      downloadResultsBtn.disabled = true;
+      sendResultsBtn.disabled = true;
+      previewGraphBtn.disabled = true;
+      downloadGraphBtn.disabled = true;
+      insightsDetails.hidden = true;
+      insightsDetails.open = false;
+    }
+
+    let lastResult = null;
+
+    function renderInsights(canvas, result) {
+      if (!canvas || !result || !result.series) return;
+      const roundRectPath = (ctx, x, y, w, h, r) => {
+        const rr = Math.max(0, Math.min(r, Math.min(w, h) / 2));
+        ctx.beginPath();
+        ctx.moveTo(x + rr, y);
+        ctx.arcTo(x + w, y, x + w, y + h, rr);
+        ctx.arcTo(x + w, y + h, x, y + h, rr);
+        ctx.arcTo(x, y + h, x, y, rr);
+        ctx.arcTo(x, y, x + w, y, rr);
+        ctx.closePath();
+      };
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      const w = canvas.clientWidth || 800;
+      const h = canvas.clientHeight || 260;
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const bg = "rgba(2, 6, 23, 0.35)";
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, w, h);
+
+      const pad = 12;
+      const gap = 10;
+      const panels = 3;
+      const panelH = Math.floor((h - pad * 2 - gap * (panels - 1)) / panels);
+      const panelW = w - pad * 2;
+
+      const seriesDownload = (result.series.download || []).filter((p) => p && typeof p.tMs === "number" && typeof p.mbps === "number");
+      const seriesUpload = (result.series.upload || []).filter((p) => p && typeof p.tMs === "number" && typeof p.mbps === "number");
+      const seriesPing = (result.series.loadedPing || []).filter((p) => p && typeof p.tMs === "number" && typeof p.ms === "number");
+
+      const maxT = Math.max(
+        1,
+        ...seriesDownload.map((p) => p.tMs),
+        ...seriesUpload.map((p) => p.tMs),
+        ...seriesPing.map((p) => p.tMs)
+      );
+
+      const drawPanel = ({ y, title, unit, series, yMax, color }) => {
+        ctx.save();
+        ctx.translate(pad, y);
+        ctx.fillStyle = "rgba(15, 23, 42, 0.55)";
+        ctx.strokeStyle = "rgba(148, 163, 184, 0.16)";
+        ctx.lineWidth = 1;
+        roundRectPath(ctx, 0, 0, panelW, panelH, 10);
+        ctx.fill();
+        ctx.stroke();
+
+        // Title
+        ctx.fillStyle = "rgba(226, 232, 240, 0.92)";
+        ctx.font = "12px ui-sans-serif, system-ui";
+        ctx.fillText(title, 10, 18);
+
+        // Axes + grid
+        const left = 10;
+        const top = 26;
+        const right = panelW - 10;
+        const bottom = panelH - 14;
+        ctx.strokeStyle = "rgba(148, 163, 184, 0.14)";
+        for (let i = 0; i <= 4; i++) {
+          const yy = top + ((bottom - top) * i) / 4;
+          ctx.beginPath();
+          ctx.moveTo(left, yy);
+          ctx.lineTo(right, yy);
+          ctx.stroke();
+        }
+
+        ctx.fillStyle = "rgba(148, 163, 184, 0.85)";
+        ctx.font = "10px ui-monospace, SFMono-Regular, Menlo, monospace";
+        ctx.fillText(`${Math.round(yMax)} ${unit}`, left, top + 10);
+        ctx.fillText(`0 ${unit}`, left, bottom);
+
+        const sx = (tMs) => left + ((right - left) * tMs) / maxT;
+        const sy = (v) => bottom - ((bottom - top) * v) / (yMax || 1);
+
+        if (series.length >= 2) {
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          let started = false;
+          for (const p of series) {
+            const x = sx(p.tMs);
+            const yv = sy(p.v);
+            if (!started) { ctx.moveTo(x, yv); started = true; }
+            else ctx.lineTo(x, yv);
+          }
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      };
+
+      const maxDown = Math.max(1, ...seriesDownload.map((p) => p.mbps));
+      const maxUp = Math.max(1, ...seriesUpload.map((p) => p.mbps));
+      const maxPing = Math.max(1, ...seriesPing.map((p) => p.ms));
+
+      drawPanel({
+        y: pad,
+        title: "Download (Mbps)",
+        unit: "Mbps",
+        series: seriesDownload.map((p) => ({ tMs: p.tMs, v: p.mbps })),
+        yMax: maxDown,
+        color: "rgba(34, 211, 238, 0.95)"
+      });
+      drawPanel({
+        y: pad + panelH + gap,
+        title: "Upload (Mbps)",
+        unit: "Mbps",
+        series: seriesUpload.map((p) => ({ tMs: p.tMs, v: p.mbps })),
+        yMax: maxUp,
+        color: "rgba(167, 139, 250, 0.95)"
+      });
+      drawPanel({
+        y: pad + (panelH + gap) * 2,
+        title: "Loaded Ping (ms)",
+        unit: "ms",
+        series: seriesPing.map((p) => ({ tMs: p.tMs, v: p.ms })),
+        yMax: maxPing,
+        color: "rgba(96, 165, 250, 0.95)"
+      });
+    }
+
+    function buildGraphHtml(result) {
+      const safe = JSON.stringify(result).replaceAll("</", "<\\/");
+      // IMPORTANT: Avoid the literal substring "</scr" + "ipt>" anywhere in this file,
+      // or the browser will terminate the *current* <script> tag early.
+      return [
+        "<!doctype html>",
+        '<html lang="en">',
+        "<head>",
+        '  <meta charset="UTF-8" />',
+        '  <meta name="viewport" content="width=device-width, initial-scale=1.0" />',
+        "  <title>Network Speed Insights</title>",
+        "  <style>",
+        "    :root { color-scheme: dark; --bg:#050a14; --text:#e2e8f0; --muted:#94a3b8; }",
+        "    body{ margin:0; font-family: ui-sans-serif, system-ui; background:var(--bg); color:var(--text); }",
+        "    .wrap{ max-width:980px; margin:24px auto; padding:0 14px 28px; }",
+        "    .card{ background:rgba(15,23,42,.72); border:1px solid rgba(148,163,184,.22); border-radius:14px; padding:14px; }",
+        "    h1{ font-size:18px; margin:0 0 6px; }",
+        "    .sub{ color:var(--muted); font-size:12px; margin-bottom:10px; }",
+        "    canvas{ width:100%; height:420px; border-radius:12px; display:block; background:rgba(2,6,23,.35); border:1px solid rgba(148,163,184,.16); }",
+        "    pre{ white-space:pre-wrap; color:var(--muted); font-size:11px; }",
+        "  </style>",
+        "</head>",
+        "<body>",
+        '  <div class="wrap">',
+        '    <div class="card">',
+        "      <h1>Network Speed Insights</h1>",
+        '      <div class="sub">Generated by internet-tester.html</div>',
+        '      <canvas id="c"></canvas>',
+        '      <details style="margin-top:10px;">',
+        '        <summary style="cursor:pointer; font-weight:700;">Raw JSON</summary>',
+        '        <pre id="raw"></pre>',
+        "      </details>",
+        "    </div>",
+        "  </div>",
+        "  <script>",
+        `    const result = ${safe};`,
+        '    document.getElementById("raw").textContent = JSON.stringify(result, null, 2);',
+        `    (${renderInsights.toString()})(document.getElementById("c"), result);`,
+        "  </scr" + "ipt>",
+        "</body>",
+        "</html>",
+      ].join("\\n");
+    }
+
+    async function runTest() {
+      running = true;
+      aborter = new AbortController();
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      setStatus("", "Running…");
+      downloadResultsBtn.disabled = true;
+      sendResultsBtn.disabled = true;
+      lastResult = null;
+
+      let downBytesSoFar = 0;
+      let upBytesSoFar = 0;
+      const eps = await endpointsForTestTarget();
+      if (eps.targetKind === "invalid") {
+        log(`Invalid custom test URL: "${String(eps.targetValue)}" — using Public test server.`);
+        testTargetSel.value = "public";
+        customTestUrlInput.value = "";
+        customTargetWrap.hidden = true;
+      }
+      const downUrlTemplate = eps.downUrlTemplate;
+      const upUrl = eps.upUrl;
+      const pingUrl = eps.pingUrl;
+      const durationSecRaw = parseInt(durationSecInput.value, 10);
+      const durationSec = Math.max(1, Math.min(300, Number.isFinite(durationSecRaw) ? durationSecRaw : 12));
+      durationSecInput.value = String(durationSec);
+      const parallel = parseInt(parallelSel.value, 10) || 2;
+      const chunkBytes = (parseInt(chunkSel.value, 10) || 2) * 1024 * 1024;
+
+      try {
+        const startedAt = new Date();
+        log(`Target: ${eps.targetKind === "public" ? "Public test server" : eps.targetKind === "this_site" ? "This site" : "Custom"}`);
+
+        const downloadSeries = [];
+        const uploadSeries = [];
+        const loadedPingSeries = [];
+
+        // Ping
+        setPhase("Latency", 5);
+        log("Measuring server latency & Wi‑Fi stability…");
+        const basePing = await measurePingStats({ url: pingUrl, samples: 14, intervalMs: 120, timeoutMs: 6000 });
+        pingVal.textContent = basePing.median ?? "—";
+        pingAvgVal.textContent = basePing.avg ?? "—";
+        jitterVal.textContent = basePing.jitter ?? "—";
+        lossVal.textContent = basePing.lossPct ?? "—";
+        pingMinVal.textContent = basePing.min ?? "—";
+        pingMaxVal.textContent = basePing.max ?? "—";
+        if (basePing.median === null) log("Server latency: blocked/failed (CORS/network?).");
+        else log(`Ping (latency): median ${basePing.median} ms, avg ${basePing.avg} ms, jitter ${basePing.jitter} ms, loss ${basePing.lossPct}%`);
+
+        // Download
+        setPhase("Download", 25);
+        if (eps.targetKind === "public") log("Measuring download (internet)…");
+        else if (eps.targetKind === "this_site") log("Measuring download (this site)…");
+        else log("Measuring download (custom)…");
+        const downStart = performance.now();
+        const loadedPingT0 = performance.now();
+        const loadedPingMon = createPingMonitor({
+          url: pingUrl,
+          intervalMs: 380,
+          timeoutMs: 4000,
+          onUpdate: ({ median: med, lossPct, lastMs }) => {
+            loadedPingVal.textContent = med ?? "—";
+            loadedLossVal.textContent = lossPct ?? "—";
+            if (typeof lastMs === "number") {
+              loadedPingSeries.push({ tMs: performance.now() - loadedPingT0, ms: lastMs });
+            }
+          }
+        });
+        const down = await downloadTest({
+          downUrlTemplate,
+          durationSec,
+          parallel,
+          chunkBytes,
+          onProgress: (bytes, peak, windowMbps) => {
+            downBytesSoFar = bytes;
+            downPeakVal.textContent = fmt(peak, 1);
+            downVal.textContent = fmt(mbps(bytes, performance.now() - downStart), 1);
+            downDataVal.textContent = String(Math.round(bytes / (1024 * 1024)));
+            dataVal.textContent = String(Math.round((downBytesSoFar + upBytesSoFar) / (1024 * 1024)));
+            setPhase("Download", 25 + Math.min(35, (bytes / (chunkBytes * parallel * 3)) * 35));
+            if (typeof windowMbps === "number" && Number.isFinite(windowMbps)) {
+              downloadSeries.push({ tMs: performance.now() - downStart, mbps: Number(windowMbps.toFixed(2)) });
+            }
+          }
+        });
+        loadedPingMon.stop();
+        await loadedPingMon.done.catch(() => {});
+        downBytesSoFar = down.bytes;
+        downVal.textContent = fmt(down.mbps, 1);
+        downAvgVal.textContent = fmt(down.mbps, 1);
+        downPeakVal.textContent = fmt(down.peakMbps, 1);
+        downDataVal.textContent = String(Math.round(down.bytes / (1024 * 1024)));
+        log(`Download: ${fmt(down.mbps, 1)} Mbps (peak ${fmt(down.peakMbps, 1)} Mbps)`);
+
+        const loadedPing = loadedPingMon.stats();
+        loadedPingVal.textContent = loadedPing.median ?? "—";
+        loadedLossVal.textContent = loadedPing.lossPct ?? "—";
+        const bloat = (basePing.median !== null && loadedPing.median !== null) ? Math.max(0, loadedPing.median - basePing.median) : null;
+        bloatVal.textContent = bloat === null ? "—" : String(bloat);
+
+        const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        const hint = c && c.effectiveType ? `(${c.effectiveType})` : "";
+        const loss = basePing.lossPct ?? 0;
+        const jit = basePing.jitter ?? 0;
+        const b = bloat ?? 0;
+        if (basePing.median === null) {
+          setWifiBadge({ quality: "Blocked", hint, kind: "bad" });
+        } else if (loss >= 5 || b >= 150 || jit >= 60) {
+          setWifiBadge({ quality: "Poor", hint: hint || "Wi‑Fi/router congested", kind: "bad" });
+        } else if (loss >= 1 || b >= 80 || jit >= 35) {
+          setWifiBadge({ quality: "Fair", hint: hint || "Some congestion", kind: "warn" });
+        } else {
+          setWifiBadge({ quality: "Good", hint: hint || "Stable", kind: "good" });
+        }
+
+        // Upload
+        setPhase("Upload", 70);
+        if (eps.targetKind === "public") log("Measuring upload (internet)…");
+        else if (eps.targetKind === "this_site") log("Measuring upload (this site)…");
+        else log("Measuring upload (custom)…");
+        const upStart = performance.now();
+        const up = await uploadTest({
+          upUrl,
+          durationSec: Math.max(5, Math.round(durationSec * 0.6)),
+          chunkBytes: Math.min(chunkBytes, 2 * 1024 * 1024),
+          onProgress: (bytes, peak, cur) => {
+            upBytesSoFar = bytes;
+            upPeakVal.textContent = fmt(peak, 1);
+            upVal.textContent = fmt(mbps(bytes, performance.now() - upStart), 1);
+            upDataVal.textContent = String(Math.round(bytes / (1024 * 1024)));
+            dataVal.textContent = String(Math.round((downBytesSoFar + upBytesSoFar) / (1024 * 1024)));
+            setPhase("Upload", 70 + Math.min(25, (bytes / (chunkBytes * 6)) * 25));
+            if (typeof cur === "number" && Number.isFinite(cur)) {
+              uploadSeries.push({ tMs: performance.now() - upStart, mbps: Number(cur.toFixed(2)) });
+            }
+          }
+        });
+        upBytesSoFar = up.bytes;
+        if (up.blocked) {
+          upVal.textContent = "blocked";
+          upAvgVal.textContent = "—";
+          upPeakVal.textContent = "—";
+          upDataVal.textContent = "0";
+          log(eps.targetKind === "public"
+            ? "Upload: blocked/failed (some networks/browsers block cross-site upload tests)."
+            : "Upload: blocked/failed (this server likely doesn’t accept cross‑origin POST uploads).");
+        } else {
+          upVal.textContent = fmt(up.mbps, 1);
+          upAvgVal.textContent = fmt(up.mbps, 1);
+          upPeakVal.textContent = fmt(up.peakMbps, 1);
+          upDataVal.textContent = String(Math.round(up.bytes / (1024 * 1024)));
+          log(`Upload: ${fmt(up.mbps, 1)} Mbps (peak ${fmt(up.peakMbps, 1)} Mbps)`);
+        }
+
+        dataVal.textContent = String(Math.round((down.bytes + up.bytes) / (1024 * 1024)));
+        setPhase("Done", 100);
+        setStatus("good", "Done");
+
+        lastResult = {
+          version: 1,
+          startedAt: startedAt.toISOString(),
+          finishedAt: new Date().toISOString(),
+          testTarget: { kind: eps.targetKind, value: eps.targetValue },
+          page: { origin: location.origin, path: location.pathname },
+          ping: {
+            medianMs: basePing.median ?? null,
+            avgMs: basePing.avg ?? null,
+            jitterMs: basePing.jitter ?? null,
+            lossPct: basePing.lossPct ?? null
+          },
+          loadedPing: {
+            medianMs: loadedPing.median ?? null,
+            jitterMs: loadedPing.jitter ?? null,
+            lossPct: loadedPing.lossPct ?? null
+          },
+          bufferbloatMs: bloat === null ? null : bloat,
+          download: { avgMbps: down.mbps ?? null, peakMbps: down.peakMbps ?? null, bytes: down.bytes ?? 0 },
+          upload: { avgMbps: up.mbps ?? null, peakMbps: up.peakMbps ?? null, bytes: up.bytes ?? 0, blocked: !!up.blocked },
+          series: { download: downloadSeries, upload: uploadSeries, loadedPing: loadedPingSeries },
+          dataUsedMB: Math.round((down.bytes + up.bytes) / (1024 * 1024))
+        };
+        downloadResultsBtn.disabled = false;
+        sendResultsBtn.disabled = false;
+        previewGraphBtn.disabled = false;
+        downloadGraphBtn.disabled = false;
+      } catch (err) {
+        setStatus("bad", "Failed");
+        setPhase("Failed", 0);
+        log("Error: " + (err && err.message ? err.message : String(err)));
+      } finally {
+        running = false;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+      }
+    }
+
+    startBtn.addEventListener("click", () => {
+      if (running) return;
+      runTest();
+    });
+
+    stopBtn.addEventListener("click", () => {
+      if (!running) return;
+      setStatus("", "Stopping…");
+      log("Stopping…");
+      running = false;
+      try { aborter.abort(); } catch {}
+      stopBtn.disabled = true;
+      startBtn.disabled = false;
+      setPhase("Stopped", 0);
+      setStatus("", "Stopped");
+    });
+
+    resetBtn.addEventListener("click", () => {
+      if (running) return;
+      resetUi();
+    });
+
+    testTargetSel.addEventListener("change", () => {
+      customTargetWrap.hidden = testTargetSel.value !== "custom";
+      if (testTargetSel.value === "this_site" && isLikelyLocalHost(location.hostname)) {
+        log("Note: This site looks like LAN/localhost, so it won’t measure internet speed. Use Public test server for internet speed.");
+      }
+    });
+
+    defaultHost.textContent = location.host || "this site";
+    resetUi();
+
+    copyLogBtn.addEventListener("click", async () => {
+      const text = logEl.value || "";
+      try {
+        await navigator.clipboard.writeText(text);
+        log("Log copied to clipboard.");
+      } catch {
+        logEl.focus();
+        logEl.select();
+        try { document.execCommand("copy"); log("Log copied (fallback)."); } catch {}
+      }
+    });
+
+    function downloadTextFile(filename, text) {
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function tsForFilename(d) {
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+    }
+
+    downloadLogBtn.addEventListener("click", () => {
+      const text = logEl.value || "";
+      const name = `internet-tester-log-${tsForFilename(new Date())}.txt`;
+      downloadTextFile(name, text);
+      log("Log downloaded.");
+    });
+
+    downloadResultsBtn.addEventListener("click", () => {
+      if (!lastResult) return;
+      const name = `internet-speed-results-${tsForFilename(new Date())}.json`;
+      downloadTextFile(name, JSON.stringify(lastResult, null, 2));
+      log("Results downloaded.");
+    });
+
+    function showInsights() {
+      if (!lastResult) return;
+      insightsDetails.hidden = false;
+      insightsDetails.open = true;
+      renderInsights(insightsCanvas, lastResult);
+    }
+
+    previewGraphBtn.addEventListener("click", () => {
+      if (running) return;
+      showInsights();
+    });
+
+    window.addEventListener("resize", () => {
+      if (!insightsDetails.hidden && insightsDetails.open && lastResult) renderInsights(insightsCanvas, lastResult);
+    });
+
+    downloadGraphBtn.addEventListener("click", () => {
+      if (!lastResult) return;
+      const name = `internet-speed-insights-${tsForFilename(new Date())}.html`;
+      downloadTextFile(name, buildGraphHtml(lastResult));
+      log("Graph downloaded.");
+    });
+
+    function normalizeResultsServer(raw) {
+      const s = (raw || "").trim();
+      if (!s || s === DEFAULT_TARGET) return { kind: "default" };
+      try {
+        const url = new URL(s.includes("://") ? s : `https://${s}`);
+        return { kind: "custom", url: url.toString() };
+      } catch {
+        return { kind: "invalid", raw: s };
+      }
+    }
+
+    sendResultsBtn.addEventListener("click", async () => {
+      if (running) return;
+      if (!lastResult) return;
+      const t = normalizeResultsServer(resultsServerInput.value);
+      if (t.kind === "invalid") { log(`Invalid results server: "${String(t.raw)}"`); return; }
+      const url = t.kind === "default"
+        ? new URL("/speedtest-results", location.origin).toString()
+        : new URL("/speedtest-results", t.url).toString();
+      log(`Sending results to: ${url}`);
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(lastResult),
+          mode: t.kind === "default" ? "same-origin" : "cors",
+          cache: "no-store"
+        });
+        const text = await res.text().catch(() => "");
+        if (!res.ok) {
+          log(`Server response: ${res.status} ${res.statusText}`);
+          if (text) log(text.slice(0, 400));
+          log("To store results, your server must implement POST /speedtest-results.");
+          return;
+        }
+        log("Results sent successfully.");
+        if (text) log(text.slice(0, 400));
+      } catch (e) {
+        log("Send failed: " + (e && e.message ? e.message : String(e)));
+        log("To store results, your server must implement POST /speedtest-results (and allow CORS if cross-site).");
+      }
+    });
+  </script>
+  <script src="js/app-guardian.js"></script>
+</body>
+</html>

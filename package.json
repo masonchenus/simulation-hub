@@ -1,0 +1,47 @@
+{
+    "name": "simulation-hub",
+    "version": "1.0.0",
+    "description": "A group of simulations, for personal, wellbeing, relaxation, and more.",
+    "keywords": [
+        "simulation",
+        "brainwave",
+        "critical",
+        "game",
+        "presets",
+        "Relaxation",
+        "personal"
+    ],
+    "author": "Mason Chen",
+    "license": "MIT",
+    "homepage": "N / A",
+    "main": "main.js",
+    "repository": "https://github.com/masonchenus/simulation-hub",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "dev:webpack": "webpack serve --config webpack.fallback.config.cjs --mode development",
+        "build": "tsc --noEmit && vite build",
+        "build:webpack-fallback": "webpack --config webpack.fallback.config.cjs --mode production",
+        "preview": "vite preview",
+        "clean": "rm -rf dist/"
+    },
+    "dependencies": {
+        "audiobuffer-to-wav": "^1.0.0",
+        "react": "^19.2.4",
+        "react-dom": "^19.2.4",
+        "ws": "^8.19.0",
+        "yarn": "^1.22.22"
+    },
+    "devDependencies": {
+        "@types/react": "^19.1.13",
+        "@types/react-dom": "^19.1.9",
+        "@vitejs/plugin-react": "^4.3.4",
+        "esbuild": "^0.25.0",
+        "esbuild-loader": "^4.3.0",
+        "typescript": "^5.8.2",
+        "vite": "^6.2.0",
+        "webpack": "^5.99.0",
+        "webpack-cli": "^6.0.0",
+        "webpack-dev-server": "^5.2.0"
+    }
+}

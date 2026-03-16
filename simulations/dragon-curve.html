@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dragon Curve Fractal Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        canvas {
+            image-rendering: crisp-edges;
+            cursor: crosshair;
+        }
+        .controls {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header & Controls -->
+    <div class="controls p-4 border-b border-slate-700 flex flex-wrap items-center justify-between gap-4 z-10">
+        <div>
+            <h1 class="text-xl font-bold text-sky-400">Dragon Curve Fractal</h1>
+            <p class="text-xs text-slate-400">Recursive "paper-folding" visualization</p>
+        </div>
+        
+        <div class="flex items-center gap-6">
+            <div class="flex flex-col">
+                <label for="iterationRange" class="text-sm font-medium mb-1">Iterations: <span id="iterVal" class="text-sky-400">10</span></label>
+                <input type="range" id="iterationRange" min="1" max="16" value="10" 
+                    class="w-48 h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-sky-500">
+            </div>
+            
+            <button id="resetBtn" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-sm font-bold transition">
+                Reset View
+            </button>
+        </div>
+    </div>
+
+    <!-- Canvas Container -->
+    <div class="relative flex-grow flex items-center justify-center bg-slate-900">
+        <canvas id="dragonCanvas"></canvas>
+        <div class="absolute bottom-4 right-4 text-[10px] text-slate-500 pointer-events-none uppercase tracking-widest">
+            Drag to Pan • Scroll to Zoom
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('dragonCanvas');
+        const ctx = canvas.getContext('2d');
+        const iterSlider = document.getElementById('iterationRange');
+        const iterVal = document.getElementById('iterVal');
+        const resetBtn = document.getElementById('resetBtn');
+
+        let width, height;
+        let iterations = parseInt(iterSlider.value);
+        let scale = 1;
+        let offsetX = 0;
+        let offsetY = 0;
+        let isDragging = false;
+        let lastMousePos = { x: 0, y: 0 };
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            resetView();
+        }
+
+        function resetView() {
+            scale = Math.min(width, height) / (Math.pow(1.5, iterations) * 2);
+            offsetX = width / 2;
+            offsetY = height / 2;
+            draw();
+        }
+
+        // The core algorithm: generating turns (1 for Right, -1 for Left)
+        function getDragonSequence(n) {
+            let sequence = [1];
+            for (let i = 1; i < n; i++) {
+                const copy = [...sequence].reverse().map(x => -x);
+                sequence.push(1);
+                sequence = sequence.concat(copy);
+            }
+            return sequence;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+            
+            const sequence = getDragonSequence(iterations);
+            const stepLen = 5 * (16 / iterations) * (scale / 10);
+            
+            let x = offsetX;
+            let y = offsetY;
+            let angle = 0;
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = Math.max(0.5, 2 - iterations/8);
+            ctx.lineJoin = 'round';
+            ctx.moveTo(x, y);
+
+            // Initial move
+            x += Math.cos(angle) * stepLen;
+            y += Math.sin(angle) * stepLen;
+            ctx.lineTo(x, y);
+
+            for (let turn of sequence) {
+                angle += (turn * Math.PI) / 2;
+                x += Math.cos(angle) * stepLen;
+                y += Math.sin(angle) * stepLen;
+                ctx.lineTo(x, y);
+            }
+            
+            ctx.stroke();
+        }
+
+        // Interaction Listeners
+        iterSlider.addEventListener('input', (e) => {
+            iterations = parseInt(e.target.value);
+            iterVal.innerText = iterations;
+            draw();
+        });
+
+        resetBtn.addEventListener('click', resetView);
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            lastMousePos = { x: e.clientX, y: e.clientY };
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            offsetX += (e.clientX - lastMousePos.x);
+            offsetY += (e.clientY - lastMousePos.y);
+            lastMousePos = { x: e.clientX, y: e.clientY };
+            draw();
+        });
+
+        window.addEventListener('mouseup', () => isDragging = false);
+
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const zoomSpeed = 0.001;
+            const factor = Math.exp(-e.deltaY * zoomSpeed);
+            scale *= factor;
+            draw();
+        }, { passive: false });
+
+        window.addEventListener('resize', resize);
+        
+        // Initial setup
+        resize();
+    </script>
+</body>
+</html>

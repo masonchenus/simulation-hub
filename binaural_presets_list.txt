@@ -1,0 +1,760 @@
+Name: Sub-Delta Drift, Freq: 0.6, Mode: subdelta
+Name: Sub-Delta Deep, Freq: 0.9, Mode: subdelta
+Name: Delta Sleep Deep, Freq: 1.2, Mode: sleep
+Name: Delta Dream Drift, Freq: 3.4, Mode: sleep
+Name: Theta Restore, Freq: 4.5, Mode: theta
+Name: Theta Calm, Freq: 6, Mode: theta
+Name: Schumann Resonance, Freq: 7.83, Mode: theta
+Name: Alpha Ease, Freq: 9, Mode: relax
+Name: Alpha Centering, Freq: 10, Mode: relax
+Name: SMR Focus, Freq: 14, Mode: beta
+Name: Beta Focus, Freq: 16, Mode: beta
+Name: High Beta Drive, Freq: 20, Mode: beta
+Name: Gamma Spark, Freq: 40, Mode: gamma
+Name: Gamma Peak, Freq: 41.6, Mode: gamma
+Name: High Gamma Clarity, Freq: 80, Mode: highgamma
+Name: Epsilon Stillness, Freq: 0.2, Mode: subdelta
+Name: Focus Flow, Freq: 12, Mode: beta
+Name: Deep Restoration, Freq: 1.5, Mode: sleep
+Name: Memory Boost, Freq: 10.2, Mode: relax
+Name: Creativity Burst, Freq: 7.83, Mode: theta
+Name: Alertness, Freq: 18, Mode: beta
+Name: Profound Relaxation, Freq: 0.5, Mode: subdelta
+Name: Sleep Cycle Entry, Freq: 1.5, Mode: sleep
+Name: Emotional Release, Freq: 3.5, Mode: delta
+Name: Introspection, Freq: 4.2, Mode: theta
+Name: Visualization, Freq: 5.8, Mode: theta
+Name: Pre-Sleep Calm, Freq: 7.2, Mode: theta
+Name: Stress Relief, Freq: 8.3, Mode: relax
+Name: Mental Stability, Freq: 11, Mode: relax
+Name: Active Focus, Freq: 13.5, Mode: beta
+Name: Calculation, Freq: 17, Mode: beta
+Name: Performance, Freq: 23, Mode: beta
+Name: High Level Processing, Freq: 32, Mode: gamma
+Name: Perception Binding, Freq: 42, Mode: gamma
+Name: Hyper Gamma, Freq: 100, Mode: highgamma
+Name: Lambda State, Freq: 200, Mode: highgamma
+Name: Energy Boost 1, Freq: 18, Mode: beta
+Name: Energy Boost 2, Freq: 18.4, Mode: beta
+Name: Energy Boost 3, Freq: 18.8, Mode: beta
+Name: Energy Boost 4, Freq: 19.2, Mode: beta
+Name: Energy Boost 5, Freq: 19.6, Mode: beta
+Name: Energy Boost 6, Freq: 20, Mode: beta
+Name: Energy Boost 7, Freq: 20.4, Mode: beta
+Name: Energy Boost 8, Freq: 20.8, Mode: beta
+Name: Energy Boost 9, Freq: 21.2, Mode: beta
+Name: Energy Boost 10, Freq: 21.6, Mode: beta
+Name: Energy Boost 11, Freq: 22, Mode: beta
+Name: Energy Boost 12, Freq: 22.4, Mode: beta
+Name: Energy Boost 13, Freq: 22.8, Mode: beta
+Name: Energy Boost 14, Freq: 23.2, Mode: beta
+Name: Energy Boost 15, Freq: 23.6, Mode: beta
+Name: Energy Boost 16, Freq: 24, Mode: beta
+Name: Energy Boost 17, Freq: 24.4, Mode: beta
+Name: Energy Boost 18, Freq: 24.8, Mode: beta
+Name: Energy Boost 19, Freq: 25.2, Mode: beta
+Name: Energy Boost 20, Freq: 25.6, Mode: beta
+Name: Energy Boost 21, Freq: 26, Mode: beta
+Name: Energy Boost 22, Freq: 26.4, Mode: beta
+Name: Energy Boost 23, Freq: 26.8, Mode: beta
+Name: Energy Boost 24, Freq: 27.2, Mode: beta
+Name: Energy Boost 25, Freq: 27.6, Mode: beta
+Name: Energy Boost 26, Freq: 28, Mode: beta
+Name: Energy Boost 27, Freq: 28.4, Mode: beta
+Name: Energy Boost 28, Freq: 28.8, Mode: beta
+Name: Energy Boost 29, Freq: 29.2, Mode: beta
+Name: Energy Boost 30, Freq: 29.6, Mode: beta
+Name: Energy Boost 31, Freq: 30, Mode: gamma
+Name: Energy Boost 32, Freq: 30.4, Mode: gamma
+Name: Energy Boost 33, Freq: 30.8, Mode: gamma
+Name: Energy Boost 34, Freq: 31.2, Mode: gamma
+Name: Energy Boost 35, Freq: 31.6, Mode: gamma
+Name: Energy Boost 36, Freq: 32, Mode: gamma
+Name: Energy Boost 37, Freq: 32.4, Mode: gamma
+Name: Energy Boost 38, Freq: 32.8, Mode: gamma
+Name: Energy Boost 39, Freq: 33.2, Mode: gamma
+Name: Energy Boost 40, Freq: 33.6, Mode: gamma
+Name: Energy Boost 41, Freq: 34, Mode: gamma
+Name: Energy Boost 42, Freq: 34.4, Mode: gamma
+Name: Energy Boost 43, Freq: 34.8, Mode: gamma
+Name: Energy Boost 44, Freq: 35.2, Mode: gamma
+Name: Energy Boost 45, Freq: 35.6, Mode: gamma
+Name: Energy Boost 46, Freq: 36, Mode: gamma
+Name: Energy Boost 47, Freq: 36.4, Mode: gamma
+Name: Energy Boost 48, Freq: 36.8, Mode: gamma
+Name: Energy Boost 49, Freq: 37.2, Mode: gamma
+Name: Energy Boost 50, Freq: 37.6, Mode: gamma
+Name: Energy Boost 51, Freq: 38, Mode: gamma
+Name: Energy Boost 52, Freq: 38.4, Mode: gamma
+Name: Energy Boost 53, Freq: 38.8, Mode: gamma
+Name: Energy Boost 54, Freq: 39.2, Mode: gamma
+Name: Energy Boost 55, Freq: 39.6, Mode: gamma
+Name: Energy Boost 56, Freq: 40, Mode: gamma
+Name: Energy Boost 57, Freq: 40.4, Mode: gamma
+Name: Energy Boost 58, Freq: 40.8, Mode: gamma
+Name: Energy Boost 59, Freq: 41.2, Mode: gamma
+Name: Energy Boost 60, Freq: 41.6, Mode: gamma
+Name: Energy Boost 61, Freq: 42, Mode: gamma
+Name: Energy Boost 62, Freq: 42.4, Mode: gamma
+Name: Energy Boost 63, Freq: 42.8, Mode: gamma
+Name: Energy Boost 64, Freq: 43.2, Mode: gamma
+Name: Energy Boost 65, Freq: 43.6, Mode: gamma
+Name: Energy Boost 66, Freq: 44, Mode: gamma
+Name: Energy Boost 67, Freq: 44.4, Mode: gamma
+Name: Energy Boost 68, Freq: 44.8, Mode: gamma
+Name: Energy Boost 69, Freq: 45.2, Mode: gamma
+Name: Energy Boost 70, Freq: 45.6, Mode: gamma
+Name: Energy Boost 71, Freq: 46, Mode: gamma
+Name: Energy Boost 72, Freq: 46.4, Mode: gamma
+Name: Energy Boost 73, Freq: 46.8, Mode: gamma
+Name: Energy Boost 74, Freq: 47.2, Mode: gamma
+Name: Energy Boost 75, Freq: 47.6, Mode: gamma
+Name: Energy Boost 76, Freq: 48, Mode: gamma
+Name: Energy Boost 77, Freq: 48.4, Mode: gamma
+Name: Energy Boost 78, Freq: 48.8, Mode: gamma
+Name: Energy Boost 79, Freq: 49.2, Mode: gamma
+Name: Energy Boost 80, Freq: 49.6, Mode: gamma
+Name: Energy Boost 81, Freq: 50, Mode: gamma
+Name: Energy Boost 82, Freq: 50.4, Mode: gamma
+Name: Energy Boost 83, Freq: 50.8, Mode: gamma
+Name: Energy Boost 84, Freq: 51.2, Mode: gamma
+Name: Energy Boost 85, Freq: 51.6, Mode: gamma
+Name: Energy Boost 86, Freq: 52, Mode: gamma
+Name: Energy Boost 87, Freq: 52.4, Mode: gamma
+Name: Energy Boost 88, Freq: 52.8, Mode: gamma
+Name: Energy Boost 89, Freq: 53.2, Mode: gamma
+Name: Energy Boost 90, Freq: 53.6, Mode: gamma
+Name: Energy Boost 91, Freq: 54, Mode: gamma
+Name: Energy Boost 92, Freq: 54.4, Mode: gamma
+Name: Energy Boost 93, Freq: 54.8, Mode: gamma
+Name: Energy Boost 94, Freq: 55.2, Mode: gamma
+Name: Energy Boost 95, Freq: 55.6, Mode: gamma
+Name: Energy Boost 96, Freq: 56, Mode: gamma
+Name: Energy Boost 97, Freq: 56.4, Mode: gamma
+Name: Energy Boost 98, Freq: 56.8, Mode: gamma
+Name: Energy Boost 99, Freq: 57.2, Mode: gamma
+Name: Energy Boost 100, Freq: 57.6, Mode: gamma
+Name: Sleep Mode 1, Freq: 1, Mode: sleep
+Name: Sleep Mode 2, Freq: 1.1, Mode: sleep
+Name: Sleep Mode 3, Freq: 1.2, Mode: sleep
+Name: Sleep Mode 4, Freq: 1.3, Mode: sleep
+Name: Sleep Mode 5, Freq: 1.4, Mode: sleep
+Name: Sleep Mode 6, Freq: 1.5, Mode: sleep
+Name: Sleep Mode 7, Freq: 1.6, Mode: sleep
+Name: Sleep Mode 8, Freq: 1.7, Mode: sleep
+Name: Sleep Mode 9, Freq: 1.8, Mode: sleep
+Name: Sleep Mode 10, Freq: 1.9, Mode: sleep
+Name: Sleep Mode 11, Freq: 2, Mode: sleep
+Name: Sleep Mode 12, Freq: 2.1, Mode: sleep
+Name: Sleep Mode 13, Freq: 2.2, Mode: sleep
+Name: Sleep Mode 14, Freq: 2.3, Mode: sleep
+Name: Sleep Mode 15, Freq: 2.4, Mode: sleep
+Name: Sleep Mode 16, Freq: 2.5, Mode: sleep
+Name: Sleep Mode 17, Freq: 2.6, Mode: sleep
+Name: Sleep Mode 18, Freq: 2.7, Mode: sleep
+Name: Sleep Mode 19, Freq: 2.8, Mode: sleep
+Name: Sleep Mode 20, Freq: 2.9, Mode: sleep
+Name: Sleep Mode 21, Freq: 3, Mode: sleep
+Name: Sleep Mode 22, Freq: 3.1, Mode: sleep
+Name: Sleep Mode 23, Freq: 3.2, Mode: sleep
+Name: Sleep Mode 24, Freq: 3.3, Mode: sleep
+Name: Sleep Mode 25, Freq: 3.4, Mode: sleep
+Name: Sleep Mode 26, Freq: 3.5, Mode: sleep
+Name: Sleep Mode 27, Freq: 3.6, Mode: sleep
+Name: Sleep Mode 28, Freq: 3.7, Mode: sleep
+Name: Sleep Mode 29, Freq: 3.8, Mode: sleep
+Name: Sleep Mode 30, Freq: 3.9, Mode: sleep
+Name: Sleep Mode 31, Freq: 4, Mode: sleep
+Name: Sleep Mode 32, Freq: 4.1, Mode: sleep
+Name: Sleep Mode 33, Freq: 4.2, Mode: sleep
+Name: Sleep Mode 34, Freq: 4.3, Mode: sleep
+Name: Sleep Mode 35, Freq: 4.4, Mode: sleep
+Name: Sleep Mode 36, Freq: 4.5, Mode: sleep
+Name: Sleep Mode 37, Freq: 4.6, Mode: sleep
+Name: Sleep Mode 38, Freq: 4.7, Mode: sleep
+Name: Sleep Mode 39, Freq: 4.8, Mode: sleep
+Name: Sleep Mode 40, Freq: 4.9, Mode: sleep
+Name: Sleep Mode 41, Freq: 5, Mode: sleep
+Name: Sleep Mode 42, Freq: 5.1, Mode: sleep
+Name: Sleep Mode 43, Freq: 5.2, Mode: sleep
+Name: Sleep Mode 44, Freq: 5.3, Mode: sleep
+Name: Sleep Mode 45, Freq: 5.4, Mode: sleep
+Name: Sleep Mode 46, Freq: 5.5, Mode: sleep
+Name: Sleep Mode 47, Freq: 5.6, Mode: sleep
+Name: Sleep Mode 48, Freq: 5.7, Mode: sleep
+Name: Sleep Mode 49, Freq: 5.8, Mode: sleep
+Name: Sleep Mode 50, Freq: 5.9, Mode: sleep
+Name: Sleep Mode 51, Freq: 6, Mode: sleep
+Name: Sleep Mode 52, Freq: 6.1, Mode: sleep
+Name: Sleep Mode 53, Freq: 6.2, Mode: sleep
+Name: Sleep Mode 54, Freq: 6.3, Mode: sleep
+Name: Sleep Mode 55, Freq: 6.4, Mode: sleep
+Name: Sleep Mode 56, Freq: 6.5, Mode: sleep
+Name: Sleep Mode 57, Freq: 6.6, Mode: sleep
+Name: Sleep Mode 58, Freq: 6.7, Mode: sleep
+Name: Sleep Mode 59, Freq: 6.8, Mode: sleep
+Name: Sleep Mode 60, Freq: 6.9, Mode: sleep
+Name: Sub-Delta 1, Freq: 0.2, Mode: subdelta
+Name: Sub-Delta 2, Freq: 0.24, Mode: subdelta
+Name: Sub-Delta 3, Freq: 0.28, Mode: subdelta
+Name: Sub-Delta 4, Freq: 0.32, Mode: subdelta
+Name: Sub-Delta 5, Freq: 0.36, Mode: subdelta
+Name: Sub-Delta 6, Freq: 0.4, Mode: subdelta
+Name: Sub-Delta 7, Freq: 0.44, Mode: subdelta
+Name: Sub-Delta 8, Freq: 0.48, Mode: subdelta
+Name: Sub-Delta 9, Freq: 0.52, Mode: subdelta
+Name: Sub-Delta 10, Freq: 0.56, Mode: subdelta
+Name: Sub-Delta 11, Freq: 0.6, Mode: subdelta
+Name: Sub-Delta 12, Freq: 0.64, Mode: subdelta
+Name: Sub-Delta 13, Freq: 0.68, Mode: subdelta
+Name: Sub-Delta 14, Freq: 0.72, Mode: subdelta
+Name: Sub-Delta 15, Freq: 0.76, Mode: subdelta
+Name: Sub-Delta 16, Freq: 0.8, Mode: subdelta
+Name: Sub-Delta 17, Freq: 0.84, Mode: subdelta
+Name: Sub-Delta 18, Freq: 0.88, Mode: subdelta
+Name: Sub-Delta 19, Freq: 0.92, Mode: subdelta
+Name: Sub-Delta 20, Freq: 0.96, Mode: subdelta
+Name: Relax Mode 1, Freq: 6, Mode: relax
+Name: Relax Mode 2, Freq: 6.2, Mode: relax
+Name: Relax Mode 3, Freq: 6.4, Mode: relax
+Name: Relax Mode 4, Freq: 6.6, Mode: relax
+Name: Relax Mode 5, Freq: 6.8, Mode: relax
+Name: Relax Mode 6, Freq: 7, Mode: relax
+Name: Relax Mode 7, Freq: 7.2, Mode: relax
+Name: Relax Mode 8, Freq: 7.4, Mode: relax
+Name: Relax Mode 9, Freq: 7.6, Mode: relax
+Name: Relax Mode 10, Freq: 7.8, Mode: relax
+Name: Relax Mode 11, Freq: 8, Mode: relax
+Name: Relax Mode 12, Freq: 8.2, Mode: relax
+Name: Relax Mode 13, Freq: 8.4, Mode: relax
+Name: Relax Mode 14, Freq: 8.6, Mode: relax
+Name: Relax Mode 15, Freq: 8.8, Mode: relax
+Name: Relax Mode 16, Freq: 9, Mode: relax
+Name: Relax Mode 17, Freq: 9.2, Mode: relax
+Name: Relax Mode 18, Freq: 9.4, Mode: relax
+Name: Relax Mode 19, Freq: 9.6, Mode: relax
+Name: Relax Mode 20, Freq: 9.8, Mode: relax
+Name: Relax Mode 21, Freq: 10, Mode: relax
+Name: Relax Mode 22, Freq: 10.2, Mode: relax
+Name: Relax Mode 23, Freq: 10.4, Mode: relax
+Name: Relax Mode 24, Freq: 10.6, Mode: relax
+Name: Relax Mode 25, Freq: 10.8, Mode: relax
+Name: Relax Mode 26, Freq: 11, Mode: relax
+Name: Relax Mode 27, Freq: 11.2, Mode: relax
+Name: Relax Mode 28, Freq: 11.4, Mode: relax
+Name: Relax Mode 29, Freq: 11.6, Mode: relax
+Name: Relax Mode 30, Freq: 11.8, Mode: relax
+Name: Relax Mode 31, Freq: 12, Mode: relax
+Name: Relax Mode 32, Freq: 12.2, Mode: relax
+Name: Relax Mode 33, Freq: 12.4, Mode: relax
+Name: Relax Mode 34, Freq: 12.6, Mode: relax
+Name: Relax Mode 35, Freq: 12.8, Mode: relax
+Name: Relax Mode 36, Freq: 13, Mode: relax
+Name: Relax Mode 37, Freq: 13.2, Mode: relax
+Name: Relax Mode 38, Freq: 13.4, Mode: relax
+Name: Relax Mode 39, Freq: 13.6, Mode: relax
+Name: Relax Mode 40, Freq: 13.8, Mode: relax
+Name: Theta Mode 1, Freq: 4, Mode: theta
+Name: Theta Mode 2, Freq: 4.15, Mode: theta
+Name: Theta Mode 3, Freq: 4.3, Mode: theta
+Name: Theta Mode 4, Freq: 4.45, Mode: theta
+Name: Theta Mode 5, Freq: 4.6, Mode: theta
+Name: Theta Mode 6, Freq: 4.75, Mode: theta
+Name: Theta Mode 7, Freq: 4.9, Mode: theta
+Name: Theta Mode 8, Freq: 5.05, Mode: theta
+Name: Theta Mode 9, Freq: 5.2, Mode: theta
+Name: Theta Mode 10, Freq: 5.35, Mode: theta
+Name: Theta Mode 11, Freq: 5.5, Mode: theta
+Name: Theta Mode 12, Freq: 5.65, Mode: theta
+Name: Theta Mode 13, Freq: 5.8, Mode: theta
+Name: Theta Mode 14, Freq: 5.95, Mode: theta
+Name: Theta Mode 15, Freq: 6.1, Mode: theta
+Name: Theta Mode 16, Freq: 6.25, Mode: theta
+Name: Theta Mode 17, Freq: 6.4, Mode: theta
+Name: Theta Mode 18, Freq: 6.55, Mode: theta
+Name: Theta Mode 19, Freq: 6.7, Mode: theta
+Name: Theta Mode 20, Freq: 6.85, Mode: theta
+Name: Theta Mode 21, Freq: 7, Mode: theta
+Name: Theta Mode 22, Freq: 7.15, Mode: theta
+Name: Theta Mode 23, Freq: 7.3, Mode: theta
+Name: Theta Mode 24, Freq: 7.45, Mode: theta
+Name: Theta Mode 25, Freq: 7.6, Mode: theta
+Name: Theta Mode 26, Freq: 7.75, Mode: theta
+Name: Theta Mode 27, Freq: 7.9, Mode: theta
+Name: Theta Mode 28, Freq: 8.05, Mode: theta
+Name: Theta Mode 29, Freq: 8.2, Mode: theta
+Name: Theta Mode 30, Freq: 8.35, Mode: theta
+Name: Theta Mode 31, Freq: 8.5, Mode: theta
+Name: Theta Mode 32, Freq: 8.65, Mode: theta
+Name: Theta Mode 33, Freq: 8.8, Mode: theta
+Name: Theta Mode 34, Freq: 8.95, Mode: theta
+Name: Theta Mode 35, Freq: 9.1, Mode: theta
+Name: Theta Mode 36, Freq: 9.25, Mode: theta
+Name: Theta Mode 37, Freq: 9.4, Mode: theta
+Name: Theta Mode 38, Freq: 9.55, Mode: theta
+Name: Theta Mode 39, Freq: 9.7, Mode: theta
+Name: Theta Mode 40, Freq: 9.85, Mode: theta
+Name: Beta Mode 1, Freq: 12, Mode: beta
+Name: Beta Mode 2, Freq: 12.3, Mode: beta
+Name: Beta Mode 3, Freq: 12.6, Mode: beta
+Name: Beta Mode 4, Freq: 12.9, Mode: beta
+Name: Beta Mode 5, Freq: 13.2, Mode: beta
+Name: Beta Mode 6, Freq: 13.5, Mode: beta
+Name: Beta Mode 7, Freq: 13.8, Mode: beta
+Name: Beta Mode 8, Freq: 14.1, Mode: beta
+Name: Beta Mode 9, Freq: 14.4, Mode: beta
+Name: Beta Mode 10, Freq: 14.7, Mode: beta
+Name: Beta Mode 11, Freq: 15, Mode: beta
+Name: Beta Mode 12, Freq: 15.3, Mode: beta
+Name: Beta Mode 13, Freq: 15.6, Mode: beta
+Name: Beta Mode 14, Freq: 15.9, Mode: beta
+Name: Beta Mode 15, Freq: 16.2, Mode: beta
+Name: Beta Mode 16, Freq: 16.5, Mode: beta
+Name: Beta Mode 17, Freq: 16.8, Mode: beta
+Name: Beta Mode 18, Freq: 17.1, Mode: beta
+Name: Beta Mode 19, Freq: 17.4, Mode: beta
+Name: Beta Mode 20, Freq: 17.7, Mode: beta
+Name: Beta Mode 21, Freq: 18, Mode: beta
+Name: Beta Mode 22, Freq: 18.3, Mode: beta
+Name: Beta Mode 23, Freq: 18.6, Mode: beta
+Name: Beta Mode 24, Freq: 18.9, Mode: beta
+Name: Beta Mode 25, Freq: 19.2, Mode: beta
+Name: Beta Mode 26, Freq: 19.5, Mode: beta
+Name: Beta Mode 27, Freq: 19.8, Mode: beta
+Name: Beta Mode 28, Freq: 20.1, Mode: beta
+Name: Beta Mode 29, Freq: 20.4, Mode: beta
+Name: Beta Mode 30, Freq: 20.7, Mode: beta
+Name: Beta Mode 31, Freq: 21, Mode: beta
+Name: Beta Mode 32, Freq: 21.3, Mode: beta
+Name: Beta Mode 33, Freq: 21.6, Mode: beta
+Name: Beta Mode 34, Freq: 21.9, Mode: beta
+Name: Beta Mode 35, Freq: 22.2, Mode: beta
+Name: Beta Mode 36, Freq: 22.5, Mode: beta
+Name: Beta Mode 37, Freq: 22.8, Mode: beta
+Name: Beta Mode 38, Freq: 23.1, Mode: beta
+Name: Beta Mode 39, Freq: 23.4, Mode: beta
+Name: Beta Mode 40, Freq: 23.7, Mode: beta
+Name: Beta Mode 41, Freq: 24, Mode: beta
+Name: Beta Mode 42, Freq: 24.3, Mode: beta
+Name: Beta Mode 43, Freq: 24.6, Mode: beta
+Name: Beta Mode 44, Freq: 24.9, Mode: beta
+Name: Beta Mode 45, Freq: 25.2, Mode: beta
+Name: Beta Mode 46, Freq: 25.5, Mode: beta
+Name: Beta Mode 47, Freq: 25.8, Mode: beta
+Name: Beta Mode 48, Freq: 26.1, Mode: beta
+Name: Beta Mode 49, Freq: 26.4, Mode: beta
+Name: Beta Mode 50, Freq: 26.7, Mode: beta
+Name: Beta Mode 51, Freq: 27, Mode: beta
+Name: Beta Mode 52, Freq: 27.3, Mode: beta
+Name: Beta Mode 53, Freq: 27.6, Mode: beta
+Name: Beta Mode 54, Freq: 27.9, Mode: beta
+Name: Beta Mode 55, Freq: 28.2, Mode: beta
+Name: Alpha Mode 1, Freq: 8, Mode: relax
+Name: Alpha Mode 2, Freq: 8.15, Mode: relax
+Name: Alpha Mode 3, Freq: 8.3, Mode: relax
+Name: Alpha Mode 4, Freq: 8.45, Mode: relax
+Name: Alpha Mode 5, Freq: 8.6, Mode: relax
+Name: Alpha Mode 6, Freq: 8.75, Mode: relax
+Name: Alpha Mode 7, Freq: 8.9, Mode: relax
+Name: Alpha Mode 8, Freq: 9.05, Mode: relax
+Name: Alpha Mode 9, Freq: 9.2, Mode: relax
+Name: Alpha Mode 10, Freq: 9.35, Mode: relax
+Name: Alpha Mode 11, Freq: 9.5, Mode: relax
+Name: Alpha Mode 12, Freq: 9.65, Mode: relax
+Name: Alpha Mode 13, Freq: 9.8, Mode: relax
+Name: Alpha Mode 14, Freq: 9.95, Mode: relax
+Name: Alpha Mode 15, Freq: 10.1, Mode: relax
+Name: Alpha Mode 16, Freq: 10.25, Mode: relax
+Name: Alpha Mode 17, Freq: 10.4, Mode: relax
+Name: Alpha Mode 18, Freq: 10.55, Mode: relax
+Name: Alpha Mode 19, Freq: 10.7, Mode: relax
+Name: Alpha Mode 20, Freq: 10.85, Mode: relax
+Name: Alpha Mode 21, Freq: 11, Mode: relax
+Name: Alpha Mode 22, Freq: 11.15, Mode: relax
+Name: Alpha Mode 23, Freq: 11.3, Mode: relax
+Name: Alpha Mode 24, Freq: 11.45, Mode: relax
+Name: Alpha Mode 25, Freq: 11.6, Mode: relax
+Name: Alpha Mode 26, Freq: 11.75, Mode: relax
+Name: Alpha Mode 27, Freq: 11.9, Mode: relax
+Name: Alpha Mode 28, Freq: 12.05, Mode: relax
+Name: Alpha Mode 29, Freq: 12.2, Mode: relax
+Name: Alpha Mode 30, Freq: 12.35, Mode: relax
+Name: Focus Mode 1, Freq: 14, Mode: beta
+Name: Focus Mode 2, Freq: 14.25, Mode: beta
+Name: Focus Mode 3, Freq: 14.5, Mode: beta
+Name: Focus Mode 4, Freq: 14.75, Mode: beta
+Name: Focus Mode 5, Freq: 15, Mode: beta
+Name: Focus Mode 6, Freq: 15.25, Mode: beta
+Name: Focus Mode 7, Freq: 15.5, Mode: beta
+Name: Focus Mode 8, Freq: 15.75, Mode: beta
+Name: Focus Mode 9, Freq: 16, Mode: beta
+Name: Focus Mode 10, Freq: 16.25, Mode: beta
+Name: Focus Mode 11, Freq: 16.5, Mode: beta
+Name: Focus Mode 12, Freq: 16.75, Mode: beta
+Name: Focus Mode 13, Freq: 17, Mode: beta
+Name: Focus Mode 14, Freq: 17.25, Mode: beta
+Name: Focus Mode 15, Freq: 17.5, Mode: beta
+Name: Focus Mode 16, Freq: 17.75, Mode: beta
+Name: Focus Mode 17, Freq: 18, Mode: beta
+Name: Focus Mode 18, Freq: 18.25, Mode: beta
+Name: Focus Mode 19, Freq: 18.5, Mode: beta
+Name: Focus Mode 20, Freq: 18.75, Mode: beta
+Name: Focus Mode 21, Freq: 19, Mode: beta
+Name: Focus Mode 22, Freq: 19.25, Mode: beta
+Name: Focus Mode 23, Freq: 19.5, Mode: beta
+Name: Focus Mode 24, Freq: 19.75, Mode: beta
+Name: Focus Mode 25, Freq: 20, Mode: beta
+Name: Focus Mode 26, Freq: 20.25, Mode: beta
+Name: Focus Mode 27, Freq: 20.5, Mode: beta
+Name: Focus Mode 28, Freq: 20.75, Mode: beta
+Name: Focus Mode 29, Freq: 21, Mode: beta
+Name: Focus Mode 30, Freq: 21.25, Mode: beta
+Name: Focus Mode 31, Freq: 21.5, Mode: beta
+Name: Focus Mode 32, Freq: 21.75, Mode: beta
+Name: Focus Mode 33, Freq: 22, Mode: beta
+Name: Focus Mode 34, Freq: 22.25, Mode: beta
+Name: Focus Mode 35, Freq: 22.5, Mode: beta
+Name: Focus Mode 36, Freq: 22.75, Mode: beta
+Name: Focus Mode 37, Freq: 23, Mode: beta
+Name: Focus Mode 38, Freq: 23.25, Mode: beta
+Name: Focus Mode 39, Freq: 23.5, Mode: beta
+Name: Focus Mode 40, Freq: 23.75, Mode: beta
+Name: High Hertz 1, Freq: 60, Mode: gamma
+Name: High Hertz 2, Freq: 63.5, Mode: highgamma
+Name: High Hertz 3, Freq: 67, Mode: gamma
+Name: High Hertz 4, Freq: 70.5, Mode: highgamma
+Name: High Hertz 5, Freq: 74, Mode: gamma
+Name: High Hertz 6, Freq: 77.5, Mode: highgamma
+Name: High Hertz 7, Freq: 81, Mode: gamma
+Name: High Hertz 8, Freq: 84.5, Mode: highgamma
+Name: High Hertz 9, Freq: 88, Mode: gamma
+Name: High Hertz 10, Freq: 91.5, Mode: highgamma
+Name: High Hertz 11, Freq: 95, Mode: gamma
+Name: High Hertz 12, Freq: 98.5, Mode: highgamma
+Name: High Hertz 13, Freq: 102, Mode: gamma
+Name: High Hertz 14, Freq: 105.5, Mode: highgamma
+Name: High Hertz 15, Freq: 109, Mode: gamma
+Name: High Hertz 16, Freq: 112.5, Mode: highgamma
+Name: High Hertz 17, Freq: 116, Mode: gamma
+Name: High Hertz 18, Freq: 119.5, Mode: highgamma
+Name: High Hertz 19, Freq: 123, Mode: gamma
+Name: High Hertz 20, Freq: 126.5, Mode: highgamma
+Name: High Hertz 21, Freq: 130, Mode: gamma
+Name: High Hertz 22, Freq: 133.5, Mode: highgamma
+Name: High Hertz 23, Freq: 137, Mode: gamma
+Name: High Hertz 24, Freq: 140.5, Mode: highgamma
+Name: High Hertz 25, Freq: 144, Mode: gamma
+Name: High Hertz 26, Freq: 147.5, Mode: highgamma
+Name: High Hertz 27, Freq: 151, Mode: gamma
+Name: High Hertz 28, Freq: 154.5, Mode: highgamma
+Name: High Hertz 29, Freq: 158, Mode: gamma
+Name: High Hertz 30, Freq: 161.5, Mode: highgamma
+Name: High Hertz 31, Freq: 165, Mode: gamma
+Name: High Hertz 32, Freq: 168.5, Mode: highgamma
+Name: High Hertz 33, Freq: 172, Mode: gamma
+Name: High Hertz 34, Freq: 175.5, Mode: highgamma
+Name: High Hertz 35, Freq: 179, Mode: gamma
+Name: High Hertz 36, Freq: 182.5, Mode: highgamma
+Name: High Hertz 37, Freq: 186, Mode: gamma
+Name: High Hertz 38, Freq: 189.5, Mode: highgamma
+Name: High Hertz 39, Freq: 193, Mode: gamma
+Name: High Hertz 40, Freq: 196.5, Mode: highgamma
+Name: High Hertz 41, Freq: 200, Mode: gamma
+Name: High Hertz 42, Freq: 203.5, Mode: highgamma
+Name: High Hertz 43, Freq: 207, Mode: gamma
+Name: High Hertz 44, Freq: 210.5, Mode: highgamma
+Name: High Hertz 45, Freq: 214, Mode: gamma
+Name: High Hertz 46, Freq: 217.5, Mode: highgamma
+Name: High Hertz 47, Freq: 221, Mode: gamma
+Name: High Hertz 48, Freq: 224.5, Mode: highgamma
+Name: High Hertz 49, Freq: 228, Mode: gamma
+Name: High Hertz 50, Freq: 231.5, Mode: highgamma
+Name: High Hertz 51, Freq: 235, Mode: gamma
+Name: High Hertz 52, Freq: 238.5, Mode: highgamma
+Name: High Hertz 53, Freq: 242, Mode: gamma
+Name: High Hertz 54, Freq: 245.5, Mode: highgamma
+Name: High Hertz 55, Freq: 249, Mode: gamma
+Name: High Hertz 56, Freq: 252.5, Mode: highgamma
+Name: High Hertz 57, Freq: 256, Mode: gamma
+Name: High Hertz 58, Freq: 259.5, Mode: highgamma
+Name: High Hertz 59, Freq: 263, Mode: gamma
+Name: High Hertz 60, Freq: 266.5, Mode: highgamma
+Name: High Hertz 61, Freq: 270, Mode: gamma
+Name: High Hertz 62, Freq: 273.5, Mode: highgamma
+Name: High Hertz 63, Freq: 277, Mode: gamma
+Name: High Hertz 64, Freq: 280.5, Mode: highgamma
+Name: High Hertz 65, Freq: 284, Mode: gamma
+Name: High Hertz 66, Freq: 287.5, Mode: highgamma
+Name: High Hertz 67, Freq: 291, Mode: gamma
+Name: High Hertz 68, Freq: 294.5, Mode: highgamma
+Name: High Hertz 69, Freq: 298, Mode: gamma
+Name: High Hertz 70, Freq: 301.5, Mode: highgamma
+Name: High Hertz 71, Freq: 305, Mode: gamma
+Name: High Hertz 72, Freq: 308.5, Mode: highgamma
+Name: High Hertz 73, Freq: 312, Mode: gamma
+Name: High Hertz 74, Freq: 315.5, Mode: highgamma
+Name: High Hertz 75, Freq: 319, Mode: gamma
+Name: High Hertz 76, Freq: 322.5, Mode: highgamma
+Name: High Hertz 77, Freq: 326, Mode: gamma
+Name: High Hertz 78, Freq: 329.5, Mode: highgamma
+Name: High Hertz 79, Freq: 333, Mode: gamma
+Name: High Hertz 80, Freq: 336.5, Mode: highgamma
+Name: High Hertz 81, Freq: 340, Mode: gamma
+Name: High Hertz 82, Freq: 343.5, Mode: highgamma
+Name: High Hertz 83, Freq: 347, Mode: gamma
+Name: High Hertz 84, Freq: 350.5, Mode: highgamma
+Name: High Hertz 85, Freq: 354, Mode: gamma
+Name: High Hertz 86, Freq: 357.5, Mode: highgamma
+Name: High Hertz 87, Freq: 361, Mode: gamma
+Name: High Hertz 88, Freq: 364.5, Mode: highgamma
+Name: High Hertz 89, Freq: 368, Mode: gamma
+Name: High Hertz 90, Freq: 371.5, Mode: highgamma
+Name: High Hertz 91, Freq: 375, Mode: gamma
+Name: High Hertz 92, Freq: 378.5, Mode: highgamma
+Name: High Hertz 93, Freq: 382, Mode: gamma
+Name: High Hertz 94, Freq: 385.5, Mode: highgamma
+Name: High Hertz 95, Freq: 389, Mode: gamma
+Name: High Hertz 96, Freq: 392.5, Mode: highgamma
+Name: High Hertz 97, Freq: 396, Mode: gamma
+Name: High Hertz 98, Freq: 399.5, Mode: highgamma
+Name: High Hertz 99, Freq: 403, Mode: gamma
+Name: High Hertz 100, Freq: 406.5, Mode: highgamma
+Name: High Hertz 101, Freq: 410, Mode: gamma
+Name: High Hertz 102, Freq: 413.5, Mode: highgamma
+Name: High Hertz 103, Freq: 417, Mode: gamma
+Name: High Hertz 104, Freq: 420.5, Mode: highgamma
+Name: High Hertz 105, Freq: 424, Mode: gamma
+Name: High Hertz 106, Freq: 427.5, Mode: highgamma
+Name: High Hertz 107, Freq: 431, Mode: gamma
+Name: High Hertz 108, Freq: 434.5, Mode: highgamma
+Name: High Hertz 109, Freq: 438, Mode: gamma
+Name: High Hertz 110, Freq: 441.5, Mode: highgamma
+Name: High Hertz 111, Freq: 445, Mode: gamma
+Name: High Hertz 112, Freq: 448.5, Mode: highgamma
+Name: High Hertz 113, Freq: 452, Mode: gamma
+Name: High Hertz 114, Freq: 455.5, Mode: highgamma
+Name: High Hertz 115, Freq: 459, Mode: gamma
+Name: High Hertz 116, Freq: 462.5, Mode: highgamma
+Name: High Hertz 117, Freq: 466, Mode: gamma
+Name: High Hertz 118, Freq: 469.5, Mode: highgamma
+Name: High Hertz 119, Freq: 473, Mode: gamma
+Name: High Hertz 120, Freq: 476.5, Mode: highgamma
+Name: High Hertz 121, Freq: 480, Mode: gamma
+Name: High Hertz 122, Freq: 483.5, Mode: highgamma
+Name: High Hertz 123, Freq: 487, Mode: gamma
+Name: High Hertz 124, Freq: 490.5, Mode: highgamma
+Name: High Hertz 125, Freq: 494, Mode: gamma
+Name: High Hertz 126, Freq: 497.5, Mode: highgamma
+Name: High Hertz 127, Freq: 501, Mode: gamma
+Name: High Hertz 128, Freq: 504.5, Mode: highgamma
+Name: High Hertz 129, Freq: 508, Mode: gamma
+Name: High Hertz 130, Freq: 511.5, Mode: highgamma
+Name: High Hertz 131, Freq: 515, Mode: gamma
+Name: High Hertz 132, Freq: 518.5, Mode: highgamma
+Name: High Hertz 133, Freq: 522, Mode: gamma
+Name: High Hertz 134, Freq: 525.5, Mode: highgamma
+Name: High Hertz 135, Freq: 529, Mode: gamma
+Name: High Hertz 136, Freq: 532.5, Mode: highgamma
+Name: High Hertz 137, Freq: 536, Mode: gamma
+Name: High Hertz 138, Freq: 539.5, Mode: highgamma
+Name: High Hertz 139, Freq: 543, Mode: gamma
+Name: High Hertz 140, Freq: 546.5, Mode: highgamma
+Name: High Hertz 141, Freq: 550, Mode: gamma
+Name: High Hertz 142, Freq: 553.5, Mode: highgamma
+Name: High Hertz 143, Freq: 557, Mode: gamma
+Name: High Hertz 144, Freq: 560.5, Mode: highgamma
+Name: High Hertz 145, Freq: 564, Mode: gamma
+Name: High Hertz 146, Freq: 567.5, Mode: highgamma
+Name: High Hertz 147, Freq: 571, Mode: gamma
+Name: High Hertz 148, Freq: 574.5, Mode: highgamma
+Name: High Hertz 149, Freq: 578, Mode: gamma
+Name: High Hertz 150, Freq: 581.5, Mode: highgamma
+Name: High Hertz 151, Freq: 585, Mode: gamma
+Name: High Hertz 152, Freq: 588.5, Mode: highgamma
+Name: High Hertz 153, Freq: 592, Mode: gamma
+Name: High Hertz 154, Freq: 595.5, Mode: highgamma
+Name: High Hertz 155, Freq: 599, Mode: gamma
+Name: High Hertz 156, Freq: 602.5, Mode: highgamma
+Name: High Hertz 157, Freq: 606, Mode: gamma
+Name: High Hertz 158, Freq: 609.5, Mode: highgamma
+Name: High Hertz 159, Freq: 613, Mode: gamma
+Name: High Hertz 160, Freq: 616.5, Mode: highgamma
+Name: High Hertz 161, Freq: 620, Mode: gamma
+Name: High Hertz 162, Freq: 623.5, Mode: highgamma
+Name: High Hertz 163, Freq: 627, Mode: gamma
+Name: High Hertz 164, Freq: 630.5, Mode: highgamma
+Name: High Hertz 165, Freq: 634, Mode: gamma
+Name: High Hertz 166, Freq: 637.5, Mode: highgamma
+Name: High Hertz 167, Freq: 641, Mode: gamma
+Name: High Hertz 168, Freq: 644.5, Mode: highgamma
+Name: High Hertz 169, Freq: 648, Mode: gamma
+Name: High Hertz 170, Freq: 651.5, Mode: highgamma
+Name: High Hertz 171, Freq: 655, Mode: gamma
+Name: High Hertz 172, Freq: 658.5, Mode: highgamma
+Name: High Hertz 173, Freq: 662, Mode: gamma
+Name: High Hertz 174, Freq: 665.5, Mode: highgamma
+Name: High Hertz 175, Freq: 669, Mode: gamma
+Name: High Hertz 176, Freq: 672.5, Mode: highgamma
+Name: High Hertz 177, Freq: 676, Mode: gamma
+Name: High Hertz 178, Freq: 679.5, Mode: highgamma
+Name: High Hertz 179, Freq: 683, Mode: gamma
+Name: High Hertz 180, Freq: 686.5, Mode: highgamma
+Name: High Hertz 181, Freq: 690, Mode: gamma
+Name: High Hertz 182, Freq: 693.5, Mode: highgamma
+Name: High Hertz 183, Freq: 697, Mode: gamma
+Name: High Hertz 184, Freq: 700.5, Mode: highgamma
+Name: High Hertz 185, Freq: 704, Mode: gamma
+Name: High Hertz 186, Freq: 707.5, Mode: highgamma
+Name: High Hertz 187, Freq: 711, Mode: gamma
+Name: High Hertz 188, Freq: 714.5, Mode: highgamma
+Name: High Hertz 189, Freq: 718, Mode: gamma
+Name: High Hertz 190, Freq: 721.5, Mode: highgamma
+Name: High Hertz 191, Freq: 725, Mode: gamma
+Name: High Hertz 192, Freq: 728.5, Mode: highgamma
+Name: High Hertz 193, Freq: 732, Mode: gamma
+Name: High Hertz 194, Freq: 735.5, Mode: highgamma
+Name: High Hertz 195, Freq: 739, Mode: gamma
+Name: High Hertz 196, Freq: 742.5, Mode: highgamma
+Name: High Hertz 197, Freq: 746, Mode: gamma
+Name: High Hertz 198, Freq: 749.5, Mode: highgamma
+Name: High Hertz 199, Freq: 753, Mode: gamma
+Name: High Hertz 200, Freq: 756.5, Mode: highgamma
+Name: Experimental 957 Hz, Freq: 957, Mode: highgamma
+Name: Schumann Earth (7.83 Hz), Freq: 7.83, Mode: theta
+Name: Schumann Peak 2 (14.3 Hz), Freq: 14.3, Mode: beta
+Name: Schumann Peak 3 (20.8 Hz), Freq: 20.8, Mode: beta
+Name: Schumann Peak 4 (27.3 Hz), Freq: 27.3, Mode: gamma
+Name: Schumann Peak 5 (33.8 Hz), Freq: 33.8, Mode: gamma
+Name: 174 Hz Pain Relief, Freq: 4, Mode: theta
+Name: 285 Hz Tissue Repair, Freq: 5, Mode: theta
+Name: 396 Hz Liberation, Freq: 6, Mode: theta
+Name: 417 Hz Change, Freq: 7, Mode: theta
+Name: 528 Hz Transformation, Freq: 8, Mode: relax
+Name: 639 Hz Connection, Freq: 9, Mode: relax
+Name: 741 Hz Awakening, Freq: 10, Mode: relax
+Name: 852 Hz Intuition, Freq: 11, Mode: relax
+Name: 963 Hz Oneness, Freq: 12, Mode: beta
+Name: Creative Bridge, Freq: 7.5, Mode: theta
+Name: Insight Spark, Freq: 8, Mode: relax
+Name: Flow State, Freq: 10.5, Mode: relax
+Name: Artist's Zone, Freq: 9.5, Mode: relax
+Name: Study Aid (Low Beta), Freq: 13, Mode: beta
+Name: Active Learning, Freq: 15, Mode: beta
+Name: Cognitive Boost, Freq: 18, Mode: beta
+Name: Memory Lock, Freq: 10, Mode: relax
+Name: Zen Focus, Freq: 6, Mode: theta
+Name: Deep Om, Freq: 4.5, Mode: theta
+Name: Kundalini Rise, Freq: 5.5, Mode: theta
+Name: Lucid Gateway, Freq: 6.3, Mode: theta
+Name: Astral Vibration, Freq: 40, Mode: gamma
+Name: Projection Pulse, Freq: 4, Mode: theta
+Name: Deep Travel, Freq: 3, Mode: delta
+Name: Cellular Regen, Freq: 111, Mode: highgamma
+Name: Pain Relief, Freq: 2.5, Mode: delta
+Name: Stress Dissolve, Freq: 0.9, Mode: subdelta
+Name: Morning Ignition, Freq: 22, Mode: beta
+Name: Cognitive Fuel, Freq: 30, Mode: gamma
+Name: Workout Prime, Freq: 38, Mode: gamma
+Name: Deadline Drive, Freq: 45, Mode: gamma
+Name: Neural Sync, Freq: 55, Mode: highgamma
+Name: Quantum Focus, Freq: 70, Mode: highgamma
+Name: Deep Dive 1, Freq: 0.5, Mode: sleep
+Name: Deep Dive 2, Freq: 0.8, Mode: sleep
+Name: Deep Dive 3, Freq: 1.1, Mode: sleep
+Name: Deep Dive 4, Freq: 1.4, Mode: sleep
+Name: Deep Dive 5, Freq: 1.7, Mode: sleep
+Name: Deep Dive 6, Freq: 2, Mode: sleep
+Name: Deep Dive 7, Freq: 2.3, Mode: sleep
+Name: Deep Dive 8, Freq: 2.6, Mode: sleep
+Name: Deep Dive 9, Freq: 2.9, Mode: sleep
+Name: Deep Dive 10, Freq: 3.2, Mode: sleep
+Name: Deep Dive 11, Freq: 3.5, Mode: sleep
+Name: Deep Dive 12, Freq: 3.8, Mode: sleep
+Name: Deep Dive 13, Freq: 4.1, Mode: theta
+Name: Deep Dive 14, Freq: 4.4, Mode: theta
+Name: Deep Dive 15, Freq: 4.7, Mode: theta
+Name: Deep Dive 16, Freq: 5, Mode: theta
+Name: Deep Dive 17, Freq: 5.3, Mode: theta
+Name: Deep Dive 18, Freq: 5.6, Mode: theta
+Name: Deep Dive 19, Freq: 5.9, Mode: theta
+Name: Deep Dive 20, Freq: 6.2, Mode: theta
+Name: Deep Dive 21, Freq: 6.5, Mode: theta
+Name: Deep Dive 22, Freq: 6.8, Mode: theta
+Name: Deep Dive 23, Freq: 7.1, Mode: theta
+Name: Deep Dive 24, Freq: 7.4, Mode: theta
+Name: Deep Dive 25, Freq: 7.7, Mode: theta
+Name: Calm State 1, Freq: 8, Mode: relax
+Name: Calm State 2, Freq: 8.25, Mode: relax
+Name: Calm State 3, Freq: 8.5, Mode: relax
+Name: Calm State 4, Freq: 8.75, Mode: relax
+Name: Calm State 5, Freq: 9, Mode: relax
+Name: Calm State 6, Freq: 9.25, Mode: relax
+Name: Calm State 7, Freq: 9.5, Mode: relax
+Name: Calm State 8, Freq: 9.75, Mode: relax
+Name: Calm State 9, Freq: 10, Mode: relax
+Name: Calm State 10, Freq: 10.25, Mode: relax
+Name: Calm State 11, Freq: 10.5, Mode: relax
+Name: Calm State 12, Freq: 10.75, Mode: relax
+Name: Calm State 13, Freq: 11, Mode: relax
+Name: Calm State 14, Freq: 11.25, Mode: relax
+Name: Calm State 15, Freq: 11.5, Mode: relax
+Name: Calm State 16, Freq: 11.75, Mode: relax
+Name: Calm State 17, Freq: 12, Mode: relax
+Name: Calm State 18, Freq: 12.25, Mode: relax
+Name: Calm State 19, Freq: 12.5, Mode: relax
+Name: Calm State 20, Freq: 12.75, Mode: relax
+Name: Calm State 21, Freq: 13, Mode: relax
+Name: Calm State 22, Freq: 13.25, Mode: relax
+Name: Calm State 23, Freq: 13.5, Mode: relax
+Name: Calm State 24, Freq: 13.75, Mode: relax
+Name: Calm State 25, Freq: 14, Mode: relax
+Name: Active Mind 1, Freq: 14.5, Mode: beta
+Name: Active Mind 2, Freq: 15.1, Mode: beta
+Name: Active Mind 3, Freq: 15.7, Mode: beta
+Name: Active Mind 4, Freq: 16.3, Mode: beta
+Name: Active Mind 5, Freq: 16.9, Mode: beta
+Name: Active Mind 6, Freq: 17.5, Mode: beta
+Name: Active Mind 7, Freq: 18.1, Mode: beta
+Name: Active Mind 8, Freq: 18.7, Mode: beta
+Name: Active Mind 9, Freq: 19.3, Mode: beta
+Name: Active Mind 10, Freq: 19.9, Mode: beta
+Name: Active Mind 11, Freq: 20.5, Mode: beta
+Name: Active Mind 12, Freq: 21.1, Mode: beta
+Name: Active Mind 13, Freq: 21.7, Mode: beta
+Name: Active Mind 14, Freq: 22.3, Mode: beta
+Name: Active Mind 15, Freq: 22.9, Mode: beta
+Name: Active Mind 16, Freq: 23.5, Mode: beta
+Name: Active Mind 17, Freq: 24.1, Mode: beta
+Name: Active Mind 18, Freq: 24.7, Mode: beta
+Name: Active Mind 19, Freq: 25.3, Mode: beta
+Name: Active Mind 20, Freq: 25.9, Mode: beta
+Name: Active Mind 21, Freq: 26.5, Mode: beta
+Name: Active Mind 22, Freq: 27.1, Mode: beta
+Name: Active Mind 23, Freq: 27.7, Mode: beta
+Name: Active Mind 24, Freq: 28.3, Mode: beta
+Name: Active Mind 25, Freq: 28.9, Mode: beta
+Name: Hyper Sync 1, Freq: 32, Mode: beta
+Name: Hyper Sync 2, Freq: 34, Mode: beta
+Name: Hyper Sync 3, Freq: 36, Mode: beta
+Name: Hyper Sync 4, Freq: 38, Mode: beta
+Name: Hyper Sync 5, Freq: 40, Mode: beta
+Name: Hyper Sync 6, Freq: 42, Mode: gamma
+Name: Hyper Sync 7, Freq: 44, Mode: gamma
+Name: Hyper Sync 8, Freq: 46, Mode: gamma
+Name: Hyper Sync 9, Freq: 48, Mode: gamma
+Name: Hyper Sync 10, Freq: 50, Mode: gamma
+Name: Hyper Sync 11, Freq: 52, Mode: gamma
+Name: Hyper Sync 12, Freq: 54, Mode: gamma
+Name: Hyper Sync 13, Freq: 56, Mode: gamma
+Name: Hyper Sync 14, Freq: 58, Mode: gamma
+Name: Hyper Sync 15, Freq: 60, Mode: gamma
+Name: Hyper Sync 16, Freq: 62, Mode: gamma
+Name: Hyper Sync 17, Freq: 64, Mode: gamma
+Name: Hyper Sync 18, Freq: 66, Mode: gamma
+Name: Hyper Sync 19, Freq: 68, Mode: gamma
+Name: Hyper Sync 20, Freq: 70, Mode: gamma
+Name: Hyper Sync 21, Freq: 72, Mode: gamma
+Name: Hyper Sync 22, Freq: 74, Mode: gamma
+Name: Hyper Sync 23, Freq: 76, Mode: gamma
+Name: Hyper Sync 24, Freq: 78, Mode: gamma
+Name: Hyper Sync 25, Freq: 80, Mode: gamma

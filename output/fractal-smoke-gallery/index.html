@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fractal Smoke Gallery</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b1020;
+        --panel: rgba(255, 255, 255, 0.06);
+        --panel2: rgba(255, 255, 255, 0.09);
+        --text: rgba(255, 255, 255, 0.9);
+        --muted: rgba(255, 255, 255, 0.65);
+        --border: rgba(255, 255, 255, 0.12);
+        --accent: #60a5fa;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+          "Apple Color Emoji", "Segoe UI Emoji";
+        background: radial-gradient(1200px 800px at 20% 0%, rgba(96, 165, 250, 0.15), transparent),
+          radial-gradient(900px 700px at 90% 10%, rgba(16, 185, 129, 0.12), transparent), var(--bg);
+        color: var(--text);
+      }
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        backdrop-filter: blur(10px);
+        background: rgba(11, 16, 32, 0.75);
+        border-bottom: 1px solid var(--border);
+      }
+      .wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 14px 16px;
+      }
+      h1 {
+        font-size: 16px;
+        margin: 0 0 2px;
+      }
+      .sub {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .controls {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      @media (min-width: 900px) {
+        .controls {
+          grid-template-columns: 1fr 1fr 1fr;
+          align-items: end;
+        }
+      }
+      label {
+        font-size: 12px;
+        color: var(--muted);
+        display: block;
+        margin-bottom: 6px;
+      }
+      input,
+      select {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px 10px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        outline: none;
+      }
+      input:focus,
+      select:focus {
+        border-color: rgba(96, 165, 250, 0.55);
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+      }
+      main {
+        padding: 18px 16px 40px;
+      }
+      .section {
+        max-width: 1200px;
+        margin: 0 auto 28px;
+      }
+      .section-title {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 10px 0 10px;
+      }
+      .section-title h2 {
+        margin: 0;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.9);
+      }
+      .count {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+      @media (min-width: 720px) {
+        .grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+      @media (min-width: 1100px) {
+        .grid {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      .thumb {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: rgba(0, 0, 0, 0.2);
+        object-fit: cover;
+      }
+      .meta {
+        padding: 10px 10px 12px;
+        display: grid;
+        gap: 6px;
+      }
+      .name {
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .path {
+        font-size: 11px;
+        color: var(--muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      a:hover .card {
+        border-color: rgba(96, 165, 250, 0.55);
+        background: var(--panel2);
+      }
+      .empty {
+        font-size: 12px;
+        color: var(--muted);
+        padding: 10px;
+        border: 1px dashed var(--border);
+        border-radius: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <h1>Fractal Smoke Gallery</h1>
+        <div class="sub">Browse screenshots from automated preset/layout runs.</div>
+        <div class="controls">
+          <div>
+            <label for="filter">Filter</label>
+            <input id="filter" placeholder="Type to filter…" autocomplete="off" />
+          </div>
+          <div>
+            <label for="sort">Sort</label>
+            <select id="sort">
+              <option value="name">Name</option>
+              <option value="path">Path</option>
+            </select>
+          </div>
+          <div>
+            <label for="section">Section</label>
+            <select id="section">
+              <option value="all">All</option>
+              <option value="layouts">Layouts</option>
+              <option value="presets">Presets</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main>
+      <div class="section" id="layouts-sec">
+        <div class="section-title">
+          <h2>Layouts</h2>
+          <div class="count" id="layouts-count"></div>
+        </div>
+        <div class="grid" id="layouts"></div>
+      </div>
+      <div class="section" id="presets-sec">
+        <div class="section-title">
+          <h2>Presets</h2>
+          <div class="count" id="presets-count"></div>
+        </div>
+        <div class="grid" id="presets"></div>
+      </div>
+      <div class="section" id="empty" style="display: none">
+        <div class="empty">No images match the current filter.</div>
+      </div>
+    </main>
+    <script>
+      const manifestUrl = new URL("./manifest.json", location.href).toString();
+
+      function baseName(p) {
+        const parts = String(p).split("/");
+        return parts[parts.length - 1].replace(/\\.png$/i, "");
+      }
+
+      function toRelPath(p) {
+        const url = new URL(p, location.href);
+        return url.pathname.split("/").slice(-4).join("/");
+      }
+
+      function cardHtml(item) {
+        const name = item.name;
+        const p = item.path;
+        const rel = toRelPath(p);
+        const href = new URL("../" + rel, location.href).toString();
+        const img = new URL("../" + rel, location.href).toString();
+        return `
+          <a href="${href}" target="_blank" rel="noopener">
+            <div class="card">
+              <img class="thumb" src="${img}" alt="${name}" loading="lazy" />
+              <div class="meta">
+                <div class="name" title="${name}">${name}</div>
+                <div class="path" title="${rel}">${rel}</div>
+              </div>
+            </div>
+          </a>
+        `;
+      }
+
+      function renderSection(container, items) {
+        container.innerHTML = items.map(cardHtml).join("");
+      }
+
+      function applyUi(state) {
+        const filter = state.filter.trim().toLowerCase();
+        const sortKey = state.sort;
+
+        function prep(items) {
+          let next = items;
+          if (filter) {
+            next = next.filter((it) => it.name.toLowerCase().includes(filter) || it.path.toLowerCase().includes(filter));
+          }
+          next = [...next].sort((a, b) => String(a[sortKey]).localeCompare(String(b[sortKey])));
+          return next;
+        }
+
+        const show = state.section;
+        const layoutsSec = document.getElementById("layouts-sec");
+        const presetsSec = document.getElementById("presets-sec");
+
+        const layouts = prep(state.layouts);
+        const presets = prep(state.presets);
+
+        const showLayouts = show === "all" || show === "layouts";
+        const showPresets = show === "all" || show === "presets";
+
+        layoutsSec.style.display = showLayouts ? "" : "none";
+        presetsSec.style.display = showPresets ? "" : "none";
+
+        if (showLayouts) renderSection(document.getElementById("layouts"), layouts);
+        if (showPresets) renderSection(document.getElementById("presets"), presets);
+
+        document.getElementById("layouts-count").textContent = `${layouts.length} images`;
+        document.getElementById("presets-count").textContent = `${presets.length} images`;
+
+        const anyShown = (showLayouts && layouts.length) || (showPresets && presets.length);
+        document.getElementById("empty").style.display = anyShown ? "none" : "";
+      }
+
+      async function main() {
+        const res = await fetch(manifestUrl);
+        const manifest = await res.json();
+
+        const state = {
+          filter: "",
+          sort: "name",
+          section: "all",
+          layouts: (manifest.layouts || []).map((p) => ({ name: baseName(p), path: p })),
+          presets: (manifest.presets || []).map((p) => ({ name: baseName(p), path: p })),
+        };
+
+        const filterEl = document.getElementById("filter");
+        const sortEl = document.getElementById("sort");
+        const sectionEl = document.getElementById("section");
+
+        function update() {
+          state.filter = filterEl.value || "";
+          state.sort = sortEl.value || "name";
+          state.section = sectionEl.value || "all";
+          applyUi(state);
+        }
+
+        filterEl.addEventListener("input", update);
+        sortEl.addEventListener("input", update);
+        sectionEl.addEventListener("input", update);
+        update();
+      }
+
+      main().catch((err) => {
+        document.body.innerHTML = `<pre style="padding:16px;white-space:pre-wrap;color:#fff">${String(err && err.stack ? err.stack : err)}</pre>`;
+      });
+    </script>
+  </body>
+</html>
+

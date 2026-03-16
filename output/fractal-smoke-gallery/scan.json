@@ -1,0 +1,2465 @@
+{
+  "layouts": [
+    {
+      "path": "output/fractal-layout-smoke-run9/arc.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.035424766718507,
+      "bbox": {
+        "minx": 24,
+        "miny": 47,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8451010886469673,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/astroid.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.030619815966822186,
+      "bbox": {
+        "minx": 24,
+        "miny": 74,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8052099533437014,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/atom.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.026885692068429237,
+      "bbox": {
+        "minx": 24,
+        "miny": 46,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8465785381026438,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/binary.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03286839035769829,
+      "bbox": {
+        "minx": 24,
+        "miny": 172,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.6604199066874028,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/block.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.035920489891135304,
+      "bbox": {
+        "minx": 0,
+        "miny": 50,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8627916018662519,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/box.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.033040111456713324,
+      "bbox": {
+        "minx": 24,
+        "miny": 53,
+        "maxx": 935,
+        "maxy": 642
+      },
+      "bbox_area_frac": 0.8716951788491446,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/bracket.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.021231855883877656,
+      "bbox": {
+        "minx": 0,
+        "miny": 310,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.46854587869362363,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/braid.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03044485484707102,
+      "bbox": {
+        "minx": 24,
+        "miny": 48,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8436236391912908,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/braid2.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03210536547433904,
+      "bbox": {
+        "minx": 24,
+        "miny": 48,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8436236391912908,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/burst.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03231110679108346,
+      "bbox": {
+        "minx": 24,
+        "miny": 50,
+        "maxx": 935,
+        "maxy": 638
+      },
+      "bbox_area_frac": 0.8702177293934681,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/cardioid.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.02817360031104199,
+      "bbox": {
+        "minx": 24,
+        "miny": 47,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8451010886469673,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/chaos.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.026242547952306895,
+      "bbox": {
+        "minx": 24,
+        "miny": 47,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8451010886469673,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/circuit.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.028154160186625195,
+      "bbox": {
+        "minx": 24,
+        "miny": 152,
+        "maxx": 935,
+        "maxy": 642
+      },
+      "bbox_area_frac": 0.7254276827371695,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/city.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.029649429756350442,
+      "bbox": {
+        "minx": 24,
+        "miny": 61,
+        "maxx": 935,
+        "maxy": 642
+      },
+      "bbox_area_frac": 0.8598755832037325,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/clover.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.02985031104199067,
+      "bbox": {
+        "minx": 24,
+        "miny": 98,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.769751166407465,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/comet.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.030746176775531365,
+      "bbox": {
+        "minx": 24,
+        "miny": 48,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8436236391912908,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/compass16.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03898392949714878,
+      "bbox": {
+        "minx": 24,
+        "miny": 132,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.7195178849144634,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/compass8.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.032497407983411095,
+      "bbox": {
+        "minx": 24,
+        "miny": 157,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.6825816485225505,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/concentric.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.032673989113530325,
+      "bbox": {
+        "minx": 24,
+        "miny": 49,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8421461897356143,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/corkscrew.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.034838322965266975,
+      "bbox": {
+        "minx": 24,
+        "miny": 118,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.7402021772939347,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/corner.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.027823678071539657,
+      "bbox": {
+        "minx": 0,
+        "miny": 50,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8627916018662519,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/cross.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.0239696734059098,
+      "bbox": {
+        "minx": 24,
+        "miny": 47,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8451010886469673,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/crosshatch.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.028460342146189737,
+      "bbox": {
+        "minx": 24,
+        "miny": 50,
+        "maxx": 935,
+        "maxy": 642
+      },
+      "bbox_area_frac": 0.8761275272161742,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/daisy.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03169226283048211,
+      "bbox": {
+        "minx": 24,
+        "miny": 108,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.7549766718506998,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/deltoid.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.0317700233281493,
+      "bbox": {
+        "minx": 24,
+        "miny": 95,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.7741835147744945,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/diamond.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.028818364437532402,
+      "bbox": {
+        "minx": 24,
+        "miny": 50,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8406687402799378,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/diamondwarp.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.026504989631933644,
+      "bbox": {
+        "minx": 24,
+        "miny": 47,
+        "maxx": 935,
+        "maxy": 642
+      },
+      "bbox_area_frac": 0.8805598755832037,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/dna.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.031047498703991705,
+      "bbox": {
+        "minx": 24,
+        "miny": 0,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.9145412130637636,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/epitrochoid.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.02544064282011405,
+      "bbox": {
+        "minx": 24,
+        "miny": 50,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8406687402799378,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/fan.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.027749157594608605,
+      "bbox": {
+        "minx": 24,
+        "miny": 48,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8436236391912908,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/fork.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.02833074131674443,
+      "bbox": {
+        "minx": 24,
+        "miny": 73,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8066874027993779,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/fountain.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03067165629860031,
+      "bbox": {
+        "minx": 24,
+        "miny": 47,
+        "maxx": 935,
+        "maxy": 642
+      },
+      "bbox_area_frac": 0.8805598755832037,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/galaxy.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.026602190254017624,
+      "bbox": {
+        "minx": 24,
+        "miny": 46,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8465785381026438,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/gear.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03169064282011405,
+      "bbox": {
+        "minx": 24,
+        "miny": 46,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8465785381026438,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/globe.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.02507128045619492,
+      "bbox": {
+        "minx": 24,
+        "miny": 47,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8451010886469673,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/grid.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03144116122343183,
+      "bbox": {
+        "minx": 24,
+        "miny": 69,
+        "maxx": 935,
+        "maxy": 642
+      },
+      "bbox_area_frac": 0.8480559875583203,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/gridwarp.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.028291861067910835,
+      "bbox": {
+        "minx": 24,
+        "miny": 50,
+        "maxx": 935,
+        "maxy": 642
+      },
+      "bbox_area_frac": 0.8761275272161742,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/h-tree.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03148328149300156,
+      "bbox": {
+        "minx": 24,
+        "miny": 82,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.7933903576982893,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/helix.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03587674961119751,
+      "bbox": {
+        "minx": 0,
+        "miny": 86,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.808203732503888,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/hex.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.033971617418351474,
+      "bbox": {
+        "minx": 24,
+        "miny": 51,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8391912908242612,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/hexwarp.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.031256480041472266,
+      "bbox": {
+        "minx": 24,
+        "miny": 102,
+        "maxx": 935,
+        "maxy": 642
+      },
+      "bbox_area_frac": 0.7993001555209953,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/hilbert.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.0371630378434422,
+      "bbox": {
+        "minx": 24,
+        "miny": 44,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8495334370139969,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/honeycomb.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.02423211508553655,
+      "bbox": {
+        "minx": 24,
+        "miny": 49,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8421461897356143,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/hypotrochoid.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.030219673405909798,
+      "bbox": {
+        "minx": 24,
+        "miny": 217,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.5939346811819596,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/jitterfan.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.036327112493519956,
+      "bbox": {
+        "minx": 24,
+        "miny": 48,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8436236391912908,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/ladder.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03413199844479005,
+      "bbox": {
+        "minx": 24,
+        "miny": 46,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8465785381026438,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/lattice.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.0380151632970451,
+      "bbox": {
+        "minx": 24,
+        "miny": 210,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.6042768273716952,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/lemniscate.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.028154160186625195,
+      "bbox": {
+        "minx": 24,
+        "miny": 212,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.6013219284603422,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/linear.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.019785186625194403,
+      "bbox": {
+        "minx": 0,
+        "miny": 315,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.4609642301710731,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/lissajous.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.02963160964230171,
+      "bbox": {
+        "minx": 24,
+        "miny": 48,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8436236391912908,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/lituus.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.02509720062208398,
+      "bbox": {
+        "minx": 24,
+        "miny": 47,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8451010886469673,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/logspiral.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.025388802488335926,
+      "bbox": {
+        "minx": 24,
+        "miny": 51,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8391912908242612,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/moire.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.031029678589942974,
+      "bbox": {
+        "minx": 24,
+        "miny": 68,
+        "maxx": 935,
+        "maxy": 642
+      },
+      "bbox_area_frac": 0.8495334370139969,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/nephroid.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.029213646967340592,
+      "bbox": {
+        "minx": 24,
+        "miny": 49,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8421461897356143,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/orbit.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.031593442198030064,
+      "bbox": {
+        "minx": 24,
+        "miny": 46,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8465785381026438,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/pendulum.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03413523846552618,
+      "bbox": {
+        "minx": 24,
+        "miny": 49,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8421461897356143,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/phyllotaxis.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.040466238983929495,
+      "bbox": {
+        "minx": 24,
+        "miny": 45,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8480559875583203,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/pinwheel.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.032299766718507,
+      "bbox": {
+        "minx": 24,
+        "miny": 49,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8421461897356143,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/pluscross.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.024842858994297563,
+      "bbox": {
+        "minx": 24,
+        "miny": 47,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8451010886469673,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/pythagorean.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.029220127008812855,
+      "bbox": {
+        "minx": 24,
+        "miny": 52,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8377138413685847,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/quarter.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.032942910834629344,
+      "bbox": {
+        "minx": 24,
+        "miny": 47,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8451010886469673,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/radial.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03331713322965267,
+      "bbox": {
+        "minx": 24,
+        "miny": 49,
+        "maxx": 935,
+        "maxy": 642
+      },
+      "bbox_area_frac": 0.8776049766718507,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/rain.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03160316226023847,
+      "bbox": {
+        "minx": 24,
+        "miny": 0,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.9145412130637636,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/randomwalk.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03655067392431312,
+      "bbox": {
+        "minx": 24,
+        "miny": 70,
+        "maxx": 935,
+        "maxy": 642
+      },
+      "bbox_area_frac": 0.8465785381026438,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/ring.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03260594867807154,
+      "bbox": {
+        "minx": 24,
+        "miny": 56,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8318040435458787,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/rings.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.02944044841886988,
+      "bbox": {
+        "minx": 24,
+        "miny": 48,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8436236391912908,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/ripple.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.032460147744945565,
+      "bbox": {
+        "minx": 24,
+        "miny": 140,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.7076982892690513,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/rose.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03010789269051322,
+      "bbox": {
+        "minx": 24,
+        "miny": 178,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.6515552099533437,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/rose5.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.031531881804043545,
+      "bbox": {
+        "minx": 24,
+        "miny": 55,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8332814930015552,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/rose7.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.031194919647485744,
+      "bbox": {
+        "minx": 24,
+        "miny": 59,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8273716951788491,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/rose9.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03399753758424054,
+      "bbox": {
+        "minx": 24,
+        "miny": 77,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8007776049766718,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/scatter.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.030908177812337997,
+      "bbox": {
+        "minx": 24,
+        "miny": 49,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8421461897356143,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/semicircle.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03444466044582686,
+      "bbox": {
+        "minx": 24,
+        "miny": 47,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8451010886469673,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/sierpinski.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.026448289269051323,
+      "bbox": {
+        "minx": 24,
+        "miny": 49,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8421461897356143,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/sine.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03484804302747538,
+      "bbox": {
+        "minx": 0,
+        "miny": 182,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.6626360808709175,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/snowflake.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.028544582685329185,
+      "bbox": {
+        "minx": 24,
+        "miny": 46,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8465785381026438,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/solar.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.026665370658372215,
+      "bbox": {
+        "minx": 24,
+        "miny": 45,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8480559875583203,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/spiral.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.025296461897356144,
+      "bbox": {
+        "minx": 24,
+        "miny": 47,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8451010886469673,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/spiral3.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.029615409538621046,
+      "bbox": {
+        "minx": 24,
+        "miny": 47,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8451010886469673,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/spiral5.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.028811884396060135,
+      "bbox": {
+        "minx": 24,
+        "miny": 48,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8436236391912908,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/staircase.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.039013089683773976,
+      "bbox": {
+        "minx": 0,
+        "miny": 49,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.864307931570762,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/star.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.034697382063245207,
+      "bbox": {
+        "minx": 24,
+        "miny": 57,
+        "maxx": 935,
+        "maxy": 642
+      },
+      "bbox_area_frac": 0.8657853810264385,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/tree.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.021700038880248834,
+      "bbox": {
+        "minx": 24,
+        "miny": 110,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.7520217729393468,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/triangle.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.02798405909797823,
+      "bbox": {
+        "minx": 24,
+        "miny": 53,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8362363919129082,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/trident.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.029113206324520476,
+      "bbox": {
+        "minx": 24,
+        "miny": 46,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8465785381026438,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/tunnel.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.027130313634007256,
+      "bbox": {
+        "minx": 24,
+        "miny": 46,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8465785381026438,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/ulam.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.029892431311560393,
+      "bbox": {
+        "minx": 24,
+        "miny": 166,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.6692846034214619,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/v-tree.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03274040953862105,
+      "bbox": {
+        "minx": 24,
+        "miny": 0,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.9145412130637636,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/vertical.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        50,
+        33,
+        49
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 1,
+      "bbox": {
+        "minx": 0,
+        "miny": 0,
+        "maxx": 959,
+        "maxy": 642
+      },
+      "bbox_area_frac": 1,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/vortex.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03389385692068429,
+      "bbox": {
+        "minx": 24,
+        "miny": 49,
+        "maxx": 935,
+        "maxy": 642
+      },
+      "bbox_area_frac": 0.8776049766718507,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/wall.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.029087286158631414,
+      "bbox": {
+        "minx": 24,
+        "miny": 191,
+        "maxx": 935,
+        "maxy": 642
+      },
+      "bbox_area_frac": 0.6678071539657854,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/wave.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.02817360031104199,
+      "bbox": {
+        "minx": 24,
+        "miny": 46,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8465785381026438,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/wavefront.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03295101088646967,
+      "bbox": {
+        "minx": 24,
+        "miny": 110,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.7520217729393468,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/xcross.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.02592502592016589,
+      "bbox": {
+        "minx": 24,
+        "miny": 46,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8465785381026438,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/zigzag.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03268208916537066,
+      "bbox": {
+        "minx": 24,
+        "miny": 45,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8480559875583203,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-layout-smoke-run9/zipper.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.03339327371695179,
+      "bbox": {
+        "minx": 24,
+        "miny": 47,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8451010886469673,
+      "touch_edge": false
+    }
+  ],
+  "presets": [
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/Binary_Tree.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.018858540694660447,
+      "bbox": {
+        "minx": 0,
+        "miny": 315,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.4609642301710731,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/Circuit_Board.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.06630540435458787,
+      "bbox": {
+        "minx": 24,
+        "miny": 52,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8377138413685847,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/City_Block.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.10092340590979783,
+      "bbox": {
+        "minx": 24,
+        "miny": 47,
+        "maxx": 935,
+        "maxy": 620
+      },
+      "bbox_area_frac": 0.8480559875583203,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/Collatz_27.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        50,
+        33,
+        49
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.9999951399688958,
+      "bbox": {
+        "minx": 0,
+        "miny": 0,
+        "maxx": 959,
+        "maxy": 642
+      },
+      "bbox_area_frac": 1,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/Digital_Plant_L-Sys.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.07460957750129601,
+      "bbox": {
+        "minx": 0,
+        "miny": 0,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.9386080870917574,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/DNA_Strand.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.033252332814930015,
+      "bbox": {
+        "minx": 24,
+        "miny": 0,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.9145412130637636,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/Dragon_Curve_L-Sys.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.02286644634525661,
+      "bbox": {
+        "minx": 24,
+        "miny": 38,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.858398133748056,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/Game_of_Life_Grid.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.016114243131156038,
+      "bbox": {
+        "minx": 24,
+        "miny": 119,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.7387247278382582,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/Golden_Spiral.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.021536417833074133,
+      "bbox": {
+        "minx": 24,
+        "miny": 49,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8421461897356143,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/Hilbert_Curve.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.02899494556765163,
+      "bbox": {
+        "minx": 24,
+        "miny": 43,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8510108864696734,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/Number_Galaxy.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.0276146967340591,
+      "bbox": {
+        "minx": 24,
+        "miny": 56,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8318040435458787,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/Prime_Lattice.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.014892755313634006,
+      "bbox": {
+        "minx": 24,
+        "miny": 353,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.39300155520995333,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/Pythagorean_Tree.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.02768435717988595,
+      "bbox": {
+        "minx": 0,
+        "miny": 313,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.46399688958009333,
+      "touch_edge": true
+    },
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/Snowflake_Factor.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.030073872472783827,
+      "bbox": {
+        "minx": 24,
+        "miny": 49,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8421461897356143,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/Ulam_Prime_Spiral.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.016760627268014517,
+      "bbox": {
+        "minx": 24,
+        "miny": 50,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8406687402799378,
+      "touch_edge": false
+    },
+    {
+      "path": "output/fractal-presets-smoke-run6/presets/V-Tree.png",
+      "w": 960,
+      "h": 643,
+      "bg": [
+        15,
+        23,
+        42
+      ],
+      "sample_step": 1,
+      "non_bg_frac": 0.017899494556765164,
+      "bbox": {
+        "minx": 24,
+        "miny": 66,
+        "maxx": 935,
+        "maxy": 618
+      },
+      "bbox_area_frac": 0.8170295489891135,
+      "touch_edge": false
+    }
+  ],
+  "flags": [
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/block.png",
+      "non_bg_frac": 0.035920489891135304,
+      "bbox_area_frac": 0.8627916018662519
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/box.png",
+      "non_bg_frac": 0.033040111456713324,
+      "bbox_area_frac": 0.8716951788491446
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/bracket.png",
+      "non_bg_frac": 0.021231855883877656,
+      "bbox_area_frac": 0.46854587869362363
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/circuit.png",
+      "non_bg_frac": 0.028154160186625195,
+      "bbox_area_frac": 0.7254276827371695
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/city.png",
+      "non_bg_frac": 0.029649429756350442,
+      "bbox_area_frac": 0.8598755832037325
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/corner.png",
+      "non_bg_frac": 0.027823678071539657,
+      "bbox_area_frac": 0.8627916018662519
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/crosshatch.png",
+      "non_bg_frac": 0.028460342146189737,
+      "bbox_area_frac": 0.8761275272161742
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/diamondwarp.png",
+      "non_bg_frac": 0.026504989631933644,
+      "bbox_area_frac": 0.8805598755832037
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/dna.png",
+      "non_bg_frac": 0.031047498703991705,
+      "bbox_area_frac": 0.9145412130637636
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/fountain.png",
+      "non_bg_frac": 0.03067165629860031,
+      "bbox_area_frac": 0.8805598755832037
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/grid.png",
+      "non_bg_frac": 0.03144116122343183,
+      "bbox_area_frac": 0.8480559875583203
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/gridwarp.png",
+      "non_bg_frac": 0.028291861067910835,
+      "bbox_area_frac": 0.8761275272161742
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/helix.png",
+      "non_bg_frac": 0.03587674961119751,
+      "bbox_area_frac": 0.808203732503888
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/hexwarp.png",
+      "non_bg_frac": 0.031256480041472266,
+      "bbox_area_frac": 0.7993001555209953
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/linear.png",
+      "non_bg_frac": 0.019785186625194403,
+      "bbox_area_frac": 0.4609642301710731
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/moire.png",
+      "non_bg_frac": 0.031029678589942974,
+      "bbox_area_frac": 0.8495334370139969
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/radial.png",
+      "non_bg_frac": 0.03331713322965267,
+      "bbox_area_frac": 0.8776049766718507
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/rain.png",
+      "non_bg_frac": 0.03160316226023847,
+      "bbox_area_frac": 0.9145412130637636
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/randomwalk.png",
+      "non_bg_frac": 0.03655067392431312,
+      "bbox_area_frac": 0.8465785381026438
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/sine.png",
+      "non_bg_frac": 0.03484804302747538,
+      "bbox_area_frac": 0.6626360808709175
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/staircase.png",
+      "non_bg_frac": 0.039013089683773976,
+      "bbox_area_frac": 0.864307931570762
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/star.png",
+      "non_bg_frac": 0.034697382063245207,
+      "bbox_area_frac": 0.8657853810264385
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/v-tree.png",
+      "non_bg_frac": 0.03274040953862105,
+      "bbox_area_frac": 0.9145412130637636
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/vertical.png",
+      "non_bg_frac": 1,
+      "bbox_area_frac": 1
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/vortex.png",
+      "non_bg_frac": 0.03389385692068429,
+      "bbox_area_frac": 0.8776049766718507
+    },
+    {
+      "section": "layouts",
+      "kind": "touch_edge",
+      "path": "output/fractal-layout-smoke-run9/wall.png",
+      "non_bg_frac": 0.029087286158631414,
+      "bbox_area_frac": 0.6678071539657854
+    },
+    {
+      "section": "presets",
+      "kind": "touch_edge",
+      "path": "output/fractal-presets-smoke-run6/presets/Binary_Tree.png",
+      "non_bg_frac": 0.018858540694660447,
+      "bbox_area_frac": 0.4609642301710731
+    },
+    {
+      "section": "presets",
+      "kind": "touch_edge",
+      "path": "output/fractal-presets-smoke-run6/presets/Collatz_27.png",
+      "non_bg_frac": 0.9999951399688958,
+      "bbox_area_frac": 1
+    },
+    {
+      "section": "presets",
+      "kind": "touch_edge",
+      "path": "output/fractal-presets-smoke-run6/presets/Digital_Plant_L-Sys.png",
+      "non_bg_frac": 0.07460957750129601,
+      "bbox_area_frac": 0.9386080870917574
+    },
+    {
+      "section": "presets",
+      "kind": "touch_edge",
+      "path": "output/fractal-presets-smoke-run6/presets/DNA_Strand.png",
+      "non_bg_frac": 0.033252332814930015,
+      "bbox_area_frac": 0.9145412130637636
+    },
+    {
+      "section": "presets",
+      "kind": "touch_edge",
+      "path": "output/fractal-presets-smoke-run6/presets/Pythagorean_Tree.png",
+      "non_bg_frac": 0.02768435717988595,
+      "bbox_area_frac": 0.46399688958009333
+    }
+  ]
+}

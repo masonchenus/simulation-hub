@@ -1,0 +1,25 @@
+[
+  {
+    "layout": "hilbert",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "errorPath": "output/fractal-layout-smoke-run2/hilbert.errors.json",
+    "errors": [
+      {
+        "type": "pageerror",
+        "text": "ReferenceError: Cannot access 'decay' before initialization"
+      },
+      {
+        "type": "pageerror",
+        "text": "ReferenceError: Cannot access 'decay' before initialization"
+      },
+      {
+        "type": "pageerror",
+        "text": "ReferenceError: Cannot access 'decay' before initialization"
+      },
+      {
+        "type": "pageerror",
+        "text": "ReferenceError: Cannot access 'decay' before initialization"
+      }
+    ]
+  }
+]

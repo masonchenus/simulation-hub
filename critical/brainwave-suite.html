@@ -819,6 +819,7 @@
             <button class="btn btn-ghost" id="gamma-reset">Gamma Reset</button>
             <button class="btn btn-ghost" id="smr-study">SMR Study</button>
             <button class="btn btn-ghost" id="void-state">Void State (0.1Hz)</button>
+            <button class="btn btn-ghost" id="full-spectrum-journey" style="grid-column: 1 / -1; border-color: var(--accent-3); color: var(--accent-3);">Full Spectrum Journey</button>
           </div>
 
           <div class="sound-grid" id="sound-grid" aria-label="Dynamic sound tiles"></div>
@@ -1002,6 +1003,7 @@
       const gammaResetBtn = document.getElementById("gamma-reset");
       const smrStudyBtn = document.getElementById("smr-study");
       const voidStateBtn = document.getElementById("void-state");
+      const fullSpectrumBtn = document.getElementById("full-spectrum-journey");
       const emergencyResetBtn = document.getElementById("emergencyResetBtn");
       const carrierWaveform = document.getElementById("carrier-waveform");
       const pulseShape = document.getElementById("pulse-shape");
@@ -1016,7 +1018,7 @@
       const calcSuggest = document.getElementById("calc-suggest");
       const calcApply = document.getElementById("calc-apply");
 
-      let running = false;
+      let running = false
       let mode = "sleep";
       let audioCtx = null;
       let leftBase = 200;
@@ -1079,7 +1081,7 @@
       let panGain = null;
 
       const basePresets = [
-        { name: "Delta Profound Sleep", freq: 0.1, mode: "delta", note: "Insonmia support", details: "At 0.1 Hz, This frequency promotes a state of near-unconsiousness, promoting growth hormones, and profound recovery."},
+        { name: "Delta Profound Sleep", freq: 0.1, mode: "subdelta", note: "Insonmia support", details: "At 0.1 Hz, This frequency promotes a state of near-unconsiousness, promoting growth hormones, and profound recovery."},
         { name: "Sub-Delta Drift", freq: 0.6, mode: "subdelta", note: "Ultra-slow sub-delta downshift.", details: "At 0.6 Hz, this preset targets the sub-delta range, often associated with deep unconsciousness and the glymphatic system's waste clearance in the brain. Ideal for profound rest." },
         { name: "Sub-Delta Deep", freq: 0.9, mode: "subdelta", note: "Deepest sub-delta support.", details: "0.9 Hz encourages a state of suspended animation, helping to quiet the mind completely and disconnect from sensory input for total regeneration." },
         { name: "Pin-Sleep Deep", freq: 0.1, mode: "subdelta", note: "Pin-point deep sleep.", details: "0.1 Hz frequency for deepest possible entrainment." },
@@ -1119,8 +1121,8 @@
         { name: "Lambda State", freq: 200.0, mode: "highgamma", note: "Tibetan monk state.", details: "200 Hz Lambda waves are associated with advanced meditation states." },
       ];
 
-      const energyPresets = Array.from({ length: 100 }, (_, i) => {
-        const freq = 18 + i * 0.4;
+      const energyPresets = Array.from({ length: 280 }, (_, i) => {
+        const freq = 18 + i * 0.2;
         const isGamma = freq >= 30;
         return {
           name: `Energy Boost ${i + 1}`,
@@ -1130,44 +1132,44 @@
         };
       });
 
-      const sleepPresets = Array.from({ length: 60 }, (_, i) => ({
+      const sleepPresets = Array.from({ length: 115 }, (_, i) => ({
         name: `Sleep Mode ${i + 1}`,
-        freq: 1 + i * 0.1,
+        freq: 1 + i * 0.2,
         mode: "sleep",
         note: "Slow delta support.",
       }));
 
-      const subDeltaPresets = Array.from({ length: 20 }, (_, i) => ({
+      const subDeltaPresets = Array.from({ length: 10 }, (_, i) => ({
         name: `Sub-Delta ${i + 1}`,
-        freq: 0.2 + i * 0.04,
+        freq: 0.1 + i * 0.1,
         mode: "subdelta",
         note: "Ultra-low sub-delta.",
       }));
 
-      const relaxPresets = Array.from({ length: 40 }, (_, i) => ({
+      const relaxPresets = Array.from({ length: 45 }, (_, i) => ({
         name: `Relax Mode ${i + 1}`,
-        freq: 6 + i * 0.2,
+        freq: 6 + i * 0.15,
         mode: "relax",
         note: "Soft alpha/theta blend.",
       }));
 
-      const thetaPresets = Array.from({ length: 40 }, (_, i) => ({
+      const thetaPresets = Array.from({ length: 60 }, (_, i) => ({
         name: `Theta Mode ${i + 1}`,
-        freq: 4 + i * 0.15,
+        freq: 4 + i * 0.1,
         mode: "theta",
         note: "Theta dreamy focus.",
       }));
 
-      const betaPresets = Array.from({ length: 55 }, (_, i) => ({
+      const betaPresets = Array.from({ length: 70 }, (_, i) => ({
         name: `Beta Mode ${i + 1}`,
-        freq: 12 + i * 0.3,
+        freq: 12 + i * 0.2,
         mode: "beta",
         note: "Beta alertness and clarity.",
       }));
 
-      const highHzPresets = Array.from({ length: 200 }, (_, i) => ({
+      const highHzPresets = Array.from({ length: 300 }, (_, i) => ({
         name: `High Hertz ${i + 1}`,
-        freq: 60 + i * 3.5,
+        freq: 60 + i * 3,
         mode: i % 2 === 0 ? "gamma" : "highgamma",
         note: "Ultra-high hertz stimulation.",
       }));
@@ -2250,9 +2252,9 @@
 
       powerNapBtn.addEventListener("click", () => {
         runSequence([
-          { hz: 4.0, seconds: 6, mode: "theta" },
-          { hz: 2.2, seconds: 8, mode: "sleep" },
-          { hz: 6.0, seconds: 6, mode: "theta" },
+          { hz: 4.0, seconds: 1800, mode: "theta" },
+          { hz: 2.2, seconds: 1500, mode: "sleep" },
+          { hz: 6.0, seconds: 600, mode: "theta" },
         ]);
       });
 
@@ -2304,6 +2306,21 @@
             { hz: 1.0, seconds: 30, mode: "sleep" },   // Bridge: Delta
             { hz: 0.1, seconds: 300, mode: "subdelta" } // Target: Epsilon (Void)
           ]);
+        });
+      }
+
+      if (fullSpectrumBtn) {
+        fullSpectrumBtn.addEventListener("click", () => {
+            runSequence([
+                { hz: 10.0, seconds: 30, mode: "relax" },      // Alpha Centering
+                { hz: 14.0, seconds: 60, mode: "beta" },       // SMR Focus
+                { hz: 16.0, seconds: 60, mode: "beta" },       // Beta Focus
+                { hz: 40.0, seconds: 60, mode: "gamma" },      // Gamma Spark
+                { hz: 7.5, seconds: 90, mode: "theta" },       // Creative Bridge
+                { hz: 6.0, seconds: 60, mode: "theta" },       // Theta Calm
+                { hz: 3.4, seconds: 90, mode: "sleep" },       // Delta Dream Drift
+                { hz: 0.9, seconds: 120, mode: "subdelta" }    // Sub-Delta Deep
+            ]);
         });
       }
 
@@ -2713,5 +2730,6 @@
           if (e.code === "Space") { e.preventDefault(); if (running) stopSession(); else startBtn.click(); }
       });
     </script>
+    <script src="../js/app-guardian.js"></script>
   </body>
 </html>

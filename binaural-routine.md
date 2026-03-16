@@ -14,7 +14,7 @@ This routine leverages the comprehensive binaural beat presets to optimize your 
 *   **06:30 - 07:30 | Morning Workout / Movement**
     *   **Preset:** `Workout Prime` (38.0 Hz - Gamma)
     *   **Description:** Increases physical energy and coordination.
-    *   **Alternatives:** `Energy Boost 30` (29.6 Hz), `Cognitive Fuel` (30.0 hz) `Energy Boost 65` (43.6 hz, In small bursts, After you play it, step down to Alpha/theta)
+    *   **Alternatives:** `Energy Boost 30` (29.6 Hz), `Cognitive Fuel` (30.0 hz) `Energy Boost 65` (43.6 hz, In small bursts, After you play it, slope down to Alpha/theta)
 
 *   **07:30 - 08:30 | Breakfast & Planning**
     *   **Preset:** `SMR Focus` (14.0 Hz - Beta)

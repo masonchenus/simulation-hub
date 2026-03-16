@@ -1,3 +1,7 @@
-/.venv
-/.zencoder
-/.zenflow
+.venv/
+.zencoder/
+.zenflow/
+node_modules/
+dist-webpack/
+.devcontainer
+.venv

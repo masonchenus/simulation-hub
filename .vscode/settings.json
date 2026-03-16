@@ -1,3 +1,10 @@
 {
-    "livePreview.defaultPreviewPath": "/fractal-sim.html"
+	    "livePreview.defaultPreviewPath": "/index.html",
+	    "remote.autoForwardPorts": true,
+	    "remote.portsAttributes": {
+	        "4174": {
+	            "label": "Vite (Simulation Hub)",
+	            "onAutoForward": "openBrowser"
+	        }
+	    }
 }

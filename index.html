@@ -35,8 +35,8 @@
         --glass: rgba(255, 255, 255, 0.72);
         --glass-strong: rgba(255, 255, 255, 0.88);
         --ring: rgba(18, 16, 12, 0.08);
-        --card-radius: 22px;
-        --card-pad: 26px;
+        --card-radius: 24px;
+        --card-pad: 30px;
         --density: 1;
       }
 
@@ -219,7 +219,7 @@
 
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
         gap: calc(16px + var(--scroll) * 0.4px);
       }
 
@@ -314,10 +314,293 @@
         border-top: 4px solid var(--card-accent, var(--accent));
         display: grid;
         gap: 16px;
+        padding: 0; /* Remove padding from card itself */
         position: relative;
         overflow: hidden;
         transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
-        transform: perspective(900px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+        transform: perspective(900px) rotateX(var(--card-tilt-x, 0deg)) rotateY(var(--card-tilt-y, 0deg));
+        will-change: transform;
+      }
+      
+      .card-chrome {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            900px 240px at 18% 0%,
+            color-mix(in srgb, var(--card-accent, var(--accent)) 18%, transparent),
+            transparent 62%
+          ),
+          radial-gradient(
+            260px 260px at 100% 0%,
+            color-mix(in srgb, var(--card-accent, var(--accent)) 14%, transparent),
+            transparent 60%
+          ),
+          repeating-linear-gradient(90deg, rgba(18, 16, 12, 0.05) 0 1px, transparent 1px 8px);
+        opacity: 0.25;
+        mask-image: radial-gradient(circle at 32% 0%, #000 0%, transparent 70%);
+        transition: opacity 220ms ease;
+      }
+
+      .card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.7s;
+        transform-style: preserve-3d;
+      }
+
+      .card.is-flipped .card-inner {
+        transform: rotateY(180deg);
+      }
+
+      .card-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        display: grid;
+        gap: 16px;
+        padding: var(--card-pad);
+        border-radius: var(--card-radius);
+        background: var(--card);
+        overflow-y: auto;
+      }
+
+      .card-back {
+        transform: rotateY(180deg);
+      }
+
+      .card:hover .card-chrome,
+      .card:focus-within .card-chrome {
+        opacity: 0.45;
+      }
+
+      .card-ornaments {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .card-sparkline {
+        position: absolute;
+        left: 16px;
+        bottom: 14px;
+        width: 160px;
+        height: 56px;
+        opacity: 0.14;
+        transform: rotate(-2deg) translateY(0);
+        transition: opacity 220ms ease, transform 220ms ease;
+        filter: drop-shadow(0 18px 24px rgba(18, 16, 12, 0.16));
+      }
+
+      .card:hover .card-sparkline,
+      .card:focus-within .card-sparkline {
+        opacity: 0.22;
+        transform: rotate(-1deg) translateY(-2px);
+      }
+
+      .card-sparkline .spark-glow {
+        fill: none;
+        stroke: color-mix(in srgb, var(--card-accent, var(--accent)) 55%, #fff);
+        stroke-width: 6;
+        opacity: 0.25;
+        filter: blur(2px);
+      }
+
+      .card-sparkline .spark-line {
+        fill: none;
+        stroke: color-mix(in srgb, var(--card-accent, var(--accent)) 65%, #fff);
+        stroke-width: 2.5;
+        opacity: 0.9;
+      }
+      
+      .card > :not(.card-chrome):not(.card-ornaments) {
+        position: relative;
+        z-index: 1;
+      }
+
+      .card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .card-body {
+        display: grid;
+        gap: 12px;
+      }
+
+      .card-top-right {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        padding-right: 0;
+      }
+
+      .card-top-right .app-index {
+        position: static;
+        top: auto;
+        right: auto;
+      }
+
+      .card-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .card-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--card-accent, var(--accent)) 10%, rgba(255, 255, 255, 0.9));
+        border: 1px solid color-mix(in srgb, var(--card-accent, var(--accent)) 28%, rgba(18, 16, 12, 0.08));
+        box-shadow: 0 14px 26px -22px color-mix(in srgb, var(--card-accent, var(--accent)) 55%, transparent);
+      }
+
+      .card-chip[data-tone="locked"] {
+        background: rgba(15, 23, 42, 0.08);
+        border-color: rgba(15, 23, 42, 0.14);
+      }
+
+      .card-chip[data-tone="saved"] {
+        background: rgba(250, 204, 21, 0.14);
+        border-color: rgba(250, 204, 21, 0.22);
+      }
+
+      .card-kpis {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      @media (max-width: 560px) {
+        .card-kpis {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .kpi {
+        display: grid;
+        grid-template-columns: 26px 1fr;
+        grid-template-rows: auto auto;
+        gap: 2px 10px;
+        align-items: center;
+        padding: 10px 12px;
+        border-radius: 16px;
+        background: var(--glass);
+        border: 1px solid var(--ring);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, rgba(255, 255, 255, 0.55) 70%, transparent);
+      }
+
+      .kpi-icon {
+        grid-row: 1 / span 2;
+        font-size: 1rem;
+        opacity: 0.85;
+      }
+
+      .kpi-label {
+        font-size: 0.68rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: color-mix(in srgb, var(--ink) 52%, transparent);
+        font-weight: 700;
+      }
+
+      .kpi-value {
+        font-size: 0.9rem;
+        font-weight: 650;
+        color: var(--ink);
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .kpi-meter .meter {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        height: 18px;
+        grid-column: 2;
+      }
+
+      .meter-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--ink) 10%, transparent);
+        border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, rgba(255, 255, 255, 0.55) 70%, transparent);
+      }
+
+      .meter-dot.is-on {
+        background: color-mix(in srgb, var(--card-accent, var(--accent)) 42%, #fff);
+        border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 52%, rgba(18, 16, 12, 0.08));
+        box-shadow: 0 14px 22px -20px color-mix(in srgb, var(--card-accent, var(--accent)) 60%, transparent);
+      }
+
+      .lock-progress {
+        display: grid;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 18px;
+        background: var(--glass-strong);
+        border: 1px dashed var(--ring);
+      }
+
+      .lock-progress-top {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .lock-progress-label {
+        font-size: 0.68rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: color-mix(in srgb, var(--ink) 52%, transparent);
+        font-weight: 800;
+      }
+
+      .lock-progress-value {
+        font-size: 0.86rem;
+        font-weight: 650;
+        color: var(--ink);
+      }
+
+      .lock-progress-bar {
+        height: 10px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: color-mix(in srgb, var(--ink) 10%, transparent);
+        border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+      }
+
+      .lock-progress-fill {
+        display: block;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          color-mix(in srgb, var(--card-accent, var(--accent)) 55%, #fff),
+          color-mix(in srgb, var(--card-accent, var(--accent)) 35%, #fff)
+        );
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
       }
 
       .card.is-critical {
@@ -381,6 +664,15 @@
         pointer-events: none;
       }
 
+      .card::after {
+        background:
+          radial-gradient(
+            320px 220px at var(--card-glow-x, 20%) var(--card-glow-y, 0%),
+            color-mix(in srgb, var(--card-accent, var(--accent)) 18%, transparent),
+            transparent 62%
+          );
+      }
+
       .card::before {
         content: "";
         position: absolute;
@@ -396,6 +688,18 @@
         opacity: 0.9;
       }
 
+      .card[data-burst="true"] {
+        border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 55%, rgba(18, 16, 12, 0.08));
+        box-shadow:
+          0 40px 90px -54px color-mix(in srgb, var(--card-accent, var(--accent)) 65%, transparent),
+          0 24px 50px -32px var(--shadow-strong);
+      }
+
+      .card[data-burst="true"] .card-chrome {
+        opacity: 0.85;
+        animation: chromeBurst 720ms ease both;
+      }
+
       .card:hover::after,
       .card:focus-within::after {
         opacity: 1;
@@ -407,6 +711,28 @@
         box-shadow: 0 30px 60px -32px var(--shadow-strong),
           0 20px 40px -24px color-mix(in srgb, var(--card-accent, var(--accent)) 35%, transparent);
         border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 35%, rgba(18, 16, 12, 0.08));
+      }
+
+      .card.is-saved {
+        border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 45%, rgba(18, 16, 12, 0.08));
+        box-shadow:
+          0 28px 70px -54px color-mix(in srgb, var(--card-accent, var(--accent)) 55%, transparent),
+          0 18px 40px -30px var(--shadow-strong);
+      }
+
+      @keyframes chromeBurst {
+        0% {
+          opacity: 0.25;
+          filter: saturate(1.0) contrast(1.0);
+        }
+        35% {
+          opacity: 0.95;
+          filter: saturate(1.25) contrast(1.05);
+        }
+        100% {
+          opacity: 0.45;
+          filter: saturate(1.0) contrast(1.0);
+        }
       }
 
       .card[data-theme="fractal"] {
@@ -426,6 +752,11 @@
         box-shadow: 0 34px 70px -30px var(--shadow-strong),
           0 24px 50px -28px color-mix(in srgb, var(--card-accent, var(--accent)) 45%, transparent);
         border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 55%, rgba(18, 16, 12, 0.08));
+      }
+
+      .card h2 {
+        margin: 0;
+        font-size: 1.5rem;
       }
 
       .card.is-locked {
@@ -465,22 +796,6 @@
         color: var(--ink);
         border: 1px solid color-mix(in srgb, var(--card-accent, var(--accent)) 35%, rgba(18, 16, 12, 0.12));
         box-shadow: 0 10px 20px -16px rgba(18, 16, 12, 0.4);
-      }
-
-      .card h2 {
-        margin: 0;
-        font-size: 1.5rem;
-        position: relative;
-      }
-
-      .card h2::after {
-        content: "";
-        display: block;
-        width: 36px;
-        height: 3px;
-        margin-top: 8px;
-        border-radius: 999px;
-        background: color-mix(in srgb, var(--card-accent, var(--accent)) 55%, #fff);
       }
 
       .card p {
@@ -552,9 +867,15 @@
       }
 
       .card-actions {
+        display: grid;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .action-group-main, .action-group-secondary {
         display: flex;
         gap: 12px;
-        flex-wrap: wrap;
+        flex-wrap: wrap; 
         align-items: center;
       }
 
@@ -588,6 +909,7 @@
         transform: translateY(6px);
         transition: opacity 160ms ease, transform 160ms ease;
         pointer-events: none;
+        z-index: 3;
       }
 
       .card:hover .hover-preview {
@@ -660,6 +982,103 @@
         transform: translateY(-2px);
         border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 45%, rgba(18, 16, 12, 0.12));
         box-shadow: 0 12px 22px -16px rgba(18, 16, 12, 0.35);
+      }
+
+      .copy-id-btn {
+        position: static;
+        font-size: 0.75rem;
+        letter-spacing: 0.2em;
+        color: rgba(18, 16, 12, 0.45);
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(18, 16, 12, 0.08);
+        cursor: pointer;
+      }
+
+      .card-ratings {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .star-rating {
+        color: #f59e0b;
+        font-size: 1rem;
+        letter-spacing: 2px;
+      }
+
+      .difficulty-meter {
+        display: flex;
+        gap: 4px;
+      }
+
+      .diff-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: color-mix(in srgb, var(--ink) 10%, transparent);
+        border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+      }
+
+      .diff-dot.is-on {
+        background: color-mix(in srgb, var(--card-accent, var(--accent)) 60%, #fff);
+        border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 70%, rgba(18, 16, 12, 0.08));
+      }
+
+      .card-ribbon {
+        position: absolute;
+        top: -6px;
+        right: 18px;
+        background: var(--accent);
+        color: #fff;
+        padding: 8px 10px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 10px 20px -10px var(--shadow-strong);
+      }
+
+      .card-back-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      .card-back-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      .card-back-body {
+        display: grid;
+        gap: 14px;
+        align-content: start;
+      }
+
+      .card-back-body h4 {
+        margin: 0;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: var(--muted);
+      }
+
+      .card-back .tags {
+        display: flex; flex-wrap: wrap; gap: 8px;
+      }
+      .card-back .tags span {
+        padding: 4px 8px; border-radius: 8px; background: rgba(18,16,12,0.04); font-size: 0.75rem;
+      }
+
+      .meta-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; font-size: 0.85rem; color: var(--muted); }
+      .meta-list strong { color: var(--ink); }
+
+      .card-back-footer .sparkline {
+        width: 100%; height: 40px; color: var(--card-accent);
       }
 
       .btn-pill.primary {
@@ -986,493 +1405,199 @@
     </style>
   </head>
   <body>
-    <main class="frame">
-      <header>
-        <div class="eyebrow">Simulation Hub</div>
-        <h1>Choose a simulation to explore and evolve.</h1>
-        <p class="subhead">
-          Two focused experiments, each tuned for discovery. Start with fractals
-          for generative patterns, or dive into collisions for cosmic dynamics.
-        </p>
-        <div class="hero-bar" aria-hidden="true"><span></span></div>
-      </header>
+    <sim-decoration type="orb" x="10%" y="10%" size="900px" color="rgba(196, 225, 245, 0.7)"></sim-decoration>
+    <sim-decoration type="orb" x="90%" y="15%" size="800px" color="rgba(237, 214, 245, 0.6)"></sim-decoration>
+    <sim-decoration type="orb" x="50%" y="90%" size="700px" color="rgba(214, 242, 232, 0.6)"></sim-decoration>
 
-      <div class="layout-shell">
-        <div class="layout-main">
-          <div class="hub-alert" id="hub-alert">
-            <strong>Lock status:</strong>
-            <span>Collect 300 keys in the Key Vault to unlock all buggy apps.</span>
-            <a class="link-ghost" href="games/key-vault.html">Go to Key Vault</a>
+    <div id="root">
+      <!-- React app will be mounted here -->
+    </div>
+    <div id="fallback-root" style="display:none;">
+      <main class="frame">
+        <header>
+          <div class="nav-row">
+            <div class="eyebrow">Simulation Hub</div>
           </div>
+          <h1>Choose a simulation to explore and evolve.</h1>
+          <p class="subhead">
+            Two focused experiments, each tuned for discovery. Start with fractals for generative patterns, or dive into collisions for cosmic dynamics.
+          </p>
+          <div class="hero-bar" aria-hidden="true">
+            <span></span>
+          </div>
+        </header>
 
-          <section class="path" aria-label="Simulation path">
-            <div class="path-label">Simulation Path</div>
-            <div class="path-line">
-              <div class="path-nodes">
-                <div class="path-node" data-step="fractal" style="color: #1d7d6a;">Fractals</div>
-                <div class="path-node" data-step="collision" style="color: #3360b7;">Collisions</div>
-                <div class="path-node" data-step="calculator" style="color: #d94834;">Calculator</div>
-              </div>
+        <div class="layout-shell">
+          <div class="layout-main">
+            <div class="hub-alert" id="hub-alert">
+              <strong>Fallback:</strong> Running without Vite/React. Cards are rendered with a compatibility layer.
             </div>
+
+            <section class="path" aria-label="Simulation path">
+              <div class="path-label">Simulation Path</div>
+              <div class="path-line">
+                <div class="path-nodes">
+                  <div class="path-node" data-step="fractal" style="color: #1d7d6a">Fractals</div>
+                  <div class="path-node" data-step="collision" style="color: #3360b7">Collisions</div>
+                  <div class="path-node" data-step="calculator" style="color: #d94834">Calculator</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="grid" id="app-grid" aria-label="Apps"></section>
+          </div>
+
+          <section class="style-panel" aria-label="Style settings">
+            <div class="eyebrow">Style Lab</div>
+            <label for="theme-select">Theme</label>
+            <select id="theme-select">
+              <option value="classic">Classic</option>
+              <option value="aurora">Aurora</option>
+              <option value="graphite">Graphite</option>
+              <option value="solar">Solar</option>
+            </select>
+            <label for="density-range">Card Density</label>
+            <input type="range" id="density-range" min="0.8" max="1.2" step="0.05" value="1" />
+            <label>
+              <input type="checkbox" id="texture-toggle" checked />
+              Texture Layer
+            </label>
           </section>
-
-          <section class="grid" id="app-grid"></section>
         </div>
 
-        <section class="style-panel" aria-label="Style settings">
-          <div class="eyebrow">Style Lab</div>
-          <label for="theme-select">Theme</label>
-          <select id="theme-select">
-            <option value="classic">Classic</option>
-            <option value="aurora">Aurora</option>
-            <option value="graphite">Graphite</option>
-            <option value="solar">Solar</option>
-          </select>
-          <label for="density-range">Card Density</label>
-          <input type="range" id="density-range" min="0.8" max="1.2" step="0.05" value="1" />
-          <label>
-            <input type="checkbox" id="texture-toggle" checked />
-            Texture Layer
+        <div class="preview-modal" id="preview-modal" aria-hidden="true" aria-label="Preview modal">
+          <div class="preview-card">
+            <h3 id="preview-title">—</h3>
+            <p id="preview-summary">—</p>
+            <div class="concepts" id="preview-concepts"></div>
+            <div class="preview-actions">
+              <button class="btn-pill ghost icon" id="preview-close" type="button" data-icon="×">Close</button>
+              <a class="btn-pill primary icon" id="preview-launch" data-icon="→" href="#">Launch</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <span>Built for quick experiments and satisfying visuals.</span>
+          <label class="motion-toggle">
+            <input id="motion-toggle" type="checkbox" />
+            Reduce motion
           </label>
-        </section>
-      </div>
-
-      <div class="preview-modal" id="preview-modal" aria-hidden="true">
-        <div class="preview-card">
-          <h3 id="preview-title">Preview</h3>
-          <p id="preview-summary"></p>
-          <div class="concepts" id="preview-concepts"></div>
-          <div class="preview-actions">
-            <button class="btn-pill ghost" id="preview-close">Close</button>
-            <a class="btn-pill primary" id="preview-launch" href="#">Launch</a>
-          </div>
+          <a class="cta" href="simulations/fractal-sim.html">Start with Fractals</a>
         </div>
-      </div>
+      </main>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script type="module">
+      const FALLBACK_TIMEOUT_MS = 900;
 
-      <div class="footer">
-        <span>Built for quick experiments and satisfying visuals.</span>
-        <label class="motion-toggle">
-          <input type="checkbox" id="motion-toggle" />
-          Reduce motion
-        </label>
-        <a class="cta" href="simulations/fractal-sim.html">Start with Fractals</a>
-      </div>
-    </main>
-    <script>
-      const root = document.documentElement;
-      const grid = document.getElementById("app-grid");
-      const nodes = Array.from(document.querySelectorAll(".path-node"));
-      const motionToggle = document.getElementById("motion-toggle");
-      const alert = document.getElementById("hub-alert");
-      const heroBar = document.querySelector(".hero-bar span");
-      const themeSelect = document.getElementById("theme-select");
-      const densityRange = document.getElementById("density-range");
-      const textureToggle = document.getElementById("texture-toggle");
-      const previewModal = document.getElementById("preview-modal");
-      const previewTitle = document.getElementById("preview-title");
-      const previewSummary = document.getElementById("preview-summary");
-      const previewConcepts = document.getElementById("preview-concepts");
-      const previewClose = document.getElementById("preview-close");
-      const previewLaunch = document.getElementById("preview-launch");
+      function showFallback() {
+        const root = document.getElementById("root");
+        const fallback = document.getElementById("fallback-root");
+        if (root) root.style.display = "none";
+        if (fallback) fallback.style.display = "block";
+      }
 
-      const baseAccent = getComputedStyle(root).getPropertyValue("--accent");
-      const baseAccentDark = getComputedStyle(root).getPropertyValue("--accent-dark");
+      async function mountFallbackCards() {
+        // Load the web components used by the card markup (safe if already registered).
+        await import("./src/components/reusable-components/sim-badge.js").catch(() => {});
+        await import("./src/components/reusable-components/sim-decoration.js").catch(() => {});
+        await import("./src/components/reusable-components/sim-header.js").catch(() => {});
+        await import("./src/components/reusable-components/sim-footer.js").catch(() => {});
 
-      const unlockedAll = localStorage.getItem("simhub-unlocked-all") === "true";
-      let keys = Number(localStorage.getItem("simhub-keys") || "0");
-      const unlockedApps = JSON.parse(localStorage.getItem("simhub-unlocked-apps") || "[]");
+        const [{ apps }, { renderCard }, { initUI }, { initAnimations }, state] = await Promise.all([
+          import("./src/components/data.js"),
+          import("./src/components/card.js"),
+          import("./src/components/ui.js"),
+          import("./src/components/animations.js"),
+          import("./src/components/state.js"),
+        ]);
 
-      const conceptSets = {
-        Game: ["Spatial memory", "Fast reactions", "Pattern spotting", "Timing", "Flow", "Strategy", "Focus", "Momentum", "Tactics", "Score-chasing"],
-        Education: ["Recall", "Reasoning", "Concept mapping", "Skill building", "Practice loops", "Mental models", "Clarity", "Retention", "Analysis", "Curiosity"],
-        Tool: ["Productivity", "Speed", "Automation", "Utility", "Precision", "Workflow", "Focus", "Iteration", "Control", "Signal"],
-        Simulation: ["Systems", "Dynamics", "Cause & effect", "Parameter tuning", "Exploration", "Visualization", "Emergence", "Control", "Physics", "Scale"],
-        Creative: ["Mood", "Texture", "Palette", "Flow state", "Variation", "Play", "Experiment", "Layering", "Atmosphere", "Discovery"],
-        Critical: ["Personal safety", "Clarity", "Consistency", "Focus", "Rest", "Recovery", "Rhythm", "Calibration", "Intent", "Balance"],
-      };
+        const grid = document.getElementById("app-grid");
+        if (!grid) return;
+        grid.innerHTML = "";
 
-      const apps = [
-        {
-          id: "brainwave-suite",
-          title: "CRITICAL — Brainwave Suite",
-          description: "A professional brainwave environment for sleep, relaxation, and gamma focus support.",
-          href: "critical/brainwave-suite.html",
-          badge: "Critical",
-          meta: ["Mode: Personal", "Focus: Sleep + Relax + Gamma"],
-          accent: "#7c3aed",
-          locked: false,
-          critical: true,
-          actions: ["Open suite", "Read more"],
-        },
-        {
-          id: "button-room",
-          title: "Button room",
-          description: "A room with a button. What does it do?",
-          href: "button-room.html",
-          badge: "Critical",
-          meta: ["Mode: Personal", "Focus: Reset"],
-          accent: "#dc2626",
-          locked: false,
-          critical: true,
-          actions: ["Enter", "Read more"],
-        },
-        {
-          id: "key-vault",
-          title: "Key Vault",
-          description: "Collect 300 keys to unlock every locked app in the hub.",
-          href: "games/key-vault.html",
-          badge: "Game",
-          meta: ["Mode: Unlock", "Focus: Progress"],
-          accent: "#f59e0b",
-          locked: false,
-          actions: ["Launch", "Preview"],
-        },
-        {
-          id: "fractal",
-          title: "Fractal Simulation",
-          description: "Generate evolving fractal structures with adjustable parameters and hypnotic visuals.",
-          href: "simulations/fractal-sim.html",
-          badge: "Exploratory",
-          meta: ["Mode: Exploratory", "Focus: Pattern emergence"],
-          accent: "#1d7d6a",
-          step: "fractal",
-          locked: true,
-          actions: ["Launch simulation", "Preview"],
-        },
-        {
-          id: "collision",
-          title: "Galactic Collision Sim",
-          description: "Model interacting galaxies, tune orbital forces, and watch tidal tails stretch across space.",
-          href: "simulations/galactic_collision.html",
-          badge: "Dynamic",
-          meta: ["Mode: Dynamic", "Focus: Gravity play"],
-          accent: "#3360b7",
-          step: "collision",
-          locked: true,
-          actions: ["Launch simulation", "Read more"],
-        },
-        {
-          id: "calculator",
-          title: "Ultra Scientific Calculator",
-          description: "Precision combined with flair. A learning tool and scientific calculator built for exploration.",
-          href: "education/calculator.html",
-          badge: "Scientific",
-          meta: ["Mode: Scientific & fun", "Focus: Classroom-friendly tools"],
-          accent: "#d94834",
-          step: "calculator",
-          locked: true,
-          actions: ["Launch calculator", "Preview"],
-        },
-        {
-          id: "pacman",
-          title: "Pac-Man",
-          description: "Classic Pac-Man: clear the maze, eat power pellets, and outsmart the ghosts.",
-          href: "games/pacman.html",
-          badge: "Game",
-          meta: ["Mode: Arcade", "Focus: Chase + timing"],
-          accent: "#facc15",
-          locked: false,
-          actions: ["Play", "Preview"],
-        },
-        {
-          id: "screensaver-maker",
-          title: "Screensaver Maker",
-          description: "Design and preview a fractal-based screensaver with 100+ modular tools and presets.",
-          href: "tools/screensaver-maker.html",
-          badge: "Tool",
-          meta: ["Mode: Builder", "Focus: Automation"],
-          accent: "#38bdf8",
-          locked: false,
-          actions: ["Open", "Preview"],
-        },
-        { id: "orbit-playground", title: "Orbit Playground", description: "Tune orbital radius and speed to see how a single body traces a clean ellipse around a glowing core.", href: "simulations/orbit-playground.html", badge: "Simulation", meta: ["Mode: Orbital", "Focus: Gravity"], accent: "#38bdf8", locked: true, actions: ["Launch", "Preview"] },
-        { id: "comet-slingshot", title: "Comet Slingshot", description: "Experiment with slingshot paths using a single orbital track and see how velocity shapes the curve.", href: "simulations/comet-slingshot.html", badge: "Simulation", meta: ["Mode: Velocity", "Focus: Space"], accent: "#60a5fa", locked: true, actions: ["Launch", "Preview"] },
-        { id: "particle-painter", title: "Particle Painter", description: "Click to release sprays of particles and paint kinetic trails across the canvas.", href: "creative/particle-painter.html", badge: "Creative", meta: ["Mode: Particles", "Focus: Motion"], accent: "#22d3ee", locked: true, actions: ["Launch", "Preview"] },
-        { id: "meteor-shower", title: "Meteor Shower", description: "Spawn glowing meteors and adjust gravity to mimic atmospheric streaks.", href: "simulations/meteor-shower.html", badge: "Simulation", meta: ["Mode: Cosmic", "Focus: Trails"], accent: "#f97316", locked: true, actions: ["Launch", "Preview"] },
-        { id: "ember-field", title: "Ember Field", description: "Sketch ember bursts and watch them scatter like sparks in the night air.", href: "creative/ember-field.html", badge: "Creative", meta: ["Mode: Ember", "Focus: Flow"], accent: "#fb7185", locked: true, actions: ["Launch", "Preview"] },
-        { id: "pomodoro-station", title: "Pomodoro Station", description: "A calm focus timer for 25-minute sessions with a smooth progress bar.", href: "tools/pomodoro-station.html", badge: "Tool", meta: ["Mode: Focus", "Focus: Work"], accent: "#f59e0b", locked: true, actions: ["Launch", "Preview"] },
-        { id: "journal-app", title: "Journal", description: "A private notebook for reflections with import/export + share.", href: "tools/journal-app.html", badge: "Tool", meta: ["Mode: Notes", "Focus: Reflection"], accent: "#38bdf8", locked: true, actions: ["Launch", "Preview"] },
-        { id: "focus-countdown", title: "Focus Countdown", description: "A tight 10-minute countdown for bursts of deep focus.", href: "tools/focus-countdown.html", badge: "Tool", meta: ["Mode: Sprint", "Focus: Energy"], accent: "#34d399", locked: true, actions: ["Launch", "Preview"] },
-        { id: "quick-quiz", title: "Quick Quiz", description: "Fast multiple-choice questions that warm up your brain.", href: "education/quick-quiz.html", badge: "Education", meta: ["Mode: Quiz", "Focus: Speed"], accent: "#a78bfa", locked: true, actions: ["Launch", "Preview"] },
-        { id: "history-spark", title: "History Spark", description: "A tiny history quiz to keep big timelines in memory.", href: "education/history-spark.html", badge: "Education", meta: ["Mode: Quiz", "Focus: Facts"], accent: "#f472b6", locked: true, actions: ["Launch", "Preview"] },
-        { id: "flashcard-deck", title: "Flashcard Deck", description: "Flip through short prompts and definitions for fast study loops.", href: "education/flashcard-deck.html", badge: "Education", meta: ["Mode: Recall", "Focus: Study"], accent: "#38bdf8", locked: true, actions: ["Launch", "Preview"] },
-        { id: "vocab-jump", title: "Vocab Jump", description: "Quick vocabulary flips for short study sprints.", href: "education/vocab-jump.html", badge: "Education", meta: ["Mode: Vocabulary", "Focus: Language"], accent: "#facc15", locked: true, actions: ["Launch", "Preview"] },
-        { id: "word-scramble", title: "Word Scramble", description: "Unscramble playful words to keep your brain agile.", href: "games/word-scramble.html", badge: "Game", meta: ["Mode: Puzzle", "Focus: Words"], accent: "#22c55e", locked: true, actions: ["Launch", "Preview"] },
-        { id: "code-scramble", title: "Code Scramble", description: "Unscramble coding terms and build recall for developer vocabulary.", href: "games/code-scramble.html", badge: "Game", meta: ["Mode: Puzzle", "Focus: Coding"], accent: "#0ea5e9", locked: true, actions: ["Launch", "Preview"] },
-        { id: "typing-trainer", title: "Typing Trainer", description: "Practice steady typing speed and accuracy with a calming prompt.", href: "tools/typing-trainer.html", badge: "Tool", meta: ["Mode: Typing", "Focus: Accuracy"], accent: "#f472b6", locked: true, actions: ["Launch", "Preview"] },
-        { id: "rhythm-typing", title: "Rhythm Typing", description: "Short rhythmic phrase practice for timing and control.", href: "tools/rhythm-typing.html", badge: "Tool", meta: ["Mode: Typing", "Focus: Rhythm"], accent: "#a3e635", locked: true, actions: ["Launch", "Preview"] },
-        { id: "unit-converter", title: "Unit Converter", description: "Convert between meters, kilometers, and centimeters on the fly.", href: "tools/unit-converter.html", badge: "Tool", meta: ["Mode: Math", "Focus: Units"], accent: "#38bdf8", locked: true, actions: ["Launch", "Preview"] },
-        { id: "energy-converter", title: "Energy Converter", description: "Translate between joules, kilojoules, and calories.", href: "education/energy-converter.html", badge: "Education", meta: ["Mode: Physics", "Focus: Energy"], accent: "#f59e0b", locked: true, actions: ["Launch", "Preview"] },
-        { id: "color-lab", title: "Color Lab", description: "Mix RGB values to explore color theory and lighting moods.", href: "creative/color-lab.html", badge: "Creative", meta: ["Mode: Color", "Focus: Palette"], accent: "#a855f7", locked: true, actions: ["Launch", "Preview"] },
-        { id: "gradient-forge", title: "Gradient Forge", description: "Slide RGB values and craft the base tone for a gradient palette.", href: "creative/gradient-forge.html", badge: "Creative", meta: ["Mode: Color", "Focus: Gradient"], accent: "#22c55e", locked: true, actions: ["Launch", "Preview"] },
-        { id: "sorting-visualizer", title: "Sorting Visualizer", description: "Step through a bubble sort and watch values swap into order.", href: "education/sorting-visualizer.html", badge: "Education", meta: ["Mode: Algorithms", "Focus: Sorting"], accent: "#4ade80", locked: true, actions: ["Launch", "Preview"] },
-        { id: "stack-sorter", title: "Stack Sorter", description: "A compact sorting view for fast algorithm intuition.", href: "education/stack-sorter.html", badge: "Education", meta: ["Mode: Sorting", "Focus: Logic"], accent: "#fb7185", locked: true, actions: ["Launch", "Preview"] },
-        { id: "memory-grid", title: "Memory Grid", description: "Flip tiles to match hidden symbols and train recall speed.", href: "games/memory-grid.html", badge: "Game", meta: ["Mode: Memory", "Focus: Match"], accent: "#38bdf8", locked: true, actions: ["Launch", "Preview"] },
-        { id: "constellation-match", title: "Constellation Match", description: "Match star symbols in a dark grid to simulate a night-sky memory drill.", href: "games/constellation-match.html", badge: "Game", meta: ["Mode: Memory", "Focus: Stars"], accent: "#94a3b8", locked: true, actions: ["Launch", "Preview"] },
-        { id: "math-sprint", title: "Math Sprint", description: "Rapid arithmetic prompts to build quick calculation skill.", href: "education/math-sprint.html", badge: "Education", meta: ["Mode: Math", "Focus: Speed"], accent: "#facc15", locked: true, actions: ["Launch", "Preview"] },
-        { id: "prime-hunt", title: "Prime Hunt", description: "Quick number challenges that sharpen mental math instincts.", href: "education/prime-hunt.html", badge: "Education", meta: ["Mode: Numbers", "Focus: Hunt"], accent: "#38bdf8", locked: true, actions: ["Launch", "Preview"] },
-        { id: "logic-quiz", title: "Logic Quiz", description: "Short logic puzzles designed to train reasoning skills.", href: "education/logic-quiz.html", badge: "Education", meta: ["Mode: Logic", "Focus: Reasoning"], accent: "#a78bfa", locked: true, actions: ["Launch", "Preview"] },
-        { id: "eco-flash", title: "Eco Flash", description: "Fast ecology prompts to remember cycles and ecosystems.", href: "education/eco-flash.html", badge: "Education", meta: ["Mode: Ecology", "Focus: Nature"], accent: "#34d399", locked: true, actions: ["Launch", "Preview"] },
-        { id: "cipher-scramble", title: "Cipher Scramble", description: "Unscramble secret-leaning words and strengthen pattern recognition.", href: "games/cipher-scramble.html", badge: "Game", meta: ["Mode: Cipher", "Focus: Puzzle"], accent: "#f97316", locked: true, actions: ["Launch", "Preview"] },
-        { id: "velocity-drill", title: "Velocity Drill", description: "Quick arithmetic drills inspired by motion and speed.", href: "education/velocity-drill.html", badge: "Education", meta: ["Mode: Physics", "Focus: Math"], accent: "#60a5fa", locked: true, actions: ["Launch", "Preview"] },
-        { id: "chrono-lab", title: "Chrono Lab", description: "A 15-minute lab timer for experiments and timed exercises.", href: "tools/chrono-lab.html", badge: "Tool", meta: ["Mode: Timer", "Focus: Labs"], accent: "#38bdf8", locked: true, actions: ["Launch", "Preview"] },
-      ];
-
-      const buildConcepts = (app) => {
-        const base = conceptSets[app.badge] || conceptSets.Simulation;
-        return base.slice(0, 10);
-      };
-
-      const renderCard = (app) => {
-        const card = document.createElement("article");
-        card.className = app.critical ? "card is-critical" : "card";
-        card.style.setProperty("--card-accent", app.accent);
-        card.dataset.href = app.href;
-        if (app.step) card.dataset.step = app.step;
-        const locked = app.locked && !unlockedAll && !unlockedApps.includes(app.id);
-        if (locked) card.classList.add("is-locked");
-
-        const meta = app.meta
-          .map((item) => `<span><strong>${item.split(":")[0]}:</strong> ${item.split(":")[1].trim()}</span>`)
-          .join("");
-        const concepts = buildConcepts(app)
-          .map((concept) => `<span>${concept}</span>`)
-          .join("");
-
-        card.innerHTML = `
-          <div class="badge">${app.badge}</div>
-          ${app.critical ? `<div class="critical-flag">Critical</div>` : ""}
-          <div class="app-index">#${app.id.replace(/-/g, "").slice(0, 6).toUpperCase()}</div>
-          ${locked ? `<div class="lock-strip">Locked</div>` : ""}
-          <h2>${app.title}</h2>
-          <p>${app.description}</p>
-          <div class="meta">${meta}</div>
-          <div class="concepts">${concepts}</div>
-          <div class="hover-preview">Preview: ${app.description}</div>
-          <div class="preview-inline" id="inline-${app.id}">
-            <strong>Preview</strong>
-            <span>${app.description}</span>
-          </div>
-          <div class="card-actions">
-            ${
-              locked && keys < 300
-                ? `<a class="btn-pill primary icon" data-icon="🔑" href="games/key-vault.html">Collect Key</a>`
-                : locked
-                  ? `<button class="btn-pill primary unlock-btn" data-app-id="${app.id}">Unlock</button>`
-                  : `<a class="btn-pill primary icon" data-icon="→" href="${app.href}">${app.actions[0]}</a>`
-            }
-            <a class="btn-pill ghost icon" data-icon="📄" href="info/read-more.html?id=${app.id}">Read more</a>
-            <button class="btn-pill ghost icon preview-btn" data-icon="👁" data-app-id="${app.id}" type="button">Preview</button>
-            <button class="btn-pill ghost icon" data-icon="☆" type="button">Save</button>
-          </div>
-          <div class="locked-overlay"><span>${keys >= 300 ? "Locked — click unlock" : "Locked — collect keys"}</span></div>
-        `;
-        return card;
-      };
-
-      apps.forEach((app) => grid.appendChild(renderCard(app)));
-
-      const cards = Array.from(document.querySelectorAll(".card"));
-      const previewButtons = Array.from(document.querySelectorAll(".preview-btn"));
-      const unlockButtons = Array.from(document.querySelectorAll(".unlock-btn"));
-
-      const setActiveCard = (card) => {
-        cards.forEach((item) => item.removeAttribute("data-active"));
-        card.setAttribute("data-active", "true");
-      };
-
-      const setPathActive = (step) => {
-        nodes.forEach((node) => {
-          node.classList.toggle("is-active", node.dataset.step === step);
-        });
-      };
-
-      const setGlobalAccent = (card) => {
-        const accent = getComputedStyle(card).getPropertyValue("--card-accent") || baseAccent;
-        root.style.setProperty("--accent", accent.trim());
-        root.style.setProperty("--accent-dark", accent.trim());
-      };
-
-      cards.forEach((card, index) => {
-        card.classList.add("reveal");
-        card.dataset.index = String(index + 1);
-        card.addEventListener("mouseenter", () => {
-          setGlobalAccent(card);
-          setPathActive(card.dataset.step);
-        });
-        card.addEventListener("focusin", () => {
-          setGlobalAccent(card);
-          setPathActive(card.dataset.step);
-        });
-        card.addEventListener("mouseleave", () => {
-          root.style.setProperty("--accent", baseAccent);
-          root.style.setProperty("--accent-dark", baseAccentDark);
-          setPathActive(null);
-          root.style.setProperty("--tilt-x", "0deg");
-          root.style.setProperty("--tilt-y", "0deg");
-        });
-        card.addEventListener("focusout", () => {
-          root.style.setProperty("--accent", baseAccent);
-          root.style.setProperty("--accent-dark", baseAccentDark);
-          setPathActive(null);
-        });
-        card.addEventListener("click", () => {
-          setActiveCard(card);
-          setPathActive(card.dataset.step);
-          root.style.setProperty("--accent-shift", `${index * 8}deg`);
-        });
-        card.addEventListener("mousemove", (event) => {
-          const rect = card.getBoundingClientRect();
-          const px = (event.clientX - rect.left) / rect.width - 0.5;
-          const py = (event.clientY - rect.top) / rect.height - 0.5;
-          root.style.setProperty("--tilt-x", `${(-py * 6).toFixed(2)}deg`);
-          root.style.setProperty("--tilt-y", `${(px * 6).toFixed(2)}deg`);
-        });
-      });
-
-      unlockButtons.forEach((button) => {
-        button.addEventListener("click", (event) => {
-          event.preventDefault();
-          const appId = button.dataset.appId;
-          if (keys < 1) {
-            alert("Collect keys in the Key Vault first.");
-            return;
+        for (const app of apps) {
+          try {
+            const el = renderCard(app);
+            grid.appendChild(el);
+          } catch (e) {
+            const a = document.createElement("a");
+            a.href = app.href;
+            a.textContent = app.title;
+            a.className = "card";
+            grid.appendChild(a);
           }
-          if (!unlockedApps.includes(appId)) {
-            unlockedApps.push(appId);
-            localStorage.setItem("simhub-unlocked-apps", JSON.stringify(unlockedApps));
-          }
-          keys = Math.max(0, keys - 1);
-          localStorage.setItem("simhub-keys", String(keys));
-          const card = button.closest(".card");
-          if (card) {
-            card.classList.remove("is-locked");
-            const launchHref = card.dataset.href;
-            button.outerHTML = `<a class=\"btn-pill primary icon\" data-icon=\"→\" href=\"${launchHref}\">Launch</a>`;
-          }
-        });
-      });
-
-      previewButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          const appId = button.dataset.appId;
-          const app = apps.find((item) => item.id === appId);
-          if (!app) return;
-          previewTitle.textContent = app.title;
-          previewSummary.textContent = app.description;
-          previewLaunch.href = app.href;
-          previewConcepts.innerHTML = buildConcepts(app).map((c) => `<span>${c}</span>`).join("");
-          previewModal.classList.add("is-open");
-
-          const inline = document.getElementById(`inline-${app.id}`);
-          if (inline) inline.classList.toggle("is-open");
-        });
-      });
-
-      previewClose.addEventListener("click", () => {
-        previewModal.classList.remove("is-open");
-      });
-
-      previewModal.addEventListener("click", (event) => {
-        if (event.target === previewModal) previewModal.classList.remove("is-open");
-      });
-
-      motionToggle.addEventListener("change", (event) => {
-        document.body.dataset.motion = event.target.checked ? "off" : "on";
-      });
-
-      const applyStyleSettings = () => {
-        const theme = themeSelect.value;
-        document.body.dataset.theme = theme === "classic" ? "" : theme;
-        document.body.style.setProperty("--density", densityRange.value);
-        document.body.dataset.texture = textureToggle.checked ? "on" : "off";
-        localStorage.setItem("simhub-theme", theme);
-        localStorage.setItem("simhub-density", densityRange.value);
-        localStorage.setItem("simhub-texture", textureToggle.checked ? "on" : "off");
-        document.body.style.setProperty("--dot-opacity", textureToggle.checked ? "0.35" : "0");
-        document.body.style.setProperty("--grain-opacity", textureToggle.checked ? "0.25" : "0");
-      };
-
-      const initStyleSettings = () => {
-        const savedTheme = localStorage.getItem("simhub-theme") || "classic";
-        const savedDensity = localStorage.getItem("simhub-density") || "1";
-        const savedTexture = localStorage.getItem("simhub-texture") || "on";
-        themeSelect.value = savedTheme;
-        densityRange.value = savedDensity;
-        textureToggle.checked = savedTexture === "on";
-        applyStyleSettings();
-      };
-
-      themeSelect.addEventListener("change", applyStyleSettings);
-      densityRange.addEventListener("input", applyStyleSettings);
-      textureToggle.addEventListener("change", applyStyleSettings);
-
-      document.addEventListener("keydown", (event) => {
-        if (event.key === "Tab") {
-          document.body.classList.add("show-focus");
         }
-      });
 
-      document.addEventListener("mousedown", () => {
-        document.body.classList.remove("show-focus");
-      });
+        const root = document.documentElement;
+        const baseAccent = getComputedStyle(root).getPropertyValue("--accent").trim();
+        const baseAccentDark = getComputedStyle(root).getPropertyValue("--accent-dark").trim();
 
-      document.addEventListener("mousemove", (event) => {
-        const x = `${(event.clientX / window.innerWidth) * 100}%`;
-        const y = `${(event.clientY / window.innerHeight) * 100}%`;
-        root.style.setProperty("--mouse-x", x);
-        root.style.setProperty("--mouse-y", y);
-      });
-
-      const updateScroll = () => {
-        const max = document.body.scrollHeight - window.innerHeight;
-        const progress = max > 0 ? Math.min(100, (window.scrollY / max) * 100) : 0;
-        root.style.setProperty("--scroll", progress.toFixed(2));
-        if (heroBar) heroBar.style.width = `${progress}%`;
-        root.style.setProperty("--dot-opacity", (0.2 + progress / 500).toFixed(2));
-        root.style.setProperty("--hero-shift", `${(progress / 20).toFixed(1)}px`);
-      };
-
-      window.addEventListener("scroll", updateScroll, { passive: true });
-      updateScroll();
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) entry.target.classList.add("is-visible");
-          });
-        },
-        { threshold: 0.15 }
-      );
-      cards.forEach((card) => observer.observe(card));
-
-      const tickTime = () => {
-        const now = Date.now();
-        root.style.setProperty("--time", (now % 100000).toString());
-        const phase = (now / 2000) % 1;
-        root.style.setProperty("--grain-opacity", (0.18 + phase * 0.06).toFixed(2));
-        requestAnimationFrame(tickTime);
-      };
-      tickTime();
-
-      if (!unlockedAll) {
-        const lockedCards = cards.filter((card) => card.classList.contains("is-locked"));
-        let pulseIndex = 0;
-        setInterval(() => {
-          if (!lockedCards.length) return;
-          lockedCards.forEach((card) => card.classList.remove("is-active"));
-          lockedCards[pulseIndex % lockedCards.length].classList.add("is-active");
-          pulseIndex += 1;
-        }, 1400);
+        initAnimations({
+          root,
+          heroBar: document.querySelector("header .hero-bar span"),
+          unlockedAll: Boolean(state.unlockedAll),
+        });
+        initUI({
+          root,
+          grid,
+          nodes: Array.from(document.querySelectorAll(".path-node")),
+          motionToggle: document.getElementById("motion-toggle"),
+          alert: document.getElementById("hub-alert"),
+          themeSelect: document.getElementById("theme-select"),
+          densityRange: document.getElementById("density-range"),
+          textureToggle: document.getElementById("texture-toggle"),
+          previewModal: document.getElementById("preview-modal"),
+          previewTitle: document.getElementById("preview-title"),
+          previewSummary: document.getElementById("preview-summary"),
+          previewConcepts: document.getElementById("preview-concepts"),
+          previewClose: document.getElementById("preview-close"),
+          previewLaunch: document.getElementById("preview-launch"),
+          baseAccent,
+          baseAccentDark,
+        });
       }
 
-      if (unlockedAll) {
-        alert.innerHTML = "<strong>Status:</strong> All apps unlocked. Enjoy the experiments.";
-      } else {
-        alert.innerHTML = `<strong>Lock status:</strong> ${Math.min(keys, 300)} / 300 keys collected. <a class=\"link-ghost\" href=\"games/key-vault.html\">Go to Key Vault</a>`;
+      function loadScript(src, timeoutMs = 2200) {
+        return new Promise((resolve) => {
+          const s = document.createElement("script");
+          s.src = src;
+          s.async = true;
+          s.onload = () => resolve(true);
+          s.onerror = () => resolve(false);
+          document.head.appendChild(s);
+          setTimeout(() => resolve(false), timeoutMs);
+        });
       }
 
-      initStyleSettings();
+      async function tryWebpackFallback() {
+        // If a webpack bundle exists (built to ./webpack-fallback/bundle.js), load it and let it mount React.
+        const ok = await loadScript("./webpack-fallback/bundle.js", 2600);
+        if (!ok) return false;
+        for (let i = 0; i < 30; i++) {
+          if (window.__SIMHUB_MOUNTED__) return true;
+          await new Promise((r) => setTimeout(r, 50));
+        }
+        return false;
+      }
+
+      setTimeout(async () => {
+        if (window.__SIMHUB_MOUNTED__) return;
+        try {
+          if (await tryWebpackFallback()) return;
+          showFallback();
+          await mountFallbackCards();
+        } catch (e) {
+          showFallback();
+          const grid = document.getElementById("fallback-grid");
+          if (grid) {
+            grid.innerHTML =
+              '<div class="card" style="padding:18px;"><div class="eyebrow">Fallback failed</div><h2 style="margin:10px 0 0;">Could not load modules.</h2><p style="color:var(--muted); margin-top:10px; line-height:1.5;">Serve this folder with any static server, or run <code>npm run dev</code>.</p></div>';
+          }
+        }
+      }, FALLBACK_TIMEOUT_MS);
     </script>
+    <script src="js/app-guardian.js"></script>
   </body>
 </html>

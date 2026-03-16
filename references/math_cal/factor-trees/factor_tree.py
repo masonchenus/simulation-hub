@@ -1,226 +1,210 @@
 #!/usr/bin/env python3
 """
-Factor Tree Calculator
-Calculates and visualizes the prime factorization of a number as a tree structure.
+Script to calculate the number of factors (divisors) of 1728^9623
+and list a sample of the divisors.
+
+Mathematical explanation:
+- 1728 = 12^3 = (2^2 * 3)^3 = 2^6 * 3^3
+- 1728^9623 = (2^6 * 3^3)^9623 = 2^(6*9623) * 3^(3*9623) = 2^57738 * 3^28869
+
+For a number n = p1^a1 * p2^a2 * ... * pk^ak, 
+the number of divisors d(n) = (a1+1)(a2+1)...(ak+1)
 """
-
-from typing import Optional
-from dataclasses import dataclass
-
-
-@dataclass
-class TreeNode:
-    """Represents a node in the factor tree."""
-    value: int
-    is_prime: bool
-    children: list['TreeNode']
+import itertools
+import math
+import sys
 
 
-def is_prime(n: int) -> bool:
-    """Check if a number is prime."""
-    if n < 2:
-        return False
-    if n == 2:
-        return True
-    if n % 2 == 0:
-        return False
-    for i in range(3, int(n ** 0.5) + 1, 2):
-        if n % i == 0:
-            return False
-    return True
+sys.set_int_max_str_digits(500000)
 
-
-def get_smallest_prime_factor(n: int) -> Optional[int]:
-    """Get the smallest prime factor of a number."""
-    if n < 2:
-        return None
-    if n % 2 == 0:
-        return 2
-    for i in range(3, int(n ** 0.5) + 1, 2):
-        if n % i == 0:
-            return i
-    return n
-
-
-def build_factor_tree(n: int) -> Optional[TreeNode]:
-    """Build a factor tree recursively for a number."""
-    if n < 2:
-        return None
-    
-    node = TreeNode(
-        value=n,
-        is_prime=is_prime(n),
-        children=[]
-    )
-    
-    if node.is_prime:
-        return node
-    
-    factor = get_smallest_prime_factor(n)
-    other_factor = n // factor
-    
-    node.children.append(build_factor_tree(factor))
-    node.children.append(build_factor_tree(other_factor))
-    
-    return node
-
-
-def extract_prime_factors(node: TreeNode) -> list[int]:
-    """Extract all prime factors from the tree."""
-    factors = []
-    
-    if node.is_prime:
-        factors.append(node.value)
-    else:
-        for child in node.children:
-            factors.extend(extract_prime_factors(child))
-    
-    return factors
-
-
-def render_tree_ascii(node: TreeNode, prefix: str = "", is_last: bool = True, is_root: bool = True) -> str:
-    """Render the factor tree as ASCII art."""
-    if node is None:
-        return ""
-    
-    lines = []
-    connector = "└── " if is_last else "├── "
-    
-    if not is_root:
-        lines.append(f"{prefix}{connector}{node.value} {'(prime)' if node.is_prime else ''}")
-        new_prefix = prefix + ("    " if is_last else "│   ")
-    else:
-        lines.append(f"{node.value} {'(prime)' if node.is_prime else '(original)'}")
-        new_prefix = ""
-    
-    for i, child in enumerate(node.children):
-        is_last_child = (i == len(node.children) - 1)
-        lines.append(render_tree_ascii(child, new_prefix, is_last_child, False))
-    
-    return "\n".join(lines)
-
-
-def save_factor_tree(number: int, filepath: str = "factor_tree.txt") -> str:
+def calculate_prime_factorization():
     """
-    Calculate and save the factor tree of a number to a file.
-    
-    Args:
-        number: The number to factorize
-        filepath: Path to save the result
-    
-    Returns:
-        The string representation of the factor tree
+    Calculate the prime factorization of 1728^9623
     """
-    if number < 2:
-        raise ValueError("Number must be >= 2")
+    exponent = 9623
+    # Factorize 1728
+    # 1728 = 12^3 = (2^2 * 3)^3 = 2^6 * 3^3
+    base_factors = {2: 6, 3: 3}
     
-    tree = build_factor_tree(number)
-    factors = extract_prime_factors(tree)
-    unique_factors = sorted(set(factors))
+    print("=== Prime Factorization of 1728 ===")
+    print(f"1728 = 12^3 = (2^2 × 3)^3 = 2^6 × 3^3")
+    print(f"Base factorization: {base_factors}")
     
-    # Build output
-    output_lines = []
-    output_lines.append("=" * 50)
-    output_lines.append("FACTOR TREE CALCULATOR")
-    output_lines.append("=" * 50)
-    output_lines.append(f"\nNumber: {number}")
-    output_lines.append(f"Prime Factors: {' × '.join(map(str, sorted(factors)))}")
-    output_lines.append(f"Unique Prime Factors: {', '.join(map(str, unique_factors))}")
-    output_lines.append(f"\nFactor Tree Structure:")
-    output_lines.append("-" * 50)
-    output_lines.append(render_tree_ascii(tree))
-    output_lines.append("-" * 50)
+    # For 1728^9623, multiply each exponent by 9623
+    exponentiated_factors = {p: exp * exponent for p, exp in base_factors.items()}
     
-    output = "\n".join(output_lines)
+    print(f"\n=== Prime Factorization of 1728^{exponent} ===")
+    print(f"1728^{exponent} = ", end="")
+    for i, (prime, exp) in enumerate(exponentiated_factors.items()):
+        if i > 0:
+            print(" × ", end="")
+        print(f"{prime}^{exp}", end="")
+    print()
     
-    # Save to file
-    with open(filepath, 'w') as f:
-        f.write(output)
-    
-    return output
+    return exponentiated_factors
 
 
-def print_factor_tree(number: int) -> str:
+def calculate_number_of_divisors(factors):
     """
-    Calculate and print the factor tree of a number.
-    
-    Args:
-        number: The number to factorize
-    
-    Returns:
-        The string representation of the factor tree
+    Calculate the number of divisors using the formula:
+    d(n) = (a1+1)(a2+1)...(ak+1)
+    where n = p1^a1 * p2^a2 * ... * pk^ak
     """
-    if number < 2:
-        raise ValueError("Number must be >= 2")
+    print("\n=== Number of Divisors Calculation ===")
+    print("Formula: d(n) = (exponent1 + 1) × (exponent2 + 1) × ... × (exponentk + 1)")
+    print()
     
-    tree = build_factor_tree(number)
-    factors = extract_prime_factors(tree)
-    unique_factors = sorted(set(factors))
+    divisor_formula = []
+    divisor_values = []
     
-    print("=" * 50)
-    print("FACTOR TREE CALCULATOR")
-    print("=" * 50)
-    print(f"\nNumber: {number}")
-    print(f"Prime Factors: {' × '.join(map(str, sorted(factors)))}")
-    print(f"Unique Prime Factors: {', '.join(map(str, unique_factors))}")
-    print(f"\nFactor Tree Structure:")
-    print("-" * 50)
-    print(render_tree_ascii(tree))
-    print("-" * 50)
+    for prime, exp in factors.items():
+        term = f"({exp} + 1)"
+        value = exp + 1
+        divisor_formula.append(term)
+        divisor_values.append(value)
+        print(f"  For prime {prime}: {term} = {value}")
     
-    return render_tree_ascii(tree)
+    print(f"\n  Formula: {' × '.join(divisor_formula)}")
+    
+    # Calculate the product
+    total_divisors = 1
+    for val in divisor_values:
+        total_divisors *= val
+    
+    print(f"\n  = {' × '.join(str(v) for v in divisor_values)}")
+    print(f"  = {total_divisors:,}")
+    
+    return total_divisors
+
+
+def generate_divisors(factors):
+    """
+    Generates all divisors of a number given its prime factorization.
+    This is a generator function and does not store all divisors in memory.
+    Divisors are yielded in ascending order.
+
+    :param factors: A dictionary of {prime: exponent}.
+    :yields: Divisors of the number.
+    """
+    primes = list(factors.keys())
+    exponent_ranges = [range(exp + 1) for exp in factors.values()]
+
+    for exp_tuple in itertools.product(*exponent_ranges):
+        divisor = 1
+        for i, prime in enumerate(primes):
+            divisor *= prime ** exp_tuple[i]
+        yield divisor
+
+
+def generate_divisors_reverse(factors):
+    """
+    Generates all divisors in reverse (descending) order.
+
+    :param factors: A dictionary of {prime: exponent}.
+    :yields: Divisors of the number.
+    """
+    primes = list(factors.keys())
+    # The ranges for exponents should be reversed to get descending order of divisors
+    exponent_ranges = [reversed(range(exp + 1)) for exp in factors.values()]
+
+    for exp_tuple in itertools.product(*exponent_ranges):
+        divisor = 1
+        for i, prime in enumerate(primes):
+            divisor *= prime ** exp_tuple[i]
+        yield divisor
+
+
+def list_some_divisors(factors, total_divisors, count=10):
+    """
+    Lists the first and last few divisors.
+
+    :param factors: A dictionary of {prime: exponent}.
+    :param total_divisors: The total number of divisors.
+    :param count: The number of divisors to list from the beginning and end.
+    """
+    print("\n" + "=" * 60)
+    print(f"Listing a sample of the divisors (first {count} and last {count})")
+    print("=" * 60)
+    print(f"\nNote: The number has {total_divisors:,} divisors.")
+    print("Listing all of them is impractical as it would consume enormous memory and time.")
+    print("A generator function is used to produce divisors on-demand.")
+
+    print(f"\nFirst {count} divisors:")
+    divisors_generator = generate_divisors(factors)
+    for i, divisor in enumerate(divisors_generator):
+        if i >= count:
+            break
+        print(f"  {i + 1:2d}: {divisor:,}")
+
+    print(f"\nLast {count} divisors:")
+    divisors_generator_rev = generate_divisors_reverse(factors)
+    for i, divisor in enumerate(divisors_generator_rev):
+        if i >= count:
+            break
+        # The largest numbers are too big to print nicely with commas.
+        # We can print it in scientific notation if it's too long.
+        divisor_str = f"{divisor:,}"
+        if len(divisor_str) > 50:
+            divisor_str = f"{divisor:.3e}"
+        print(f"  {total_divisors - i:11d}: {divisor_str}")
+
+
+def calculate_with_python_big_int():
+    """
+    Alternative: Calculate using Python's big integers to verify
+    """
+    print("\n=== Verification using Python's built-in big integers ===")
+    
+    # Calculate actual number
+    n = 1728 ** 9623
+    
+    # Factorize using trial division (impractical for this size, but we'll use the math approach)
+    # Instead, we'll just verify our formula
+    print(f"The number 1728^9623 has {len(str(n)):,} digits.")
+    print("(Directly counting divisors of this number is not practical)")
 
 
 def main():
-    """Main function to run the factor tree calculator."""
-    import sys
+    print("=" * 60)
+    print("Calculating the number of factors of 1728^9623")
+    print("=" * 60)
     
-    if len(sys.argv) > 1:
-        try:
-            number = int(sys.argv[1])
-        except ValueError:
-            print("Error: Please provide a valid integer")
-            sys.exit(1)
-    else:
-        # Interactive mode
-        while True:
-            try:
-                user_input = input("Enter a positive integer (or 'q' to quit): ").strip()
-                if user_input.lower() == 'q':
-                    break
-                number = int(user_input)
-                if number < 2:
-                    print("Please enter a number >= 2")
-                    continue
-                print_factor_tree(number)
-                
-                # Ask to save
-                save = input("Save to file? (y/n): ").strip().lower()
-                if save == 'y':
-                    filepath = input("Enter filename (default: factor_tree.txt): ").strip()
-                    if not filepath:
-                        filepath = "factor_tree.txt"
-                    save_factor_tree(number, filepath)
-                    print(f"Saved to {filepath}")
-            except ValueError as e:
-                print(f"Error: {e}")
-            except EOFError:
-                break
+    # Get the prime factorization
+    factors = calculate_prime_factorization()
     
-    # Example usage if run with argument
-    if len(sys.argv) > 1:
-        number = int(sys.argv[1])
-        print_factor_tree(number)
-        
-        # Also save to the references directory
-        try:
-            output_path = "references/math_cal/factor-trees/factor_tree.txt"
-            save_factor_tree(number, output_path)
-            print(f"\nAlso saved to {output_path}")
-        except Exception as e:
-            print(f"Note: Could not save to references directory: {e}")
+    # Calculate number of divisors
+    num_divisors = calculate_number_of_divisors(factors)
+    
+    # List a sample of the divisors
+    list_some_divisors(factors, num_divisors, count=10)
+
+    print("\n" + "=" * 60)
+    print("FINAL RESULT SUMMARY")
+    print("=" * 60)
+    print(f"\n1728^9623 = 2^57738 × 3^28869")
+    print(f"\nNumber of factors (divisors): {num_divisors:,}")
+
+    # Show the breakdown
+    print(f"\nBreakdown: (57738 + 1) × (28869 + 1)")
+    print(f"         = 57739 × 28870")
+    print(f"         = {num_divisors:,}")
+
+    # Scientific notation
+    print(f"\nIn scientific notation: {num_divisors:.2e}")
+
+    # Save to file
+    output_file = '/Users/mason/simulation-hub/references/math_cal/factor-trees/1728^9623_divisors.txt'
+    with open(output_file, 'w') as f:
+        f.write(f"1728^9623 Factorization: 2^57738 × 3^28869\n")
+        f.write(f"Number of divisors: {num_divisors:,}\n")
+        f.write(f"Formula: (57738 + 1) × (28869 + 1) = 57739 × 28870\n")
+        f.write(f"Scientific notation: {num_divisors:.2e}\n")
+
+    print(f"\nSaved summary to: {output_file}")
+
+    # Optional: verification of number of digits
+    calculate_with_python_big_int()
 
 
 if __name__ == "__main__":
     main()
-

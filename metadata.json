@@ -1,0 +1,10 @@
+{ 
+    "name": "Simulation Hub",
+    "version": "1.0.0",
+    "description": "A group of simulations, for personal, wellbeing, relaxation, and more.",
+    "keywords": ["simulation", "brainwave", "critical", "game", "presets", "Relaxation", "personal"],
+    "author": "Mason Chen",
+    "license": "MIT",
+    "homepage": "N / A",
+    "repository": "https://github.com/masonchenus/simulation-hub"
+}

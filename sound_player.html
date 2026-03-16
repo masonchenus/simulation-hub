@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sound Player (Hz)</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(56, 189, 248, 0.12), transparent 60%),
+        radial-gradient(1000px 700px at 80% 30%, rgba(34, 197, 94, 0.10), transparent 55%),
+        linear-gradient(180deg, #020617, #000);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .card {
+      width: min(760px, 92vw);
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0.02em;
+    }
+
+    .sub {
+      margin-top: 6px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.75);
+      line-height: 1.35;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    @media (min-width: 760px) {
+      .row {
+        grid-template-columns: 1.2fr 0.8fr;
+        align-items: start;
+      }
+    }
+
+    .panel {
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 14px;
+      padding: 14px;
+      background: rgba(0, 0, 0, 0.22);
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.85;
+      margin-bottom: 8px;
+    }
+
+    input[type="number"],
+    select {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: rgba(255, 255, 255, 0.92);
+      outline: none;
+      font-size: 14px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #38bdf8;
+    }
+
+    .btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      cursor: pointer;
+      user-select: none;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-bottom-width: 4px;
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.92);
+      transition: transform 0.06s ease, background 0.12s ease;
+    }
+
+    button:active {
+      transform: translateY(2px);
+    }
+
+    .play {
+      background: rgba(34, 197, 94, 0.18);
+      border-color: rgba(34, 197, 94, 0.35);
+    }
+
+    .stop {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.06);
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.82);
+      margin-top: 10px;
+      width: fit-content;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.22);
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+      transition: background 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .dot.on {
+      background: rgba(34, 197, 94, 0.9);
+      box-shadow: 0 0 18px 2px rgba(34, 197, 94, 0.35);
+    }
+
+    .hint {
+      margin-top: 14px;
+      font-size: 11px;
+      line-height: 1.35;
+      color: rgba(255, 255, 255, 0.68);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Sound Player (Hz)</h1>
+    <div class="sub">Enter a frequency from <b>1</b> to <b>20000</b> Hz and press Play.</div>
+
+    <div class="row">
+      <div class="panel">
+        <label for="hz">Frequency (Hz)</label>
+        <input id="hz" type="number" min="1" max="20000" step="1" value="440" inputmode="numeric" />
+        <div style="margin-top:10px;">
+          <input id="hzRange" type="range" min="1" max="20000" step="1" value="440" />
+        </div>
+
+        <div class="btns">
+          <button id="playBtn" class="play">PLAY</button>
+          <button id="stopBtn" class="stop">STOP</button>
+        </div>
+
+        <div class="pill">
+          <span id="statusDot" class="dot"></span>
+          <span id="statusText">Stopped</span>
+        </div>
+        <div class="hint">Tip: start with a low volume. High frequencies can be harsh.</div>
+      </div>
+
+      <div class="panel">
+        <label for="wave">Waveform</label>
+        <select id="wave">
+          <option value="sine">Sine</option>
+          <option value="triangle">Triangle</option>
+          <option value="square">Square</option>
+          <option value="sawtooth">Sawtooth</option>
+        </select>
+
+        <div style="margin-top:14px;">
+          <label for="vol">Volume</label>
+          <input id="vol" type="range" min="0" max="1" step="0.001" value="0.08" />
+          <div class="sub" style="margin-top:6px;">Current: <span id="volVal">0.08</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const hzEl = document.getElementById('hz');
+    const hzRangeEl = document.getElementById('hzRange');
+    const waveEl = document.getElementById('wave');
+    const volEl = document.getElementById('vol');
+    const volValEl = document.getElementById('volVal');
+    const playBtn = document.getElementById('playBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+
+    let audio = null; // AudioContext
+    let osc = null; // OscillatorNode
+    let gain = null; // GainNode
+
+    function clampHz(v) {
+      const n = Math.round(Number(v) || 0);
+      return Math.max(1, Math.min(20000, n));
+    }
+
+    function setStatus(on, msg) {
+      statusDot.classList.toggle('on', Boolean(on));
+      statusText.textContent = msg;
+    }
+
+    function ensureAudio() {
+      if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)();
+      return audio;
+    }
+
+    function setFrequencySmooth(freq) {
+      if (!osc) return;
+      const a = ensureAudio();
+      const t = a.currentTime;
+      try {
+        osc.frequency.cancelScheduledValues(t);
+        osc.frequency.setTargetAtTime(freq, t, 0.01);
+      } catch {
+        osc.frequency.value = freq;
+      }
+    }
+
+    function setVolumeSmooth(v) {
+      if (!gain) return;
+      const a = ensureAudio();
+      const t = a.currentTime;
+      const vol = Math.max(0, Math.min(1, Number(v) || 0));
+      try {
+        gain.gain.cancelScheduledValues(t);
+        gain.gain.setTargetAtTime(vol, t, 0.01);
+      } catch {
+        gain.gain.value = vol;
+      }
+    }
+
+    function syncHzInputs(v) {
+      const hz = clampHz(v);
+      hzEl.value = String(hz);
+      hzRangeEl.value = String(hz);
+      setFrequencySmooth(hz);
+    }
+
+    function stop() {
+      if (!audio) {
+        setStatus(false, 'Stopped');
+        return;
+      }
+      try {
+        const t = audio.currentTime;
+        if (gain) {
+          gain.gain.cancelScheduledValues(t);
+          gain.gain.setTargetAtTime(0, t, 0.01);
+        }
+      } catch { }
+
+      try { osc && osc.stop(); } catch { }
+      try { osc && osc.disconnect(); } catch { }
+      osc = null;
+
+      setStatus(false, 'Stopped');
+    }
+
+    async function play() {
+      const a = ensureAudio();
+      if (a.state === 'suspended') await a.resume();
+
+      if (osc) stop();
+
+      gain = a.createGain();
+      gain.gain.value = 0;
+      gain.connect(a.destination);
+
+      osc = a.createOscillator();
+      osc.type = waveEl.value;
+      osc.frequency.value = clampHz(hzEl.value);
+      osc.connect(gain);
+      osc.start();
+
+      setVolumeSmooth(volEl.value);
+      setStatus(true, `Playing ${clampHz(hzEl.value)} Hz`);
+    }
+
+    hzEl.addEventListener('input', () => syncHzInputs(hzEl.value));
+    hzRangeEl.addEventListener('input', () => syncHzInputs(hzRangeEl.value));
+    waveEl.addEventListener('change', () => { if (osc) osc.type = waveEl.value; });
+    volEl.addEventListener('input', () => {
+      volValEl.textContent = Number(volEl.value).toFixed(3);
+      setVolumeSmooth(volEl.value);
+    });
+    playBtn.addEventListener('click', () => play());
+    stopBtn.addEventListener('click', () => stop());
+
+    // Defaults
+    volValEl.textContent = Number(volEl.value).toFixed(3);
+    syncHzInputs(440);
+    setStatus(false, 'Stopped');
+
+    window.addEventListener('beforeunload', () => {
+      try { stop(); } catch { }
+      try { audio && audio.close(); } catch { }
+    });
+  </script>
+  <script src="js/app-guardian.js"></script>
+</body>
+
+</html>

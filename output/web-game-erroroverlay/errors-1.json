@@ -1,0 +1,6 @@
+[
+  {
+    "type": "console.error",
+    "text": "GD Clone Error: Error: Render loop stalled; attempting recovery\n    at http://localhost:5173/gd-clone.html:925:27\n    at <anonymous>:23:9"
+  }
+]

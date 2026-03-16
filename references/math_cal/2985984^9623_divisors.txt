@@ -1,0 +1,4 @@
+1728^9623 Factorization: 2^57738 × 3^28869
+Number of divisors: 1,666,924,930
+Formula: (57738 + 1) × (28869 + 1) = 57739 × 28870
+Scientific notation: 1.67e+09

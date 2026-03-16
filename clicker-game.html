@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revolution Idle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #020617;
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            user-select: none;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        #ui-layer {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .interactive {
+            pointer-events: auto;
+        }
+
+        .panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #1e293b, #0f172a);
+            border: 1px solid #334155;
+            color: #94a3b8;
+            transition: all 0.15s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: #334155;
+            border-color: #475569;
+            color: #f8fafc;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        .upgrade-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(71, 85, 105, 0.4);
+            transition: border-color 0.2s;
+        }
+
+        .upgrade-card:hover {
+            border-color: #3b82f6;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .glow-text {
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        #toast {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid #3b82f6;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="ui-layer">
+            <!-- Top Bar: Stats -->
+            <div class="w-full p-6 flex justify-between items-start shrink-0 pointer-events-none">
+                <div class="panel px-6 py-4 rounded-2xl flex flex-col items-center min-w-[200px]">
+                    <span class="text-xs text-slate-400 uppercase tracking-widest mb-1">Revolutions</span>
+                    <h1 id="scoreDisplay" class="text-4xl font-black text-blue-400 glow-text font-mono">0</h1>
+                    <span id="rpsDisplay" class="text-xs text-emerald-400 mt-1 font-mono">0.00 / sec</span>
+                </div>
+                
+                <div class="panel px-4 py-2 rounded-xl flex flex-col items-end">
+                    <div class="text-[10px] text-slate-500 uppercase">System Status</div>
+                    <div id="ringCountDisplay" class="text-sm font-bold text-slate-300">1 Ring Active</div>
+                    <div id="clickPowerDisplay" class="text-xs text-slate-400">Click Power: 10°</div>
+                    <div id="multiplierDisplay" class="text-xs text-purple-400">Amp: 1.0x</div>
+                    <div id="valueDisplay" class="text-xs text-yellow-400">Rev Value: 1</div>
+                    <div id="comboDisplay" class="text-xs text-orange-400 hidden">Combo: 1.0x</div>
+                    <div id="entropyDisplay" class="text-xs text-pink-400 hidden">Entropy: 0</div>
+                </div>
+                <div class="flex flex-col gap-2 pointer-events-auto">
+                    <button id="saveBtn" class="btn px-3 py-1 rounded" onclick="saveGame()">Save</button>
+                    <button id="challengesBtn" class="btn px-3 py-1 rounded border-yellow-500 text-yellow-300" onclick="openChallenges()">Challenges</button>
+                    <button id="prestigeBtn" class="btn px-3 py-1 rounded border-pink-500 text-pink-300 hidden" onclick="prestige()">Ascend</button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 flex w-full overflow-hidden pointer-events-none">
+                <!-- Click Area (Left) -->
+                <div id="clickZone" class="flex-1 interactive cursor-pointer" title="Click to Rotate"></div>
+
+                <!-- Right Sidebar: Upgrades -->
+                <div class="w-80 md:w-96 h-full p-4 pt-0 flex flex-col pointer-events-none">
+                    <div class="panel flex-1 rounded-xl p-4 flex flex-col interactive overflow-hidden">
+                        <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3 border-b border-slate-700 pb-2 sticky top-0 FMbg-slate-900/80 backdrop-blur-md z-10">Upgrades</h2>
+                        
+                        <div class="overflow-y-auto flex-1 pr-1 custom-scrollbar">
+                            <div class="mb-6">
+                                <div class="text-[10px] font-bold text-blue-400 uppercase mb-2 tracking-widest">Core Systems</div>
+                                <div id="coreUpgrades" class="flex flex-col gap-2"></div>
+                            </div>
+
+                            <div>
+                                <div class="text-[10px] font-bold text-purple-400 uppercase mb-2 tracking-widest">Ring Modules</div>
+                                <div id="ringUpgrades" class="flex flex-col gap-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="challengeModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center backdrop-blur-sm pointer-events-auto">
+        <div class="bg-slate-900 border border-slate-700 rounded-xl p-6 w-full max-w-lg shadow-2xl relative">
+            <h2 class="text-lg font-bold text-white mb-4">Challenges</h2>
+            <p class="text-xs text-slate-400 mb-4">Starting a challenge performs a Prestige reset. You must reach the goal to claim the reward.</p>
+            <div id="challengesList" class="space-y-2 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2"></div>
+            <div class="mt-4 flex gap-2">
+                <button id="abandonChallengeBtn" class="btn flex-1 py-2 rounded border-red-500 text-red-300 hidden" onclick="abandonChallenge()">Abandon Challenge</button>
+                <button class="btn flex-1 py-2 rounded" onclick="document.getElementById('challengeModal').classList.add('hidden')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">Game Saved</div>
+
+    <script>
+        // --- Game State ---
+        const game = {
+            currency: 1,
+            clickPower: 1440, // Degrees per click
+            passiveSpeed: 90, // Degrees per second
+            autoClickers: 1, // Clicks per second
+            autoClickAccumulator: 0,
+            revolutionValue: 1, // Base points per revolution
+            globalMultiplier: 1,
+            rings: [],
+            particles: [],
+            lastTime: 0,
+            totalRevolutions: 0,
+            // New state for added upgrades
+            quantumEntanglement: false,
+            echoChance: 0,
+            synergyBonus: 0,
+            comboUnlocked: false,
+            combo: 0,
+            comboTimer: 0,
+            autoClickerMultiplier: 1,
+            passiveSpeedMultiplier: 1,
+            revolutionValueMultiplier: 1,
+            ringSingularityBonus: 0,
+            clickToPassive: 0,
+            entropy: 0,
+            activeChallenge: null,
+            completedChallenges: [],
+        };
+
+        // --- Configuration ---
+        const COLORS = ['#3b82f6', '#8b5cf6', '#d946ef', '#f43f5e', '#ef4444', '#f97316', '#eab308', '#84cc16', '#10b981', '#06b6d4'];
+        
+        class Ring {
+            constructor(id) {
+                this.id = id;
+                this.angle = 0;
+                this.radius = 60 + (id * 35);
+                this.width = 12;
+                this.baseSpeed = 0; // Auto-rotation speed (deg/s)
+                this.speedMult = 1;
+                this.color = COLORS[id % COLORS.length];
+                this.unlocked = true;
+                this.level = 1;
+            }
+
+            getSpeed() {
+                const base = this.baseSpeed + game.passiveSpeed + (game.ringSingularityBonus || 0);
+                let mult = this.speedMult * (game.passiveSpeedMultiplier || 1);
+                
+                if (game.activeChallenge === 'broken_motor') return 0;
+                if (game.completedChallenges.includes('broken_motor')) mult *= 1.5;
+                
+                return base * mult;
+            }
+        }
+
+        // Initialize first ring
+        game.rings.push(new Ring(0));
+
+        // --- Upgrade System ---
+        const upgrades = [
+            {
+                id: 'passive_speed',
+                type: 'core',
+                name: 'Spin Speed',
+                desc: 'Increases base speed by 1 rev/sec.',
+                baseCost: 5,
+                costMult: 1.5,
+                level: 0,
+                apply: () => { game.passiveSpeed += 360; }
+            },
+            {
+                id: 'mr_revolution',
+                type: 'core',
+                name: 'Mr. revolution clicker',
+                desc: 'Automatically clicks 10 times/sec.',
+                baseCost: 75,
+                costMult: 2,
+                level: 0,
+                apply: () => { game.autoClickers += 40; }
+            },
+            {
+                id: 'auto_clicker',
+                type: 'core',
+                name: 'Auto Clicker',
+                desc: 'Automatically clicks 25 times/sec.',
+                baseCost: 250,
+                costMult: 2.1,
+                level: 0,
+                apply: () => { game.autoClickers += 250; }
+            },
+            {
+                id: 'industrial_motor',
+                type: 'core',
+                name: 'Industrial Motor',
+                desc: 'Auto-clicks +100 times/sec.',
+                baseCost: 2500,
+                costMult: 1.5,
+                level: 0,
+                apply: () => { game.autoClickers += 100; }
+            },
+            {
+                id: 'nuclear_reactor',
+                type: 'core',
+                name: 'Nuclear Reactor',
+                desc: 'Auto-clicks +1,000 times/sec.',
+                baseCost: 50000,
+                costMult: 1.6,
+                level: 0,
+                apply: () => { game.autoClickers += 1000; }
+            },
+            {
+                id: 'fusion_coil',
+                type: 'core',
+                name: 'Fusion Coil',
+                desc: 'Auto-clicks +5,000 times/sec.',
+                baseCost: 250000,
+                costMult: 1.7,
+                level: 0,
+                apply: () => { game.autoClickers += 5000; }
+            },
+            {
+                id: 'antimatter_drive',
+                type: 'core',
+                name: 'Antimatter Drive',
+                desc: 'Auto-clicks +25,000 times/sec.',
+                baseCost: 2000000,
+                costMult: 1.8,
+                level: 0,
+                apply: () => { game.autoClickers += 25000; }
+            },
+            {
+                id: 'warp_core',
+                type: 'core',
+                name: 'Warp Core',
+                desc: 'Auto-clicks +100,000,000 times/sec.',
+                baseCost: 50000000,
+                costMult: 2.0,
+                level: 0,
+                apply: () => { game.autoClickers += 100000000; }
+            },
+            {
+                id: 'flywheel',
+                type: 'core',
+                name: 'Heavy Flywheel',
+                desc: 'Adds +50 degrees to click power.',
+                baseCost: 75,
+                costMult: 1.6,
+                level: 0,
+                apply: () => { game.clickPower += 50; }
+            },
+            {
+                id: 'click_combo',
+                type: 'core',
+                name: 'Click Combo',
+                desc: 'Unlocks a combo multiplier for rapid manual clicks. One-time purchase.',
+                baseCost: 15000,
+                costMult: 1,
+                level: 0,
+                maxLevel: 1,
+                apply: () => { game.comboUnlocked = true; }
+            },
+            {
+                id: 'revolution_value',
+                type: 'core',
+                name: 'Passive Revs',
+                desc: 'Increases base points per revolution by +1.',
+                baseCost: 100,
+                costMult: 1.3,
+                level: 0,
+                apply: () => { game.revolutionValue += 1; }
+            },
+            {
+                id: 'echo',
+                type: 'core',
+                name: 'Revolution Echo',
+                desc: 'Each revolution has a 1% chance to count twice.',
+                baseCost: 20000,
+                costMult: 2.5,
+                level: 0,
+                apply: () => { game.echoChance = (game.echoChance || 0) + 0.01; }
+            },
+            {
+                id: 'amplifier',
+                type: 'core',
+                name: 'Harmonic Resonance',
+                desc: 'Amplifies all revolution output by 20%.',
+                baseCost: 250,
+                costMult: 3.0,
+                level: 0,
+                apply: () => { game.globalMultiplier *= 1.2; }
+            },
+            {
+                id: 'ring_singularity',
+                type: 'core',
+                name: 'Ring Singularity',
+                desc: 'Adds +50 deg/s to every ring motor.',
+                baseCost: 40000,
+                costMult: 1.8,
+                level: 0,
+                apply: () => { game.ringSingularityBonus = (game.ringSingularityBonus || 0) + 50; }
+            },
+            {
+                id: 'synergy',
+                type: 'core',
+                name: 'Synergy',
+                desc: 'Global multiplier increases by 5% for each ring beyond the first.',
+                baseCost: 50000,
+                costMult: 3,
+                level: 0,
+                apply: () => { game.synergyBonus = (game.synergyBonus || 0) + 0.05; }
+            },
+            {
+                id: 'supercharger',
+                type: 'core',
+                name: 'Supercharger',
+                desc: 'Multiplies auto-click rate by 1.5x.',
+                baseCost: 500,
+                costMult: 2.5,
+                level: 0,
+                apply: () => { game.autoClickers *= 1.5; }
+            },
+            {
+                id: 'magnetic_bearings',
+                type: 'core',
+                name: 'Magnetic Bearings',
+                desc: 'Multiplies the effectiveness of all passive speed upgrades by 50%.',
+                baseCost: 75000,
+                costMult: 2.8,
+                level: 0,
+                apply: () => { game.passiveSpeedMultiplier = (game.passiveSpeedMultiplier || 1) * 1.5; }
+            },
+            {
+                id: 'overclock',
+                type: 'core',
+                name: 'Overclock',
+                desc: 'Multiplies the effectiveness of all auto-clickers by 50%.',
+                baseCost: 80000,
+                costMult: 2.8,
+                level: 0,
+                apply: () => { game.autoClickerMultiplier = (game.autoClickerMultiplier || 1) * 1.5; }
+            },
+            {
+                id: 'atomic_clock',
+                type: 'core',
+                name: 'Atomic Clock',
+                desc: 'Adds +500 deg/s to base speed.',
+                baseCost: 1000,
+                costMult: 1.5,
+                level: 0,
+                apply: () => { game.passiveSpeed += 500; }
+            },
+            {
+                id: 'quantum_entanglement',
+                type: 'core',
+                name: 'Quantum Entanglement',
+                desc: 'All rings rotate at the speed of the fastest ring. One-time purchase.',
+                baseCost: 100000,
+                costMult: 1,
+                level: 0,
+                maxLevel: 1,
+                apply: () => { game.quantumEntanglement = true; }
+            },
+            {
+                id: 'golden_ratio',
+                type: 'core',
+                name: 'Golden Ratio',
+                desc: 'Multiplies the value of each revolution by 50%.',
+                baseCost: 120000,
+                costMult: 3.2,
+                level: 0,
+                apply: () => { game.revolutionValueMultiplier = (game.revolutionValueMultiplier || 1) * 1.5; }
+            },
+            {
+                id: 'click_singularity',
+                type: 'core',
+                name: 'Click Singularity',
+                desc: 'Each manual click also permanently increases passive speed by 0.1 deg/s.',
+                baseCost: 200000,
+                costMult: 4,
+                level: 0,
+                apply: () => { game.clickToPassive = (game.clickToPassive || 0) + 0.1; }
+            },
+            {
+                id: 'click_booster',
+                type: 'core',
+                name: 'Click Booster',
+                desc: 'Doubles your click power.',
+                baseCost: 2500,
+                costMult: 4.0,
+                level: 0,
+                apply: () => { game.clickPower *= 2; }
+            },
+            {
+                id: 'speed_booster',
+                type: 'core',
+                name: 'Speed Booster',
+                desc: 'Doubles passive rotation speed.',
+                baseCost: 2500,
+                costMult: 4.0,
+                level: 0,
+                apply: () => { game.passiveSpeed *= 2; }
+            },
+            {
+                id: 'yield_booster',
+                type: 'core',
+                name: 'Yield Booster',
+                desc: 'Doubles points per revolution.',
+                baseCost: 5000,
+                costMult: 5.0,
+                level: 0,
+                apply: () => { game.revolutionValue *= 2; }
+            },
+            {
+                id: 'time_dilation',
+                type: 'core',
+                name: 'Time Dilation',
+                desc: 'A powerful x2 global multiplier.',
+                baseCost: 500000,
+                costMult: 5,
+                level: 0,
+                apply: () => { game.globalMultiplier *= 2; }
+            },
+            {
+                id: 'click_power',
+                type: 'core',
+                name: 'Manual Crank',
+                desc: 'Increases rotation per click.',
+                baseCost: 10,
+                costMult: 1.8,
+                level: 1,
+                apply: () => { game.clickPower *= 1.5; }
+            },
+            {
+                id: 'new_ring',
+                type: 'core',
+                name: 'Expand Axle',
+                desc: 'Unlock a new outer ring.',
+                baseCost: 50,
+                costMult: 4.5,
+                level: 0,
+                apply: () => {
+                    const newId = game.rings.length;
+                    game.rings.push(new Ring(newId));
+                    generateRingUpgrades(newId);
+                    renderUpgrades();
+                }
+            }
+        ];
+
+        const ringUpgrades = [];
+
+        function generateRingUpgrades(ringId) {
+            // Auto-rotator (Motor)
+            ringUpgrades.push({
+                id: `motor_${ringId}`,
+                ringId: ringId,
+                name: `Motor Mk.${ringId + 1}`,
+                desc: `Auto-rotates Ring ${ringId + 1}.`,
+                baseCost: 15 * Math.pow(3, ringId),
+                costMult: 1.4,
+                level: 0,
+                apply: (u) => {
+                    const r = game.rings[ringId];
+                    r.baseSpeed += (10 + (ringId * 5)); 
+                }
+            });
+
+            // Speed Multiplier (Gearbox)
+            ringUpgrades.push({
+                id: `gear_${ringId}`,
+                ringId: ringId,
+                name: `Gearbox Ring ${ringId + 1}`,
+                desc: `Multiplies speed of Ring ${ringId + 1}.`,
+                baseCost: 100 * Math.pow(4, ringId),
+                costMult: 2.0,
+                level: 0,
+                apply: (u) => {
+                    const r = game.rings[ringId];
+                    r.speedMult *= 1.25;
+                }
+            });
+        }
+
+        // Generate upgrades for initial ring
+        generateRingUpgrades(0);
+
+        function getCost(u) {
+            return Math.floor(u.baseCost * Math.pow(u.costMult, u.level));
+        }
+
+        function buyUpgrade(u) {
+            const cost = getCost(u);
+            if (game.currency >= cost) {
+                if (u.maxLevel && u.level >= u.maxLevel) return;
+                game.currency -= cost;
+                u.level++;
+                u.apply(u);
+                renderUpgrades();
+                updateUI();
+            }
+        }
+
+        // --- Rendering & Logic ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function spawnParticle(x, y, color) {
+            game.particles.push({
+                x, y,
+                vx: (Math.random() - 0.5) * 4,
+                vy: (Math.random() - 0.5) * 4,
+                life: 1.0,
+                color: color
+            });
+        }
+
+        function update(dt) {
+            // Update Rings
+            let rps = 0;
+            let autoClicks = 0;
+
+            // Combo timer
+            if (game.comboUnlocked && game.comboTimer > 0) {
+                game.comboTimer -= dt;
+                if (game.comboTimer <= 0) {
+                    game.combo = 0;
+                    document.getElementById('comboDisplay').classList.add('hidden');
+                }
+            }
+
+            if (game.autoClickers > 0) {
+                let effectiveRate = game.autoClickers * game.autoClickerMultiplier;
+                
+                if (game.activeChallenge === 'manual_labor') effectiveRate = 0;
+                
+                if (effectiveRate > Infinity) effectiveRate = Infinity;
+                game.autoClickAccumulator = effectiveRate * dt;
+                autoClicks = Math.floor(game.autoClickAccumulator);
+                if (autoClicks > 0) {
+                    game.autoClickAccumulator -= autoClicks;
+                    // Visual feedback for auto-click
+                    const cx = canvas.width / 2;
+                    const cy = canvas.height / 2;
+                    spawnParticle(cx, cy, '#ffffff');
+                }
+            }
+            
+            // Synergy Multiplier
+            const synergyMultiplier = 1 + (game.rings.length - 1) * game.synergyBonus;
+            const finalMultiplier = game.globalMultiplier * synergyMultiplier * (1 + game.entropy * 0.1);
+
+            // Challenge Completion Check
+            if (game.activeChallenge) {
+                const chal = CHALLENGES.find(c => c.id === game.activeChallenge);
+                if (chal && game.totalRevolutions >= chal.goal) {
+                    game.activeChallenge = null;
+                    if (!game.completedChallenges.includes(chal.id)) {
+                        game.completedChallenges.push(chal.id);
+                        showToast(`Challenge "${chal.name}" Complete!`);
+                        openChallenges(); // Show them the success state
+                    }
+                }
+            }
+
+            // Quantum Entanglement
+            let ringSpeeds = game.rings.map(ring => ring.getSpeed());
+            if (game.quantumEntanglement) {
+                const maxSpeed = Math.max(...ringSpeeds);
+                if (isFinite(maxSpeed)) {
+                    ringSpeeds = game.rings.map(() => maxSpeed);
+                }
+            }
+            
+            game.rings.forEach((ring, index) => {
+                const speed = ringSpeeds[index];
+                const move = speed * dt;
+                
+                // Check for revolution completion
+                const oldAngle = ring.angle;
+                ring.angle += move;
+                
+                if (autoClicks > 0) {
+                    ring.angle += autoClicks * game.clickPower;
+                }
+                
+                // Calculate how many full turns happened this frame (usually 0 or 1)
+                const turns = Math.floor(ring.angle / 360) - Math.floor(oldAngle / 360);
+                
+                if (turns > 0) {
+                    let earned = turns * game.revolutionValue * game.revolutionValueMultiplier * finalMultiplier;
+                    // Echo chance
+                    if (game.echoChance > 0) {
+                        for (let i = 0; i < turns; i++) {
+                            if (Math.random() < game.echoChance) {
+                                earned += game.revolutionValue * game.revolutionValueMultiplier * finalMultiplier;
+                            }
+                        }
+                    }
+                    game.currency += earned;
+                    game.totalRevolutions += turns;
+                    
+                    // Visual flair
+                    const cx = canvas.width / 2;
+                    const cy = canvas.height / 2;
+                    // Spawn particles along the ring
+                    for(let i=0; i<8; i++) {
+                        const a = (i / 8) * Math.PI * 2;
+                        const px = cx + Math.cos(a) * ring.radius;
+                        const py = cy + Math.sin(a) * ring.radius;
+                        spawnParticle(px, py, ring.color);
+                    }
+                }
+
+                // RPS calculation (approximate)
+                rps += speed / 360;
+            });
+
+            // Update Particles
+            for (let i = game.particles.length - 1; i >= 0; i--) {
+                const p = game.particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= dt * 1.5;
+                if (p.life <= 0) game.particles.splice(i, 1);
+            }
+
+            // Update UI Text
+            document.getElementById('scoreDisplay').innerText = Math.floor(game.currency).toLocaleString();
+            document.getElementById('rpsDisplay').innerText = rps.toFixed(2) + " Revs/sec";
+            document.getElementById('ringCountDisplay').innerText = game.rings.length + " Rings Active";
+            document.getElementById('clickPowerDisplay').innerText = "Click Power: " + Math.floor(game.clickPower) + "°";
+            document.getElementById('multiplierDisplay').innerText = "Amp: " + game.globalMultiplier.toFixed(1) + "x";
+            document.getElementById('valueDisplay').innerText = "Rev Value: " + Math.floor(game.revolutionValue);
+
+            if (game.entropy > 0) {
+                document.getElementById('entropyDisplay').innerText = "Entropy: " + game.entropy;
+                document.getElementById('entropyDisplay').classList.remove('hidden');
+            }
+
+            // Update Upgrade Buttons State
+            updateUpgradeButtons();
+        }
+
+        function draw() {
+            ctx.fillStyle = '#020617';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+
+            // Draw Rings
+            ctx.lineWidth = 8;
+            ctx.lineCap = 'round';
+
+            game.rings.forEach(ring => {
+                const rad = ring.angle * (Math.PI / 180);
+                
+                // Track (dim)
+                ctx.beginPath();
+                ctx.arc(cx, cy, ring.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(30, 41, 59, 0.5)';
+                ctx.stroke();
+
+                // Progress Arc (bright)
+                ctx.beginPath();
+                // Draw from 0 to current angle
+                // We use modulo to keep the drawing clean, but logic uses accumulated angle
+                const drawAngle = (ring.angle % 360) * (Math.PI / 180);
+                ctx.arc(cx, cy, ring.radius, -Math.PI/2, -Math.PI/2 + drawAngle);
+                ctx.strokeStyle = ring.color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = ring.color;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // Head/Knob
+                const hx = cx + Math.cos(-Math.PI/2 + drawAngle) * ring.radius;
+                const hy = cy + Math.sin(-Math.PI/2 + drawAngle) * ring.radius;
+                
+                ctx.beginPath();
+                ctx.arc(hx, hy, 6, 0, Math.PI * 2);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+            });
+
+            // Draw Particles
+            game.particles.forEach(p => {
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1.0;
+        }
+
+        function loop(timestamp) {
+            const dt = (timestamp - game.lastTime) / 1000;
+            game.lastTime = timestamp;
+
+            update(dt);
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        // --- UI Rendering ---
+        function renderUpgrades() {
+            const coreContainer = document.getElementById('coreUpgrades');
+            const ringContainer = document.getElementById('ringUpgrades');
+            
+            coreContainer.innerHTML = '';
+            ringContainer.innerHTML = '';
+
+            const createCard = (u) => {
+                const cost = getCost(u);
+                const div = document.createElement('div');
+                div.className = 'upgrade-card';
+                div.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-white">${u.name}</span>
+                            <span class="text-[10px] text-blue-300">Lvl ${u.level}</span>
+                        </div>
+                        <div class="text-[10px] text-slate-400 mt-1 leading-tight">${u.desc}</div>
+                    </div>
+                    <button class="btn mt-2 w-full py-2 rounded" id="btn_${u.id}" onclick="buyUpgradeId('${u.id}', '${u.type}')">
+                        Buy ${cost.toLocaleString()}
+                    </button>
+                `;
+                return div;
+            };
+
+            upgrades.forEach(u => coreContainer.appendChild(createCard(u)));
+            ringUpgrades.forEach(u => ringContainer.appendChild(createCard(u)));
+        }
+
+        window.buyUpgradeId = (id, type) => {
+            const list = type === 'core' ? upgrades : ringUpgrades;
+            const u = list.find(x => x.id === id);
+            if (u) buyUpgrade(u);
+        };
+
+        function updateUpgradeButtons() {
+            const check = (list) => {
+                list.forEach(u => {
+                    const btn = document.getElementById(`btn_${u.id}`);
+                    if (btn) {
+                        if (u.maxLevel && u.level >= u.maxLevel) {
+                            btn.disabled = true;
+                            btn.innerText = 'Maxed';
+                        } else {
+                            const cost = getCost(u);
+                            btn.disabled = game.currency < cost;
+                            btn.innerText = `Buy ${cost.toLocaleString()}`;
+                            if (game.currency >= cost) {
+                                btn.classList.add('border-blue-500', 'text-blue-100');
+                            } else {
+                                btn.classList.remove('border-blue-500', 'text-blue-100');
+                            }
+                        }
+                    }
+                });
+            };
+            
+            // Check Prestige Availability
+            const prestigeBtn = document.getElementById('prestigeBtn');
+            if (prestigeBtn) {
+                if (game.totalRevolutions > 1000000) {
+                    prestigeBtn.classList.remove('hidden');
+                    const potential = Math.floor(Math.pow(game.totalRevolutions / 1000000, 0.5));
+                    prestigeBtn.innerText = `Ascend (+${potential} Entropy)`;
+                } else {
+                    prestigeBtn.classList.add('hidden');
+                }
+            }
+            
+            check(upgrades);
+            check(ringUpgrades);
+        }
+
+        function updateUI() {
+            // Triggered on buy
+        }
+
+        // --- Challenges ---
+        const CHALLENGES = [
+            { id: 'manual_labor', name: 'Manual Labor', desc: 'Reach 1,000 Revs. Auto-clickers disabled.', goal: 1000, reward: 'Reward: +50% Click Power' },
+            { id: 'broken_motor', name: 'Broken Motor', desc: 'Reach 5,000 Revs. No passive spin.', goal: 5000, reward: 'Reward: +50% Passive Speed' }
+        ];
+
+        // Expose functions to window for HTML onclick access
+        window.openChallenges = openChallenges;
+        window.startChallenge = startChallenge;
+        window.abandonChallenge = abandonChallenge;
+        window.prestige = prestige;
+
+        function openChallenges() {
+            const list = document.getElementById('challengesList');
+            list.innerHTML = '';
+            
+            CHALLENGES.forEach(c => {
+                const isCompleted = game.completedChallenges.includes(c.id);
+                const isActive = game.activeChallenge === c.id;
+                
+                const div = document.createElement('div');
+                div.className = `p-3 rounded border ${isActive ? 'border-yellow-500 bg-yellow-900/20' : (isCompleted ? 'border-green-500 bg-green-900/20' : 'border-slate-700 bg-slate-800/50')}`;
+                div.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-sm ${isCompleted ? 'text-green-400' : 'text-slate-200'}">${c.name}</span>
+                        ${isCompleted ? '<span class="text-[10px] bg-green-900 text-green-300 px-2 py-0.5 rounded">Completed</span>' : ''}
+                        ${isActive ? '<span class="text-[10px] bg-yellow-900 text-yellow-300 px-2 py-0.5 rounded">Active</span>' : ''}
+                    </div>
+                    <div class="text-xs text-slate-400 mb-2">${c.desc}</div>
+                    <div class="text-xs text-blue-300 mb-2">${c.reward}</div>
+                    ${!isActive && !isCompleted ? `<button class="btn w-full py-1 rounded" onclick="startChallenge('${c.id}')">Start Challenge</button>` : ''}
+                    ${isActive ? `<div class="text-xs text-yellow-400 font-mono">Progress: ${game.totalRevolutions.toLocaleString()} / ${c.goal.toLocaleString()}</div>` : ''}
+                `;
+                list.appendChild(div);
+            });
+            
+            document.getElementById('abandonChallengeBtn').classList.toggle('hidden', !game.activeChallenge);
+            document.getElementById('challengeModal').classList.remove('hidden');
+        }
+
+        function startChallenge(id) {
+            if (!confirm("Starting a challenge will reset your current run (Prestige). Are you sure?")) return;
+            
+            const earnedEntropy = Math.floor(Math.pow(game.totalRevolutions / 1000000, 0.5));
+            const newEntropy = game.entropy + earnedEntropy;
+
+            const challengeSave = {
+                currency: 0,
+                entropy: newEntropy,
+                totalRevolutions: 0,
+                upgrades: [],
+                ringUpgrades: [],
+                rings: 1,
+                activeChallenge: id,
+                completedChallenges: game.completedChallenges,
+                lastSaveTime: Date.now()
+            };
+            localStorage.setItem('revolutionIdleSave', JSON.stringify(challengeSave));
+            setTimeout(() => location.reload(), 50);
+        }
+
+        function abandonChallenge() {
+            if (!confirm("Abandon challenge? You will reset without reward.")) return;
+            prestige(true); // Force prestige reset
+        }
+
+        // --- Persistence & Prestige ---
+        function saveGame() {
+            const save = {
+                currency: game.currency,
+                entropy: game.entropy,
+                totalRevolutions: game.totalRevolutions,
+                upgrades: upgrades.map(u => ({ id: u.id, level: u.level })),
+                ringUpgrades: ringUpgrades.map(u => ({ id: u.id, level: u.level })),
+                rings: game.rings.length,
+                activeChallenge: game.activeChallenge,
+                completedChallenges: game.completedChallenges,
+                lastSaveTime: Date.now()
+            };
+            localStorage.setItem('revolutionIdleSave', JSON.stringify(save));
+            showToast("Game Saved");
+        }
+
+        function loadGame() {
+            const saveRaw = localStorage.getItem('revolutionIdleSave');
+            if (!saveRaw) return;
+            try {
+                const save = JSON.parse(saveRaw);
+                game.currency = save.currency || 0;
+                game.entropy = save.entropy || 0;
+                game.totalRevolutions = save.totalRevolutions || 0;
+                game.activeChallenge = save.activeChallenge || null;
+                game.completedChallenges = save.completedChallenges || [];
+
+                // Restore Rings
+                while (game.rings.length < (save.rings || 1)) {
+                    const newId = game.rings.length;
+                    game.rings.push(new Ring(newId));
+                    generateRingUpgrades(newId);
+                }
+                renderUpgrades();
+
+                // Restore Upgrades
+                const restoreLevels = (list, savedList) => {
+                    if (!savedList) return;
+                    savedList.forEach(s => {
+                        const u = list.find(x => x.id === s.id);
+                        if (u) {
+                            for(let i=0; i<s.level; i++) {
+                                u.level++;
+                                u.apply();
+                            }
+                        }
+                    });
+                };
+                restoreLevels(upgrades, save.upgrades);
+                restoreLevels(ringUpgrades, save.ringUpgrades);
+
+                // Offline Progress
+                if (save.lastSaveTime) {
+                    const diff = (Date.now() - save.lastSaveTime) / 1000;
+                    if (diff > 60) {
+                        // Approximate earnings
+                        let rps = 0;
+                        game.rings.forEach(r => rps += r.getSpeed() / 360);
+                        
+                        // Auto clicker contribution (approximate)
+                        const autoClickRate = game.autoClickers * game.autoClickerMultiplier;
+                        const autoClickRPS = (autoClickRate * game.clickPower) / 360;
+                        
+                        const totalRPS = rps + autoClickRPS;
+                        
+                        const synergyMultiplier = 1 + (game.rings.length - 1) * game.synergyBonus;
+                        const finalMultiplier = game.globalMultiplier * synergyMultiplier * (1 + game.entropy * 0.1);
+                        
+                        const earned = totalRPS * diff * game.revolutionValue * game.revolutionValueMultiplier * finalMultiplier;
+                        
+                        if (earned > 0) {
+                            game.currency += earned;
+                            game.totalRevolutions += Math.floor(totalRPS * diff);
+                            showToast(`Offline: +${Math.floor(earned).toLocaleString()} Revs`);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Save file corrupted", e);
+            }
+        }
+
+        function prestige(force = false) {
+            if (!force && game.totalRevolutions < 1000000) return;
+            if (!force && !confirm("Ascend? You will lose all progress but gain Entropy. Each Entropy gives +10% global production.")) return;
+            
+            const earnedEntropy = Math.floor(Math.pow(game.totalRevolutions / 1000000, 0.5));
+            const newEntropy = game.entropy + earnedEntropy;
+            
+            // Hard Reset but keep Entropy
+            localStorage.removeItem('revolutionIdleSave');
+            
+            const prestigeSave = {
+                currency: 0,
+                entropy: newEntropy,
+                totalRevolutions: 0,
+                upgrades: [],
+                ringUpgrades: [],
+                rings: 1,
+                activeChallenge: null,
+                completedChallenges: game.completedChallenges,
+                lastSaveTime: Date.now()
+            };
+            localStorage.setItem('revolutionIdleSave', JSON.stringify(prestigeSave));
+            setTimeout(() => location.reload(), 50);
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.opacity = 1;
+            setTimeout(() => t.style.opacity = 0, 3000);
+        }
+
+        // Auto Save
+        setInterval(saveGame, 30000);
+
+        // --- Input ---
+        document.getElementById('clickZone').addEventListener('mousedown', (e) => {
+            // Add rotation to all rings based on click power
+            // Visual feedback
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Combo logic
+            if (game.comboUnlocked) {
+                game.combo++;
+                game.comboTimer = 2; // 2 seconds to next click
+                const comboMult = 1 + Math.log10(1 + game.combo);
+                const comboDisplay = document.getElementById('comboDisplay');
+                comboDisplay.innerText = `Combo: ${comboMult.toFixed(1)}x`;
+                comboDisplay.classList.remove('hidden');
+            }
+            const comboMultiplier = game.comboUnlocked ? (1 + Math.log10(1 + game.combo)) : 1;
+            let effectiveClickPower = game.clickPower * comboMultiplier;
+            
+            if (game.completedChallenges.includes('manual_labor')) effectiveClickPower *= 1.5;
+
+            // Click Singularity
+            if (game.clickToPassive > 0) {
+                game.passiveSpeed += game.clickToPassive;
+            }
+            
+            game.rings.forEach(ring => {
+                ring.angle += effectiveClickPower;
+                // Check revolution immediately for responsiveness
+                if (ring.angle >= 360) {
+                    const revs = Math.floor(ring.angle / 360);
+                    const synergyMultiplier = 1 + (game.rings.length - 1) * game.synergyBonus;
+                    const finalMultiplier = game.globalMultiplier * synergyMultiplier * (1 + game.entropy * 0.1);
+                    let earned = revs * game.revolutionValue * game.revolutionValueMultiplier * finalMultiplier;
+                    game.currency += earned;
+                    game.totalRevolutions += revs;
+                    ring.angle %= 360;
+                }
+            });
+
+            // Click particle
+            for(let i=0; i<5; i++) {
+                spawnParticle(x, y, '#ffffff');
+            }
+        });
+
+        // Start
+        loadGame();
+        renderUpgrades();
+        game.lastTime = performance.now();
+        requestAnimationFrame(loop);
+
+    </script>
+</body>
+</html>

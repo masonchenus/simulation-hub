@@ -1,0 +1,98 @@
+[
+  {
+    "preset": "Binary Tree",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/Binary_Tree.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "preset": "Golden Spiral",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/Golden_Spiral.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "preset": "Collatz (27)",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/Collatz_27.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "preset": "Ulam Prime Spiral",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/Ulam_Prime_Spiral.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "preset": "Hilbert Curve",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/Hilbert_Curve.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "preset": "Number Galaxy",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/Number_Galaxy.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "preset": "Circuit Board",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/Circuit_Board.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "preset": "Snowflake Factor",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/Snowflake_Factor.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "preset": "City Block",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/City_Block.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "preset": "DNA Strand",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/DNA_Strand.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "preset": "Pythagorean Tree",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/Pythagorean_Tree.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "preset": "Dragon Curve (L-Sys)",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/Dragon_Curve_L-Sys.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "preset": "Digital Plant (L-Sys)",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/Digital_Plant_L-Sys.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "preset": "Game of Life (Grid)",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/Game_of_Life_Grid.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "preset": "Prime Lattice",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/Prime_Lattice.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "preset": "V-Tree",
+    "screenshot": "output/fractal-presets-smoke-run5/presets/V-Tree.png",
+    "ok": true,
+    "errors": 0
+  }
+]

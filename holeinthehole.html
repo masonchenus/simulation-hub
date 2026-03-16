@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Flashing Screen</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container"></div>
+
+  <script>
+    const container = document.getElementById("container");
+
+    function flashScreen() {
+      setInterval(() => {
+        container.style.backgroundColor = container.style.backgroundColor === "red" ? "blue" : "red";
+      }, 5);
+    }
+
+    flashScreen();
+  </script>
+  <script src="js/app-guardian.js"></script>
+</body>
+
+</html>

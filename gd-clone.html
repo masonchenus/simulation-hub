@@ -1,0 +1,3212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	    <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	    <title>Geometry Dash Ultimate</title>
+	    <link rel="icon" href="data:,">
+	    <script src="https://cdn.tailwindcss.com"></script>
+	    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            font-family: sans-serif;
+            touch-action: manipulation;
+        }
+
+        canvas {
+            display: block;
+            background: #0044cc;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+        }
+
+        .interactive {
+            pointer-events: auto;
+        }
+
+        .gd-shadow {
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        .progress-container {
+            position: absolute;
+            top: 20px;
+            width: 60%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1.5px solid white;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: #00ff00;
+        }
+
+        .editor-panel {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 10px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border: 1px solid #555;
+            width: 98vw;
+            max-width: 800px;
+        }
+
+        .tool-row {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+
+        .tool-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tool-btn {
+            min-width: 42px;
+            height: 42px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1.5px solid transparent;
+            font-size: 7px;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            background: rgba(255, 255, 255, 0.08);
+            flex-shrink: 0;
+        }
+
+        .tool-btn.active {
+            border-color: #00ff00;
+            background: #222;
+        }
+
+        .tool-label {
+            font-size: 6px;
+            margin-top: 1px;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        .tip-box {
+            position: absolute;
+            top: 60px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 10px;
+            color: #aaa;
+            pointer-events: none;
+        }
+
+        #editor-scroll-container {
+            position: absolute;
+            top: 15px;
+            width: 70%;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #level-scrollbar {
+            flex-grow: 1;
+            height: 8px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            outline: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        #level-scrollbar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 18px;
+            background: #0cf;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+
+        .debug-panel {
+            position: absolute;
+            top: 100px;
+            left: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 160px;
+        }
+
+        .debug-btn {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #fff;
+            color: #fff;
+            font-size: 9px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .debug-btn.active {
+            background: #ff3300;
+            border-color: #ff3300;
+            box-shadow: 0 0 10px rgba(255, 51, 0, 0.5);
+        }
+
+        .debug-slider-box {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #444;
+            padding: 8px;
+            border-radius: 6px;
+            pointer-events: auto;
+        }
+
+        .debug-label {
+            font-size: 8px;
+            color: #0cf;
+            font-weight: bold;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        #slomo-slider {
+            width: 100%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="ui-layer">
+        <div id="menu" class="interactive text-center mt-24">
+            <div id="menu-main">
+                <h1 class="text-5xl font-black gd-shadow mb-6 italic tracking-tighter">GEOMETRY DASH</h1>
+                <div class="flex gap-4 items-center justify-center">
+                    <button onclick="openPlaySelect()"
+                        class="bg-green-500 hover:bg-green-400 border-b-4 border-green-700 px-8 py-4 rounded-xl transition-all active:translate-y-1 font-bold text-lg">PLAY</button>
+                    <button onclick="openMyLevels()"
+                        class="bg-purple-500 hover:bg-purple-400 border-b-4 border-purple-700 px-6 py-4 rounded-xl transition-all active:translate-y-1 font-bold text-lg">MY LEVELS</button>
+                    <button onclick="startEditMode()"
+                        class="bg-blue-500 hover:bg-blue-400 border-b-4 border-blue-700 px-8 py-4 rounded-xl transition-all active:translate-y-1 font-bold text-lg">CREATE</button>
+                </div>
+            </div>
+
+            <div id="play-select" class="hidden mt-8 flex justify-center">
+                <div class="w-[min(520px,92vw)] bg-black/70 border border-white/15 rounded-2xl p-5">
+                    <div class="text-lg font-black tracking-wide gd-shadow">PLAY MODE</div>
+                    <div class="text-[10px] opacity-80 mt-1">Pick difficulty + gamemode focus, then start a preset level.</div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 text-left">
+                        <div>
+                            <div class="text-[10px] font-bold opacity-80 mb-1">DIFFICULTY</div>
+                            <select id="play-difficulty"
+                                class="interactive w-full bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-[12px]">
+                                <option value="easy">Easy</option>
+                                <option value="normal">Normal</option>
+                                <option value="hard">Hard</option>
+                                <option value="harder">Harder</option>
+                                <option value="insane">Insane</option>
+                                <option value="easy_demon">Easy Demon</option>
+                                <option value="medium_demon">Medium Demon</option>
+                                <option value="hard_demon">Hard Demon</option>
+                                <option value="insane_demon">Insane Demon</option>
+                                <option value="extreme_demon">Extreme Demon</option>
+                            </select>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold opacity-80 mb-1">GAMEMODE FOCUS</div>
+                            <select id="play-focus"
+                                class="interactive w-full bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-[12px]">
+                                <option value="all">All Gamemodes (Mixed)</option>
+                                <option value="cube">Cube</option>
+                                <option value="ship">Ship</option>
+                                <option value="ufo">UFO</option>
+                                <option value="wave">Wave</option>
+                                <option value="ball">Ball</option>
+                                <option value="robot">Robot</option>
+                                <option value="spider">Spider</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="play-level-info" class="mt-3 text-[11px] opacity-90"></div>
+
+                    <div class="flex gap-3 items-center justify-center mt-4">
+                        <button id="play-start-btn" onclick="startPlayFromSelection()"
+                            class="bg-green-500 hover:bg-green-400 border-b-4 border-green-700 px-6 py-3 rounded-xl transition-all active:translate-y-1 font-bold text-sm">START</button>
+                        <button onclick="rerollPlayCandidate()"
+                            class="bg-white/10 hover:bg-white/15 border-b-4 border-white/10 px-5 py-3 rounded-xl transition-all active:translate-y-1 font-bold text-sm">REROLL</button>
+                        <button onclick="closePlaySelect()"
+                            class="bg-red-600 hover:bg-red-500 border-b-4 border-red-800 px-5 py-3 rounded-xl transition-all active:translate-y-1 font-bold text-sm">BACK</button>
+                    </div>
+                    <div class="text-[10px] opacity-70 mt-3 text-center">
+                        Controls: Space (player A) • Up Arrow (dual player B)
+                    </div>
+                </div>
+            </div>
+
+            <div id="my-levels-select" class="hidden mt-8 flex justify-center">
+                <div class="w-[min(520px,92vw)] bg-black/70 border border-white/15 rounded-2xl p-5">
+                    <div class="text-lg font-black tracking-wide gd-shadow">MY LEVELS</div>
+                    <div id="my-levels-list" class="mt-4 flex flex-col gap-2 max-h-[50vh] overflow-y-auto">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="flex gap-3 items-center justify-center mt-4">
+                        <button onclick="closeMyLevels()"
+                            class="bg-red-600 hover:bg-red-500 border-b-4 border-red-800 px-5 py-3 rounded-xl transition-all active:translate-y-1 font-bold text-sm">BACK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-ui" class="hidden w-full flex justify-center">
+            <div class="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            <div id="percent-text" class="absolute top-8 font-bold text-sm gd-shadow">0%</div>
+            <div id="level-title" class="absolute top-14 text-[10px] opacity-80 gd-shadow"></div>
+	            <button onclick="showMenu()" tabindex="-1"
+	                class="interactive absolute top-4 left-4 bg-black/50 p-2 rounded text-[10px] border border-white/20">QUIT</button>
+
+            <div id="practice-panel"
+                class="interactive absolute top-4 right-4 bg-black/60 border border-white/20 rounded-lg px-2 py-2 flex items-center gap-2 text-[10px]">
+                <button id="practice-toggle" onclick="togglePracticeMode()" class="debug-btn">PRACTICE: OFF</button>
+                <button id="checkpoint-btn" onclick="addPracticeCheckpoint()" class="debug-btn">SET CP</button>
+                <button id="checkpoint-clear" onclick="clearPracticeCheckpoints()" class="debug-btn">CLEAR</button>
+                <div id="checkpoint-count" class="opacity-80">0 CP</div>
+            </div>
+
+            <!-- In-game Debug tools -->
+            <div class="debug-panel mt-4 ml-4">
+                <div class="debug-slider-box mb-2">
+                    <span class="debug-label">SPEED: <span id="speed-val">100%</span></span>
+                    <input type="range" id="slomo-slider" min="1" max="60" value="60" oninput="updateSlomo(this.value)">
+                </div>
+                <div class="debug-slider-box mb-2">
+                    <span class="debug-label">AUTOCLICK: <span id="autoclick-val">OFF</span></span>
+                    <div class="flex gap-2 items-center">
+                        <button id="autoclick-toggle" onclick="toggleAutoClick()" class="debug-btn interactive">AUTO: OFF</button>
+                        <select id="autoclick-target" onchange="setAutoClickTarget(this.value)"
+                            class="interactive bg-black/40 border border-white/20 rounded px-2 py-1 text-[10px]">
+                            <option value="a">A</option>
+                            <option value="b">B</option>
+                            <option value="both">BOTH</option>
+                        </select>
+                    </div>
+                    <div class="mt-2">
+                        <input type="range" id="autoclick-cps" min="1" max="120000" value="12"
+                            oninput="setAutoClickCps(this.value)" />
+                    </div>
+                </div>
+                <button id="noclip-game-toggle" onclick="toggleNoclip()" class="debug-btn interactive">NOCLIP:
+                    OFF</button>
+                <button id="trail-game-toggle" onclick="toggleTrail()" class="debug-btn interactive">HITBOX TRAIL:
+                    OFF</button>
+                <button id="predict-game-toggle" onclick="togglePrediction()" class="debug-btn interactive">PREDICTION:
+                    ON</button>
+                <button onclick="clearTrail()" class="debug-btn interactive">CLEAR TRAIL</button>
+            </div>
+        </div>
+
+        <div id="editor-ui" class="hidden w-full h-full">
+            <div id="editor-level-title" class="absolute top-4 right-4 text-sm font-bold opacity-80 gd-shadow"></div>
+            <div id="editor-scroll-container" class="interactive">
+                <span class="text-[10px] font-bold opacity-70">START</span>
+                <input type="range" id="level-scrollbar" min="0" max="10000" value="0"
+                    oninput="updateEditorCamera(this.value)">
+                <span class="text-[10px] font-bold opacity-70">END</span>
+            </div>
+
+	            <div class="debug-panel">
+	                <button id="hitbox-toggle" onclick="toggleHitboxes()" class="debug-btn interactive">HITBOX VIEWER:
+	                    OFF</button>
+	                <button id="trail-toggle" onclick="toggleTrail()" class="debug-btn interactive">HITBOX TRAIL:
+	                    OFF</button>
+	                <button id="noclip-toggle" onclick="toggleNoclip()" class="debug-btn interactive">NOCLIP: OFF</button>
+	                <button id="predict-toggle" onclick="togglePrediction()" class="debug-btn interactive">PREDICTION:
+	                    ON</button>
+	                <button id="tilt-toggle" onclick="toggleTiltStep()" class="debug-btn interactive">TILT STEP: 90°</button>
+	                <div class="debug-slider-box mt-2">
+	                    <span class="debug-label">AUTOCLICK: <span id="autoclick-val-editor">OFF</span></span>
+	                    <div class="flex gap-2 items-center">
+	                        <button id="autoclick-toggle-editor" onclick="toggleAutoClick()" class="debug-btn interactive">AUTO: OFF</button>
+	                        <select id="autoclick-target-editor" onchange="setAutoClickTarget(this.value)"
+                            class="interactive bg-black/40 border border-white/20 rounded px-2 py-1 text-[10px]">
+                            <option value="a">A</option>
+                            <option value="b">B</option>
+                            <option value="both">BOTH</option>
+                        </select>
+                    </div>
+                    <div class="mt-2">
+                        <input type="range" id="autoclick-cps-editor" min="1" max="120000" value="12"
+                            oninput="setAutoClickCps(this.value)" />
+                    </div>
+                </div>
+                <div class="debug-slider-box mt-2">
+                    <span class="debug-label">SLO-MO: <span id="editor-speed-val">100%</span></span>
+                    <input type="range" id="editor-slomo-slider" min="1" max="60" value="60"
+                        oninput="updateSlomo(this.value)">
+                </div>
+                <button onclick="clearTrail()" class="debug-btn interactive mt-2">CLEAR TRAIL</button>
+            </div>
+
+            <div class="tip-box">
+                <div class="font-bold text-white mb-1">EDITOR TIPS:</div>
+                • Shift + Drag to Select Region<br>
+                • Ctrl+C / Ctrl+V to Copy/Paste Selection<br>
+                • Arrows to nudge (1px)<br>
+                • Shift + Arrows to nudge (5px)<br>
+                • Space to Play/Pause Test
+            </div>
+
+            <div class="absolute top-12 left-4 flex flex-col gap-2">
+                <button onclick="showMenu()"
+                    class="interactive bg-red-600 px-3 py-1 rounded font-bold text-[10px]">EXIT</button>
+                <button onclick="saveCurrentLevel()"
+                    class="interactive bg-green-600 px-3 py-1 rounded font-bold text-[10px]">SAVE</button>
+                <button onclick="clearLevel()"
+                    class="interactive bg-gray-700 px-3 py-1 rounded font-bold text-[10px]">CLEAR</button>
+            </div>
+
+            <div class="editor-panel interactive">
+                <div class="tool-row">
+	                    <div id="tool-1" onclick="setTool(1)" class="tool-btn active">
+	                        <div class="w-3 h-3 border border-white"></div><span class="tool-label">Block</span>
+	                    </div>
+	                    <div id="tool-block_small" onclick="setTool('block_small')" class="tool-btn">S-BLOCK</div>
+	                    <div id="tool-slope_22_5" onclick="setTool('slope_22_5')" class="tool-btn bg-white/10">SLP<br>22.5</div>
+	                    <div id="tool-slope_45" onclick="setTool('slope_45')" class="tool-btn bg-white/10">SLP<br>45</div>
+	                    <div id="tool-slope_90" onclick="setTool('slope_90')" class="tool-btn bg-white/10">SLP<br>90</div>
+	                    <div id="tool-spike_small" onclick="setTool('spike_small')" class="tool-btn">S-SPIKE</div>
+	                    <div id="tool-spike_mini" onclick="setTool('spike_mini')" class="tool-btn">M-SPIKE</div>
+	                    <div id="tool-spike_flat" onclick="setTool('spike_flat')" class="tool-btn">FLAT</div>
+	                    <div id="tool-spike_normal" onclick="setTool('spike_normal')" class="tool-btn">SPIKE</div>
+                    <div id="tool-spike_big" onclick="setTool('spike_big')" class="tool-btn">BIG</div>
+                    <div id="tool-spike_long" onclick="setTool('spike_long')" class="tool-btn">XL</div>
+                    <div id="tool-spike_small_ud" onclick="setTool('spike_small_ud')" class="tool-btn">S-SPIKE<br>UD</div>
+                    <div id="tool-spike_mini_ud" onclick="setTool('spike_mini_ud')" class="tool-btn">M-SPIKE<br>UD</div>
+                    <div id="tool-spike_flat_ud" onclick="setTool('spike_flat_ud')" class="tool-btn">FLAT<br>UD</div>
+                    <div id="tool-spike_normal_ud" onclick="setTool('spike_normal_ud')" class="tool-btn">SPIKE<br>UD</div>
+                    <div id="tool-spike_big_ud" onclick="setTool('spike_big_ud')" class="tool-btn">BIG<br>UD</div>
+                    <div id="tool-spike_long_ud" onclick="setTool('spike_long_ud')" class="tool-btn">XL<br>UD</div>
+                    <div id="tool-saw_sm" onclick="setTool('saw_sm')" class="tool-btn">SAW S</div>
+                    <div id="tool-saw_md" onclick="setTool('saw_md')" class="tool-btn">SAW M</div>
+                    <div id="tool-saw_lg" onclick="setTool('saw_lg')" class="tool-btn">SAW L</div>
+                    <div id="tool-grav_up" onclick="setTool('grav_up')" class="tool-btn bg-yellow-500/40">G-UP</div>
+                    <div id="tool-grav_down" onclick="setTool('grav_down')" class="tool-btn bg-blue-500/40">G-DOWN</div>
+                    <div id="tool-orb_yellow" onclick="setTool('orb_yellow')" class="tool-btn bg-yellow-400/35">Y-ORB
+                    </div>
+                    <div id="tool-orb_pink" onclick="setTool('orb_pink')" class="tool-btn bg-pink-500/35">P-ORB</div>
+                    <div id="tool-orb_green" onclick="setTool('orb_green')" class="tool-btn bg-green-500/35">G-ORB</div>
+                    <div id="tool-orb_blue" onclick="setTool('orb_blue')" class="tool-btn bg-sky-400/35">B-ORB</div>
+                    <div id="tool-orb_black" onclick="setTool('orb_black')" class="tool-btn bg-white/10">K-ORB</div>
+                    <div id="tool-orb_dash_green" onclick="setTool('orb_dash_green')" class="tool-btn bg-green-500/20">
+                        D-GORB</div>
+                    <div id="tool-orb_dash_purple" onclick="setTool('orb_dash_purple')" class="tool-btn bg-purple-500/25">
+                        D-PORB</div>
+                    <div id="tool-pad_yellow" onclick="setTool('pad_yellow')" class="tool-btn bg-yellow-400/25">Y-PAD
+                    </div>
+                    <div id="tool-pad_pink" onclick="setTool('pad_pink')" class="tool-btn bg-pink-500/25">P-PAD</div>
+                    <div id="tool-pad_green" onclick="setTool('pad_green')" class="tool-btn bg-green-500/25">G-PAD</div>
+                    <div id="tool-pad_blue" onclick="setTool('pad_blue')" class="tool-btn bg-sky-400/25">B-PAD</div>
+                    <div id="tool-pad_black" onclick="setTool('pad_black')" class="tool-btn bg-white/10">K-PAD</div>
+                    <div id="tool-prop_spin" onclick="setTool('prop_spin')" class="tool-btn bg-yellow-500/20">DECO</div>
+                    <div id="tool-eraser" onclick="setTool('eraser')" class="tool-btn bg-red-900/60">DEL</div>
+                </div>
+                <div class="tool-row">
+                    <div id="tool-portal_cube" onclick="setTool('portal_cube')" class="tool-btn bg-green-500/20">CUBE
+                    </div>
+                    <div id="tool-portal_ship" onclick="setTool('portal_ship')" class="tool-btn bg-blue-500/20">SHIP
+                    </div>
+                    <div id="tool-portal_ball" onclick="setTool('portal_ball')" class="tool-btn bg-red-500/20">BALL
+                    </div>
+                    <div id="tool-portal_ufo" onclick="setTool('portal_ufo')" class="tool-btn bg-orange-500/20">UFO
+                    </div>
+                    <div id="tool-portal_wave" onclick="setTool('portal_wave')" class="tool-btn bg-cyan-500/20">WAVE
+                    </div>
+                    <div id="tool-portal_robot" onclick="setTool('portal_robot')" class="tool-btn bg-gray-500/20">ROBOT
+                    </div>
+                    <div id="tool-portal_spider" onclick="setTool('portal_spider')" class="tool-btn bg-purple-500/20">
+                        SPIDER</div>
+                    <div id="tool-size_big" onclick="setTool('size_big')" class="tool-btn bg-white/10">BIG<br>SIZE</div>
+                    <div id="tool-size_mini" onclick="setTool('size_mini')" class="tool-btn bg-white/10">MINI<br>SIZE</div>
+                    <div id="tool-speed_0_2" onclick="setTool('speed_0_2')" class="tool-btn bg-white/10">SPD<br>0.2x</div>
+                    <div id="tool-speed_0_5" onclick="setTool('speed_0_5')" class="tool-btn bg-white/10">SPD<br>0.5x</div>
+                    <div id="tool-speed_1" onclick="setTool('speed_1')" class="tool-btn bg-white/10">SPD<br>1x</div>
+                    <div id="tool-speed_2" onclick="setTool('speed_2')" class="tool-btn bg-white/10">SPD<br>2x</div>
+                    <div id="tool-speed_3" onclick="setTool('speed_3')" class="tool-btn bg-white/10">SPD<br>3x</div>
+                    <div id="tool-speed_4" onclick="setTool('speed_4')" class="tool-btn bg-white/10">SPD<br>4x</div>
+                    <div id="tool-speed_5" onclick="setTool('speed_5')" class="tool-btn bg-white/10">SPD<br>5x</div>
+                    <div id="tool-dual_on" onclick="setTool('dual_on')" class="tool-btn bg-white/10">DUAL<br>ON</div>
+                    <div id="tool-dual_off" onclick="setTool('dual_off')" class="tool-btn bg-white/10">DUAL<br>OFF</div>
+                    <button onclick="startPlayMode(true)"
+                        class="bg-green-600 px-4 rounded-md font-bold text-[10px] h-11 ml-auto">TEST</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-over"
+            class="hidden interactive text-center bg-black/95 p-8 rounded-2xl border-2 border-green-500 mt-32">
+            <h2 class="text-3xl font-black gd-shadow text-green-400 mb-4">LEVEL COMPLETE</h2>
+            <div class="flex gap-3 items-center justify-center">
+                <button id="next-level-btn" onclick="playNextLevel()"
+                    class="hidden bg-green-500 text-black px-6 py-2 rounded-full font-bold">NEXT</button>
+                <button onclick="restartCurrentLevel()" class="bg-white/10 border border-white/20 px-6 py-2 rounded-full font-bold">RETRY</button>
+                <button onclick="showMenu()" class="bg-white text-black px-6 py-2 rounded-full font-bold">MENU</button>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+    <div id="crash-overlay" class="hidden interactive"
+        style="position:fixed;right:14px;bottom:14px;left:auto;top:auto;background:transparent;color:white;z-index:99999;display:none;padding:0;pointer-events:none;">
+        <div
+            style="pointer-events:auto;width:min(720px,92vw);max-height:52vh;overflow:auto;background:rgba(17,24,39,0.92);border:1px solid rgba(255,255,255,0.16);border-radius:16px;padding:14px;box-shadow:0 30px 90px rgba(0,0,0,0.55);">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                <div style="font-weight:900;letter-spacing:0.08em;text-transform:uppercase;color:#fb7185;">Error Overlay</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+                    <button id="crash-copy" class="debug-btn">COPY</button>
+                    <button id="crash-resume" class="debug-btn active">HIDE</button>
+                    <button id="crash-reset" class="debug-btn">RESET</button>
+                </div>
+            </div>
+            <div style="margin-top:6px;color:rgba(255,255,255,0.78);font-size:12px;line-height:1.35;">
+                The game continues running. This panel is for any error (even minor) so it can be fixed.
+            </div>
+            <pre id="crash-text"
+                style="margin-top:10px;max-height:40vh;overflow:auto;background:rgba(0,0,0,0.35);padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);font-size:12px;white-space:pre-wrap;"></pre>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const progressBar = document.getElementById('progress-bar');
+        const percentText = document.getElementById('percent-text');
+        const levelScrollbar = document.getElementById('level-scrollbar');
+        const levelTitle = document.getElementById('level-title');
+        const menuMain = document.getElementById('menu-main');
+        const playSelect = document.getElementById('play-select');
+        const playDifficultySel = document.getElementById('play-difficulty');
+        const playFocusSel = document.getElementById('play-focus');
+        const playLevelInfo = document.getElementById('play-level-info');
+        const playStartBtn = document.getElementById('play-start-btn');
+        const myLevelsSelect = document.getElementById('my-levels-select');
+        const myLevelsList = document.getElementById('my-levels-list');
+        const nextLevelBtn = document.getElementById('next-level-btn');
+        const practiceToggleBtn = document.getElementById('practice-toggle');
+        const checkpointBtn = document.getElementById('checkpoint-btn');
+        const checkpointClearBtn = document.getElementById('checkpoint-clear');
+        const checkpointCount = document.getElementById('checkpoint-count');
+        if (!ctx) {
+            throw new Error('Canvas 2D context not available');
+        }
+
+        // --- GD PHYSICS CONSTANTS ---
+        const SPEED = 7.15;
+        const GRAVITY_CUBE = 0.95;
+        const TERMINAL_VELOCITY = 15;
+        const JUMP_FORCE_CUBE = -12.9;
+        const SHIP_THRUST = -0.42;
+        const SHIP_GRAVITY = 0.36;
+        const SHIP_DRAG = 0.985;
+	        const UFO_FORCE = -11;
+	        const WAVE_VELOCITY = 6.8;
+	        // Mini wave should be steeper (≈75°) like GD. Angle is controlled by vY vs constant forward SPEED.
+	        // tan(75°) * SPEED ≈ 3.73 * 7.15 ≈ 26.7
+	        const WAVE_VELOCITY_MINI = 13.6;
+	        const WAVE_VELOCITY_MAX = 40;
+	        const ROBOT_MAX_JUMP = 20;
+
+        const PLAYER_SIZE = 34;
+        const GROUND_Y_OFFSET = 120;
+        const GRID_SIZE = 40;
+        const HITBOX_BUFFER = 4;
+
+        let gameState = 'MENU', cameraX = 0, selectedTool = 1, globalTimer = 0;
+        let manualInputA = false; // raw (space/touch/mouse)
+        let manualInputB = false; // raw (arrow up)
+        let inputA = false; // effective (manual || autoclick)
+        let inputB = false; // effective (manual || autoclick)
+        let showHitboxes = false;
+        let showTrail = false;
+        let noclipEnabled = false;
+	        let showPrediction = true;
+	        let dualEnabled = false;
+	        let speedMultiplier = 1.0; // Speed portals: 0.2x .. 5x
+	        let gameSpeedFactor = 1.0; // 1.0 = Normal, 1/60 = Slo-Mo
+	        let frameAccumulator = 0;
+	        let suppressPhysicsInDraw = false; // used by advanceTime() to render deterministically without double-stepping
+	        let spikeRotationStep = 90; // editor rotation increment for spikes (90° or 45°)
+	        let playerTrail = []; // Stores objects: {x, y, w, h}
+
+        const makePlayer = (tint, id) => ({
+            id,
+            tint,
+            x: 100, y: 0, v: 0, rotation: 0,
+            onGround: false, mode: 'cube', gravity: 1,
+            coyote: 0, robotJumpTime: 0,
+            scale: 1,
+            dashFrames: 0,
+            dashBoost: 0,
+            waveKickFrames: 0,
+            waveKickV: 0
+        });
+
+        let player = makePlayer('#22c55e', 'a');
+        let player2 = null;
+        let levelData = [{ type: 'end', x: 40000 }];
+        const USER_LEVELS_KEY = 'gd_user_levels';
+        let currentLevelName = null;
+
+        function getSavedLevels() {
+            try {
+                const data = localStorage.getItem(USER_LEVELS_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                console.warn('Failed to get saved levels:', e);
+                return [];
+            }
+        }
+
+        function saveLevelToSlot(name, data, silent = false) {
+            if (!name) return false;
+            let levels = getSavedLevels();
+            const existingIndex = levels.findIndex(l => l.name === name);
+            const levelEntry = { name, data: JSON.parse(JSON.stringify(data)), updatedAt: new Date().toISOString() };
+            if (existingIndex > -1) {
+                levels[existingIndex] = levelEntry;
+            } else {
+                levels.push(levelEntry);
+            }
+            try {
+                localStorage.setItem(USER_LEVELS_KEY, JSON.stringify(levels));
+                return true;
+            } catch (e) {
+                console.warn('Save to slot failed:', e);
+                if (!silent) alert('Failed to save level. Storage might be full.');
+                return false;
+            }
+        }
+
+        function deleteLevelFromSlot(name, silent = false) {
+            if (!silent && !confirm(`Are you sure you want to delete "${name}"?`)) return;
+            let levels = getSavedLevels();
+            levels = levels.filter(l => l.name !== name);
+            try {
+                localStorage.setItem(USER_LEVELS_KEY, JSON.stringify(levels));
+            } catch (e) {
+                console.warn('Delete from slot failed:', e);
+            }
+            if (!silent) renderMyLevels();
+        }
+
+        function loadLevelFromSlot(name) {
+            const levels = getSavedLevels();
+            const level = levels.find(l => l.name === name);
+            if (level && level.data) {
+                levelData = level.data;
+                const endObj = levelData.find(o => o.type === 'end');
+                if (endObj && levelScrollbar) levelScrollbar.max = Math.max(4000, endObj.x + 1000);
+                // When loading a named level, we can clear the generic __autosave__ slot.
+                deleteLevelFromSlot('__autosave__', true);
+                startEditMode(name);
+            }
+        }
+
+        function autoSave() {
+            if (gameState !== 'EDITING') return;
+            const saveName = currentLevelName || '__autosave__';
+            // Silently save in the background without alerts on failure.
+            saveLevelToSlot(saveName, levelData, true);
+        }
+
+	        let lastCrashAt = -99999;
+	        let lastFrameAt = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+	        let lastActivityAt = lastFrameAt;
+            let rafHandle = null;
+	        let lastPlayingAt = -99999;
+	        let forceLoopForever = false;
+	        let lastLevelSource = 'editor'; // 'editor' | 'play'
+	        let playRunMeta = null; // { id, name, difficulty, focus, seed }
+        let playCandidate = null; // current menu candidate
+        let autoClickEnabled = false;
+        let autoClickCps = 12;
+        let autoClickTarget = 'a'; // 'a' | 'b' | 'both'
+        let autoClickTick = 0;
+        let autoClickAcc = 0; // fractional clicks accumulator
+        let practiceMode = false;
+        let practiceCheckpoints = [];
+
+        const crashOverlay = document.getElementById('crash-overlay');
+        const crashText = document.getElementById('crash-text');
+        const crashCopy = document.getElementById('crash-copy');
+        const crashResume = document.getElementById('crash-resume');
+        const crashReset = document.getElementById('crash-reset');
+        const _origConsoleError = (() => { try { return console.error.bind(console); } catch { return () => { }; } })();
+        const _origConsoleWarn = (() => { try { return console.warn.bind(console); } catch { return () => { }; } })();
+        const _origConsoleLog = (() => { try { return console.log.bind(console); } catch { return () => { }; } })();
+
+        // --- PLAY MODE (preset library + filters) ---
+        const PLAY_DIFFICULTIES = [
+            { id: 'easy', label: 'Easy', tier: 1 },
+            { id: 'normal', label: 'Normal', tier: 2 },
+            { id: 'hard', label: 'Hard', tier: 3 },
+            { id: 'harder', label: 'Harder', tier: 4 },
+            { id: 'insane', label: 'Insane', tier: 5 },
+            { id: 'easy_demon', label: 'Easy Demon', tier: 6 },
+            { id: 'medium_demon', label: 'Medium Demon', tier: 7 },
+            { id: 'hard_demon', label: 'Hard Demon', tier: 8 },
+            { id: 'insane_demon', label: 'Insane Demon', tier: 9 },
+            { id: 'extreme_demon', label: 'Extreme Demon', tier: 10 },
+        ];
+
+        const PLAY_FOCUS = [
+            { id: 'all', label: 'All Gamemodes (Mixed)' },
+            { id: 'cube', label: 'Cube' },
+            { id: 'ship', label: 'Ship' },
+            { id: 'ufo', label: 'UFO' },
+            { id: 'wave', label: 'Wave' },
+            { id: 'ball', label: 'Ball' },
+            { id: 'robot', label: 'Robot' },
+            { id: 'spider', label: 'Spider' },
+        ];
+
+        function hashStringToInt(str) {
+            let h = 2166136261;
+            for (let i = 0; i < str.length; i++) {
+                h ^= str.charCodeAt(i);
+                h = Math.imul(h, 16777619);
+            }
+            return (h >>> 0);
+        }
+
+        function mulberry32(seed) {
+            let t = seed >>> 0;
+            return () => {
+                t += 0x6D2B79F5;
+                let x = Math.imul(t ^ (t >>> 15), 1 | t);
+                x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
+                return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+            };
+        }
+
+        function diffMeta(diffId) {
+            return PLAY_DIFFICULTIES.find(d => d.id === diffId) || PLAY_DIFFICULTIES[0];
+        }
+
+        function focusLabel(focusId) {
+            return (PLAY_FOCUS.find(f => f.id === focusId)?.label) || focusId;
+        }
+
+        function clamp01(x) { return Math.max(0, Math.min(1, x)); }
+
+        function buildPlayLevelObjects({ difficulty, focus, seed }, groundY) {
+            const d = diffMeta(difficulty);
+            const rng = mulberry32((seed >>> 0) || 1);
+
+            const tier = d.tier;
+            const endX = 5200 + tier * 1400;
+
+            const objs = [];
+            const cell = GRID_SIZE;
+            const yFloor = groundY;
+            const yCeil = groundY - cell * (5 + Math.floor(tier / 2));
+
+            const placePortal = (x, mode) => {
+                objs.push({ type: 'portal', x, y: yFloor - cell * 2, w: cell, h: cell * 2, mode });
+            };
+            const placeSize = (x, size) => {
+                const mini = String(size) === 'mini';
+                objs.push({ type: 'size', x, y: yFloor - (mini ? cell : cell * 2), w: mini ? cell / 2 : cell, h: mini ? cell : cell * 2, size });
+            };
+            const placeSpeed = (x, mult) => {
+                objs.push({ type: 'speed', x, y: yFloor - cell * 2, w: cell, h: cell * 2, mult });
+            };
+            const placeDual = (x, enabled) => {
+                objs.push({ type: 'dual', x, y: yFloor - cell * 2, w: cell, h: cell * 2, enabled: Boolean(enabled) });
+            };
+
+            const spikeVariants = ['spike_small', 'spike_mini', 'spike_normal', 'spike_big', 'spike_long', 'spike_flat'];
+            const spikePick = () => spikeVariants[Math.min(spikeVariants.length - 1, Math.floor(rng() * (2 + tier / 2)))];
+            const sawPick = () => (rng() < 0.55 ? 'saw_sm' : (rng() < 0.8 ? 'saw_md' : 'saw_lg'));
+
+            const wantsCeiling = (focus === 'ship' || focus === 'wave');
+            const wantsMixed = (focus === 'all');
+
+            const baseMode = wantsMixed ? 'cube' : focus;
+
+            // Difficulty “feel”: set a starting speed portal.
+            const baseSpeed = tier <= 2 ? 1 : (tier <= 5 ? 1.2 : (tier <= 8 ? 1.5 : 2));
+            placeSpeed(240, baseSpeed);
+
+            // Add some variety triggers on higher tiers.
+            if (tier >= 4) placeSize(520, rng() < 0.5 ? 'mini' : 'big');
+            if (tier >= 6) placeDual(760, true);
+            if (tier >= 7) placeDual(endX - 900, false);
+
+            if (wantsCeiling) {
+                // Ceiling blocks for a basic corridor.
+                const ceilBlockY = yCeil;
+                for (let x = 0; x < endX; x += cell) {
+                    if (x < 200) continue;
+                    if (rng() < 0.08 && tier >= 6) continue; // occasional gaps in ceiling
+                    objs.push({ type: 1, x, y: ceilBlockY, w: cell, h: cell });
+                }
+            }
+
+            // Segment builder
+            const segmentLen = 800;
+            const segments = Math.max(6, Math.floor(endX / segmentLen));
+            const modeCycle = ['cube', 'ship', 'ufo', 'wave', 'ball', 'robot', 'spider'];
+
+            for (let si = 0; si < segments; si++) {
+                const segX0 = 400 + si * segmentLen;
+                const segX1 = segX0 + segmentLen;
+
+                if (wantsMixed && si > 0) {
+                    const mode = modeCycle[si % modeCycle.length];
+                    placePortal(segX0 + 60, mode);
+                    if (tier >= 5 && rng() < 0.25) placeSize(segX0 + 120, rng() < 0.6 ? 'mini' : 'big');
+                    if (tier >= 8 && rng() < 0.2) placeDual(segX0 + 180, rng() < 0.5);
+                }
+
+                // Platforms (mostly for cube/robot/ufo/ball/spider segments).
+                const platformChance = clamp01(0.18 + tier * 0.04);
+                const addPlatform = (x, y, tiles) => {
+                    for (let i = 0; i < tiles; i++) objs.push({ type: 1, x: x + i * cell, y, w: cell, h: cell });
+                };
+
+                for (let x = segX0 + 120; x < segX1 - 160; x += 200) {
+                    const platformY = yFloor - cell * (rng() < 0.55 ? 1 : 2);
+                    const tiles = 2 + Math.floor(rng() * 4);
+                    if (rng() < platformChance) addPlatform(x, platformY, tiles);
+                }
+
+                // Hazards
+                const hazardStep = Math.max(110, 380 - tier * 26);
+                for (let x = segX0 + 260; x < segX1 - 120; x += hazardStep) {
+                    const r = rng();
+                    const onCeil = wantsCeiling && r < 0.18 && tier >= 6;
+
+                    if (r < 0.62) {
+                        const variant = spikePick();
+                        objs.push({
+                            type: 'spike',
+                            x: Math.floor(x / cell) * cell,
+                            y: onCeil ? (yCeil + cell) : yFloor,
+                            rotation: onCeil ? 180 : 0,
+                            variant
+                        });
+                    } else if (r < 0.82) {
+                        objs.push({
+                            type: 'saw',
+                            x: Math.floor(x / cell) * cell,
+                            y: yFloor - cell * (1 + Math.floor(rng() * 3)),
+                            variant: sawPick()
+                        });
+                    } else {
+                        // Orbs/pads sprinkled through every mode (orbs work in any gamemode).
+                        const orbChoices = ['yellow', 'pink', 'green', 'blue', 'black', 'dash_green', 'dash_purple'];
+                        const orb = orbChoices[Math.floor(rng() * Math.min(orbChoices.length, 3 + Math.floor(tier / 2)))];
+                        objs.push({
+                            type: 'orb',
+                            x: Math.floor((x + 40) / cell) * cell,
+                            y: yFloor - cell * (2 + Math.floor(rng() * 3)),
+                            orb
+                        });
+                        if (rng() < 0.35) {
+                            const padChoices = ['yellow', 'pink', 'green', 'blue', 'black'];
+                            const pad = padChoices[Math.floor(rng() * Math.min(padChoices.length, 2 + Math.floor(tier / 2)))];
+                            objs.push({
+                                type: 'pad',
+                                x: Math.floor((x - 20) / cell) * cell,
+                                y: yFloor,
+                                rotation: 0,
+                                pad
+                            });
+                        }
+                    }
+                }
+
+                // Ball/spider segments: add explicit gravity triggers to make the focus feel right.
+                const segmentMode = wantsMixed ? modeCycle[si % modeCycle.length] : baseMode;
+                if ((segmentMode === 'ball' || segmentMode === 'spider') && tier >= 3) {
+                    const gx = segX0 + 220 + Math.floor(rng() * 140);
+                    objs.push({
+                        type: 'gravity',
+                        x: Math.floor(gx / cell) * cell,
+                        y: yFloor - cell * 2,
+                        rotation: 0,
+                        dir: rng() < 0.5 ? -1 : 1
+                    });
+                }
+            }
+
+            // Make sure the requested focus is respected (start mode or a portal very early).
+            if (!wantsMixed && baseMode && baseMode !== 'cube') {
+                placePortal(160, baseMode);
+            }
+
+            // End marker
+            objs.push({ type: 'end', x: endX });
+
+            // Normalize: remove NaNs / keep finite coordinates only.
+            return objs.filter(o => o && Number.isFinite(o.x) && (o.type === 'end' || Number.isFinite(o.y)));
+        }
+
+        function currentPlaySelection() {
+            const difficulty = String(playDifficultySel?.value || 'easy');
+            const focus = String(playFocusSel?.value || 'all');
+            return { difficulty, focus };
+        }
+
+        function playCandidatesFor({ difficulty, focus }) {
+            const seedBase = hashStringToInt(`${difficulty}:${focus}`);
+            const candidates = [];
+            for (let i = 0; i < 6; i++) {
+                candidates.push({
+                    id: `preset_${difficulty}_${focus}_${i + 1}`,
+                    name: `${diffMeta(difficulty).label} • ${focusLabel(focus)} #${i + 1}`,
+                    difficulty,
+                    focus,
+                    seed: (seedBase + i * 9973) >>> 0
+                });
+            }
+            return candidates;
+        }
+
+        function rerollPlayCandidate() {
+            const sel = currentPlaySelection();
+            const list = playCandidatesFor(sel);
+            playCandidate = list[Math.floor(Math.random() * list.length)] || null;
+            updatePlaySelectUI();
+        }
+
+        function updatePlaySelectUI() {
+            if (!playLevelInfo) return;
+            if (!playCandidate) {
+                playLevelInfo.textContent = 'No level selected.';
+                if (playStartBtn) playStartBtn.disabled = true;
+                return;
+            }
+            const d = diffMeta(playCandidate.difficulty);
+            playLevelInfo.innerHTML = `<span class="font-bold">${playCandidate.name}</span><div class="text-[10px] opacity-75 mt-1">Difficulty: ${d.label} • Focus: ${focusLabel(playCandidate.focus)}</div>`;
+            if (playStartBtn) playStartBtn.disabled = false;
+        }
+
+        function renderMyLevels() {
+            const levels = getSavedLevels().sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+            if (myLevelsList) {
+                if (levels.length === 0) {
+                    myLevelsList.innerHTML = `<div class="text-center text-sm opacity-70">No saved levels. Go create one!</div>`;
+                    return;
+                }
+                myLevelsList.innerHTML = levels.map(level => `
+                    <div class="bg-white/5 p-3 rounded-lg flex items-center gap-3">
+                        <div class="flex-grow">
+                            <div class="font-bold text-sm">${level.name.replace(/"/g, '&quot;')}</div>
+                            <div class="text-[10px] opacity-70">Saved: ${new Date(level.updatedAt).toLocaleString()}</div>
+                        </div>
+                        <button onclick="loadLevelFromSlot('${level.name.replace(/'/g, "\\'")}')" class="bg-blue-600 px-3 py-1 rounded font-bold text-[10px] interactive">EDIT</button>
+                        <button onclick="deleteLevelFromSlot('${level.name.replace(/'/g, "\\'")}')" class="bg-red-800 px-3 py-1 rounded font-bold text-[10px] interactive">DEL</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function openPlaySelect() {
+            if (menuMain) menuMain.classList.add('hidden');
+            if (playSelect) playSelect.classList.remove('hidden');
+            rerollPlayCandidate();
+        }
+
+        function closePlaySelect() {
+            if (playSelect) playSelect.classList.add('hidden');
+            if (menuMain) menuMain.classList.remove('hidden');
+        }
+
+        function openMyLevels() {
+            if (menuMain) menuMain.classList.add('hidden');
+            if (playSelect) playSelect.classList.add('hidden');
+            if (myLevelsSelect) myLevelsSelect.classList.remove('hidden');
+            renderMyLevels();
+        }
+
+        function startPlayFromSelection() {
+            if (!playCandidate) rerollPlayCandidate();
+            if (!playCandidate) return;
+            startPresetPlayLevel(playCandidate);
+        }
+
+        function closeMyLevels() {
+            if (myLevelsSelect) myLevelsSelect.classList.add('hidden');
+            if (menuMain) menuMain.classList.remove('hidden');
+        }
+
+        function startPresetPlayLevel(meta) {
+            const groundY = canvas.height - GROUND_Y_OFFSET;
+            const objects = buildPlayLevelObjects(meta, groundY);
+            levelData = objects;
+            playRunMeta = { ...meta };
+            lastLevelSource = 'play';
+            startPlayMode(false);
+        }
+
+        function playNextLevel() {
+            const sel = playRunMeta ? { difficulty: playRunMeta.difficulty, focus: playRunMeta.focus } : currentPlaySelection();
+            const list = playCandidatesFor(sel);
+            const pick = list[Math.floor(Math.random() * list.length)] || null;
+            if (!pick) return;
+            startPresetPlayLevel(pick);
+        }
+
+	        function restartCurrentLevel() {
+	            if (lastLevelSource === 'play' && playRunMeta) {
+	                startPresetPlayLevel(playRunMeta);
+	                return;
+	            }
+            // editor test / ad-hoc: restart without changing level data
+            resetPracticeState(true);
+            gameState = 'PLAYING';
+            resetPlayers();
+            cameraX = 0;
+            speedMultiplier = 1.0;
+            if (showTrail) playerTrail = [];
+	            document.getElementById('menu').classList.add('hidden');
+	            document.getElementById('editor-ui').classList.add('hidden');
+	            document.getElementById('game-ui').classList.remove('hidden');
+	            document.getElementById('game-over').classList.add('hidden');
+	            focusCanvasForGameplay();
+	        }
+
+        if (playDifficultySel) playDifficultySel.addEventListener('change', rerollPlayCandidate);
+        if (playFocusSel) playFocusSel.addEventListener('change', rerollPlayCandidate);
+
+        function formatCrash(err, extra = {}) {
+            const stack = (err && err.stack) ? String(err.stack) : String(err);
+            const payload = {
+                t: Date.now(),
+                kind: extra.kind || extra.label || 'unknown',
+                severity: extra.severity || 'unknown',
+                gameState,
+                globalTimer,
+                cameraX,
+                dualEnabled,
+                inputA,
+                inputB,
+                player: player ? { x: player.x, y: player.y, v: player.v, g: player.gravity, mode: player.mode, scale: player.scale } : null,
+                player2: player2 ? { x: player2.x, y: player2.y, v: player2.v, g: player2.gravity, mode: player2.mode, scale: player2.scale } : null,
+                levelCount: Array.isArray(levelData) ? levelData.length : -1,
+                ...extra,
+            };
+            return `${stack}\n\n--- context ---\n${JSON.stringify(payload, null, 2)}`;
+        }
+
+        const _seenErrorKeys = new Set();
+        function errorKey(err, extra = {}) {
+            const msg = (err && (err.message || err.stack)) ? String(err.message || err.stack) : String(err);
+            const kind = String(extra.kind || extra.label || 'unknown');
+            return `${kind}:${msg}`.slice(0, 900);
+        }
+
+        function severityFrom(extra = {}) {
+            const sev = String(extra.severity || '').toUpperCase();
+            if (sev === 'P0' || sev === 'P1') return sev;
+            const kind = String(extra.kind || '').toLowerCase();
+            const label = String(extra.label || '').toLowerCase();
+            if (kind === 'error' || kind === 'unhandledrejection' || kind === 'watchdog') return 'P0';
+            if (kind === 'console.error') return 'P1';
+            if (kind === 'handler') return 'P1';
+            if (label === 'draw' || label === 'updatephysics' || label === 'updateoneplayer') return 'P1';
+            return null; // ignore anything else (P2+)
+        }
+
+        function showCrash(err, extra = {}) {
+            const severity = severityFrom(extra);
+            if (!severity) return;
+            extra.severity = severity;
+
+            // Throttle bursts but still capture distinct issues.
+            const key = errorKey(err, extra);
+            if (_seenErrorKeys.has(key) && globalTimer - lastCrashAt < 18) return;
+            _seenErrorKeys.add(key);
+            if (globalTimer - lastCrashAt < 2) return;
+            lastCrashAt = globalTimer;
+
+            try { _origConsoleError('GD Clone Error:', err); } catch { }
+            try { if (crashText) crashText.textContent = formatCrash(err, extra); } catch { }
+            try {
+                if (crashOverlay) {
+                    crashOverlay.classList.remove('hidden');
+                    crashOverlay.style.display = 'block';
+                }
+            } catch { }
+        }
+
+        function hideCrash() {
+            if (crashOverlay) {
+                crashOverlay.classList.add('hidden');
+                crashOverlay.style.display = 'none';
+            }
+        }
+
+        if (crashCopy) {
+            crashCopy.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(crashText?.textContent || '');
+                    crashCopy.textContent = 'COPIED';
+                    setTimeout(() => (crashCopy.textContent = 'COPY'), 900);
+                } catch (e) {
+                    console.warn('Clipboard copy failed:', e);
+                }
+            });
+        }
+        if (crashResume) crashResume.addEventListener('click', hideCrash);
+        if (crashReset) crashReset.addEventListener('click', () => { hideCrash(); showMenu(); resetPlayers(); });
+
+        window.addEventListener('error', (e) => showCrash(e.error || e.message || e, { kind: 'error', severity: 'P0' }));
+        window.addEventListener('unhandledrejection', (e) => showCrash(e.reason || e, { kind: 'unhandledrejection', severity: 'P0' }));
+
+        // Treat console errors/warnings as "minor bugs" and surface them.
+        (() => {
+            try {
+                console.error = (...args) => {
+                    try { showCrash(new Error(args.map(a => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ')), { kind: 'console.error', severity: 'P1' }); } catch { }
+                    return _origConsoleError(...args);
+                };
+                console.warn = (...args) => {
+                    // Intentionally not tracked (P2+).
+                    return _origConsoleWarn(...args);
+                };
+            } catch { }
+        })();
+
+        // Watchdog: if render loop stalls, attempt to continue and surface overlay.
+        setInterval(() => {
+            const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+            const activityAt = Math.max(lastFrameAt, lastActivityAt);
+            const hidden = (typeof document !== 'undefined' && document.visibilityState === 'hidden');
+            if (!hidden && now - activityAt > 1700) {
+                showCrash(new Error('Render loop stalled; attempting recovery'), { kind: 'watchdog', severity: 'P0' });
+                try { requestAnimationFrame(draw); } catch { }
+                lastActivityAt = now;
+                lastFrameAt = now;
+            }
+        }, 700);
+
+        function safeHandler(label, fn) {
+            return (...args) => {
+                try { return fn(...args); }
+                catch (err) { showCrash(err, { kind: 'handler', label, severity: 'P1' }); }
+            };
+        }
+
+        function updateAutoClickUI() {
+            const targetLabel = autoClickTarget === 'both' ? 'BOTH' : (autoClickTarget === 'b' ? 'B' : 'A');
+            const label = autoClickEnabled ? `${autoClickCps} CPS (${targetLabel})` : 'OFF';
+            const btnText = autoClickEnabled ? 'AUTO: ON' : 'AUTO: OFF';
+
+            const v1 = document.getElementById('autoclick-val');
+            const v2 = document.getElementById('autoclick-val-editor');
+            if (v1) v1.textContent = label;
+            if (v2) v2.textContent = label;
+
+            const b1 = document.getElementById('autoclick-toggle');
+            const b2 = document.getElementById('autoclick-toggle-editor');
+            if (b1) { b1.textContent = btnText; b1.classList.toggle('active', autoClickEnabled); }
+            if (b2) { b2.textContent = btnText; b2.classList.toggle('active', autoClickEnabled); }
+
+            const s1 = document.getElementById('autoclick-cps');
+            const s2 = document.getElementById('autoclick-cps-editor');
+            if (s1) s1.value = String(autoClickCps);
+            if (s2) s2.value = String(autoClickCps);
+
+            const t1 = document.getElementById('autoclick-target');
+            const t2 = document.getElementById('autoclick-target-editor');
+            if (t1) t1.value = autoClickTarget;
+            if (t2) t2.value = autoClickTarget;
+        }
+
+        function toggleAutoClick() {
+            autoClickEnabled = !autoClickEnabled;
+            autoClickTick = 0;
+            autoClickAcc = 0;
+            updateAutoClickUI();
+        }
+
+        function setAutoClickCps(v) {
+            const n = Math.max(1, Math.min(120000, Math.round(Number(v) || 12)));
+            autoClickCps = n;
+            updateAutoClickUI();
+        }
+
+        function setAutoClickTarget(v) {
+            const s = String(v || 'a').toLowerCase();
+            autoClickTarget = (s === 'b' || s === 'both') ? s : 'a';
+            updateAutoClickUI();
+        }
+
+        // EDITOR STATE
+        let lastSelectedObject = null;
+        let selectedObjects = [];
+        let clipboard = [];
+        let selectionBox = null;
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+
+        const SPIKE_CFG = {
+            'spike_small': { h: 10, w: 10, o: 30 },
+            'spike_mini': { h: 20, w: 20, o: 20 },
+            'spike_flat': { h: 10, w: 40, o: 30 },
+            'spike_normal': { h: 30, w: 40, o: 10 },
+            'spike_big': { h: 40, w: 40, o: 0 },
+            'spike_long': { h: 58, w: 32, o: -18 }
+        };
+        const SAW_CFG = { 'saw_sm': { r: 12, v: 16 }, 'saw_md': { r: 24, v: 30 }, 'saw_lg': { r: 42, v: 54 } };
+
+        // Damage hitboxes tuned to feel closer to RobTop-style "inner" hit regions.
+        const SPIKE_HIT = {
+            // w/h are fractions of spike's drawn w/h. center is a fraction from spike top->bottom (0..1).
+            spike_small: { w: 0.52, h: 0.38, center: 0.72 },
+            spike_mini: { w: 0.55, h: 0.40, center: 0.70 },
+            spike_normal: { w: 0.62, h: 0.42, center: 0.66 },
+            spike_big: { w: 0.64, h: 0.44, center: 0.64 },
+            spike_long: { w: 0.58, h: 0.40, center: 0.62 },
+            // Flat spike: wider rectangle, but still not the full triangle.
+            spike_flat: { w: 0.86, h: 0.60, center: 0.62 },
+        };
+
+        function spikeLocalDamageRect(cfg, variant) {
+            const hp = SPIKE_HIT[variant] || { w: 0.62, h: 0.42, center: 0.66 };
+            const hitW = Math.max(4, cfg.w * hp.w);
+            const hitH = Math.max(4, cfg.h * hp.h);
+            const yTop = -20 + cfg.o;
+            const yCenter = yTop + cfg.h * hp.center;
+            return { x: -hitW / 2, y: yCenter - hitH / 2, w: hitW, h: hitH };
+        }
+
+        function aabbToLocalBounds(ax, ay, aw, ah, cx, cy, rotRad) {
+            const c = Math.cos(-rotRad);
+            const s = Math.sin(-rotRad);
+            const pts = [
+                [ax, ay],
+                [ax + aw, ay],
+                [ax + aw, ay + ah],
+                [ax, ay + ah],
+            ];
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            for (const [px, py] of pts) {
+                const dx = px - cx;
+                const dy = py - cy;
+                const lx = dx * c - dy * s;
+                const ly = dx * s + dy * c;
+                if (lx < minX) minX = lx;
+                if (ly < minY) minY = ly;
+                if (lx > maxX) maxX = lx;
+                if (ly > maxY) maxY = ly;
+            }
+            return { minX, minY, maxX, maxY };
+        }
+
+        function spikeHitsPlayerAabb(playerHb, spikeObj) {
+            const cfg = SPIKE_CFG[spikeObj.variant];
+            if (!cfg) return false;
+            const cx = spikeObj.x + 20;
+            const cy = spikeObj.y + 20;
+            const rot = ((spikeObj.rotation || 0) * Math.PI) / 180;
+            const lb = aabbToLocalBounds(playerHb.x, playerHb.y, playerHb.w, playerHb.h, cx, cy, rot);
+            const dmg = spikeLocalDamageRect(cfg, spikeObj.variant);
+            return lb.minX < dmg.x + dmg.w && lb.maxX > dmg.x && lb.minY < dmg.y + dmg.h && lb.maxY > dmg.y;
+        }
+
+        function sawDamageRadius(cfg) {
+            // Points/spikes around the rim are visual only; damage comes from the inner disc.
+            return Math.max(6, cfg.r * 0.68);
+        }
+
+        function sawHitsPlayerAabb(playerHb, sawObj) {
+            const cfg = SAW_CFG[sawObj.variant];
+            if (!cfg) return false;
+            const px = playerHb.x + playerHb.w / 2;
+            const py = playerHb.y + playerHb.h / 2;
+            const sx = sawObj.x + 20;
+            const sy = sawObj.y + 20;
+            const dx = sx - px;
+            const dy = sy - py;
+            const dist = Math.hypot(dx, dy);
+            const playerR = Math.max(2, Math.min(playerHb.w, playerHb.h) * 0.22);
+            return dist < sawDamageRadius(cfg) + playerR;
+        }
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+
+        function updateEditorCamera(val) { if (gameState === 'EDITING') cameraX = parseInt(val); }
+
+        function toggleHitboxes() {
+            showHitboxes = !showHitboxes;
+            const btn = document.getElementById('hitbox-toggle');
+            btn.innerText = `HITBOX VIEWER: ${showHitboxes ? 'ON' : 'OFF'}`;
+            btn.classList.toggle('active', showHitboxes);
+        }
+
+        function toggleTrail() {
+            showTrail = !showTrail;
+            const btnEditor = document.getElementById('trail-toggle');
+            const btnGame = document.getElementById('trail-game-toggle');
+            [btnEditor, btnGame].forEach(b => {
+                if (b) {
+                    b.innerText = `HITBOX TRAIL: ${showTrail ? 'ON' : 'OFF'}`;
+                    b.classList.toggle('active', showTrail);
+                }
+            });
+            if (!showTrail) playerTrail = [];
+        }
+
+        function toggleNoclip() {
+            noclipEnabled = !noclipEnabled;
+            const btnEditor = document.getElementById('noclip-toggle');
+            const btnGame = document.getElementById('noclip-game-toggle');
+            [btnEditor, btnGame].forEach(b => {
+                if (b) {
+                    b.innerText = `NOCLIP: ${noclipEnabled ? 'ON' : 'OFF'}`;
+                    b.classList.toggle('active', noclipEnabled);
+                }
+            });
+        }
+
+	        function togglePrediction() {
+	            showPrediction = !showPrediction;
+	            const btnEditor = document.getElementById('predict-toggle');
+	            const btnGame = document.getElementById('predict-game-toggle');
+	            [btnEditor, btnGame].forEach(b => {
+	                if (b) {
+	                    b.innerText = `PREDICTION: ${showPrediction ? 'ON' : 'OFF'}`;
+	                    b.classList.toggle('active', !showPrediction);
+	                }
+	            });
+	        }
+
+	        function toggleTiltStep() {
+	            spikeRotationStep = (spikeRotationStep === 45) ? 90 : 45;
+	            const btn = document.getElementById('tilt-toggle');
+	            if (btn) {
+	                btn.innerText = `TILT STEP: ${spikeRotationStep}°`;
+	                btn.classList.toggle('active', spikeRotationStep === 45);
+	            }
+	        }
+
+	        function updateSlomo(val) {
+	            gameSpeedFactor = val / 60;
+	            const percent = Math.round((val / 60) * 100) + '%';
+            document.getElementById('speed-val').innerText = percent;
+            document.getElementById('editor-speed-val').innerText = percent;
+            document.getElementById('slomo-slider').value = val;
+            document.getElementById('editor-slomo-slider').value = val;
+        }
+
+        function clearTrail() {
+            playerTrail = [];
+        }
+
+        function handleInput(e, start) {
+            const isShift = e.shiftKey;
+
+            if (gameState === 'EDITING') {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+                const mouseY = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+                if (start) {
+                    if (e.target && (e.target.tagName === 'BUTTON' || e.target.id === 'level-scrollbar' || e.target.closest('.interactive') || e.target.tagName === 'INPUT')) return;
+
+                    if (isShift) {
+                        isDragging = true;
+                        dragStart = { x: mouseX + cameraX, y: mouseY };
+                        selectionBox = { x: dragStart.x, y: dragStart.y, w: 0, h: 0 };
+                        return;
+                    }
+
+                    const cx = mouseX + cameraX;
+                    const cy = mouseY;
+                    const clickedObj = [...levelData].reverse().find(o => {
+                        if (o.type === 'end') return false;
+                        const rot = (o.rotation || 0) % 360;
+                        const isHorizGravity = o.type === 'gravity' && (rot % 180 !== 0);
+                        const w = o.w || (isHorizGravity ? GRID_SIZE * 2 : GRID_SIZE);
+                        const h = o.h || (o.type === 'gravity' ? (isHorizGravity ? GRID_SIZE : GRID_SIZE * 2) : GRID_SIZE);
+                        return cx >= o.x && cx <= o.x + w && cy >= o.y && cy <= o.y + h;
+                    });
+
+                    if (clickedObj) {
+                        lastSelectedObject = clickedObj;
+                        selectedObjects = [clickedObj];
+                    } else {
+                        selectedObjects = [];
+                        lastSelectedObject = null;
+                    }
+
+                    const groundY = canvas.height - GROUND_Y_OFFSET;
+                    const cell = selectedTool === 'block_small' ? (GRID_SIZE / 2) : GRID_SIZE;
+                    const gx = Math.floor(cx / cell) * cell;
+                    const gy = Math.floor((cy - groundY) / cell) * cell + groundY;
+
+                    if (selectedTool === 'eraser') {
+                        if (clickedObj) {
+                            levelData = levelData.filter(o => o === clickedObj ? o.type === 'end' : true);
+                            selectedObjects = [];
+                            lastSelectedObject = null;
+                        }
+                        return;
+                    }
+
+	                    const existing = [...levelData].reverse().find(o => o.x === gx && o.y === gy && o.type !== 'end');
+	                    if (existing) {
+	                        if (existing.type === 'pad') {
+	                            existing.rotation = (((existing.rotation || 0) + 180) % 360);
+	                        } else if (existing.type === 'spike') {
+	                            existing.rotation = (((existing.rotation || 0) + spikeRotationStep) % 360);
+	                        } else if (existing.type === 'slope') {
+	                            existing.rotation = (((existing.rotation || 0) + 90) % 360);
+	                        } else if (existing.type === 'gravity') {
+	                            // Keep gravity triggers on 90° increments (vertical/horizontal).
+	                            existing.rotation = (((existing.rotation || 0) + 90) % 360);
+	                        }
+	                        return;
+	                    }
+
+	                    let entry = { x: gx, y: gy, rotation: 0 };
+	                    if (typeof selectedTool === 'string') {
+	                        if (selectedTool === 'block_small') { entry.type = 1; entry.w = GRID_SIZE / 2; entry.h = GRID_SIZE / 2; }
+	                        if (selectedTool.startsWith('portal_')) { entry.type = 'portal'; entry.mode = selectedTool.split('_')[1]; entry.w = GRID_SIZE; entry.h = GRID_SIZE * 2; }
+	                        else if (selectedTool.startsWith('size_')) {
+                            entry.type = 'size';
+                            entry.size = selectedTool.split('_')[1]; // 'big' | 'mini'
+                            if (entry.size === 'mini') { entry.w = GRID_SIZE / 2; entry.h = GRID_SIZE; }
+                            else { entry.w = GRID_SIZE; entry.h = GRID_SIZE * 2; }
+                        }
+	                        else if (selectedTool.startsWith('speed_')) {
+	                            entry.type = 'speed';
+	                            entry.mult = parseFloat(selectedTool.replace('speed_', '').replaceAll('_', '.')) || 1;
+	                            entry.w = GRID_SIZE;
+	                            entry.h = GRID_SIZE * 2;
+	                        }
+	                        else if (selectedTool.startsWith('slope_')) {
+	                            entry.type = 'slope';
+	                            entry.angle = parseFloat(selectedTool.replace('slope_', '').replaceAll('_', '.')) || 45;
+	                            entry.w = GRID_SIZE;
+	                            entry.h = GRID_SIZE;
+	                        }
+	                        else if (selectedTool.startsWith('spike_')) {
+	                            entry.type = 'spike';
+	                            if (selectedTool.endsWith('_ud')) {
+	                                entry.variant = selectedTool.slice(0, -3);
+	                                entry.rotation = 180;
+                            } else {
+                                entry.variant = selectedTool;
+                            }
+                        }
+                        else if (selectedTool.startsWith('saw_')) { entry.type = 'saw'; entry.variant = selectedTool; }
+                        else if (selectedTool.startsWith('grav_')) { entry.type = 'gravity'; entry.dir = selectedTool.split('_')[1] === 'up' ? -1 : 1; }
+                        else if (selectedTool.startsWith('orb_')) { entry.type = 'orb'; entry.orb = selectedTool.slice(4); }
+                        else if (selectedTool.startsWith('pad_')) { entry.type = 'pad'; entry.pad = selectedTool.split('_')[1]; }
+                        else if (selectedTool.startsWith('dual_')) { entry.type = 'dual'; entry.enabled = selectedTool.split('_')[1] === 'on'; entry.w = GRID_SIZE; entry.h = GRID_SIZE * 2; }
+                        else if (selectedTool === 'prop_spin') { entry.type = 'prop'; }
+                    } else entry.type = 1;
+
+                    const endDoc = levelData.find(o => o.type === 'end');
+                    if (gx > endDoc.x - 400) endDoc.x = gx + 1000;
+                    levelScrollbar.max = endDoc.x;
+                    levelData.push(entry);
+                    lastSelectedObject = entry;
+                    selectedObjects = [entry];
+                } else {
+                    if (isDragging) {
+                        isDragging = false;
+                        const x1 = Math.min(dragStart.x, mouseX + cameraX);
+                        const x2 = Math.max(dragStart.x, mouseX + cameraX);
+                        const y1 = Math.min(dragStart.y, mouseY);
+                        const y2 = Math.max(dragStart.y, mouseY);
+
+                        selectedObjects = levelData.filter(o =>
+                            o.type !== 'end' && o.x >= x1 - 20 && o.x <= x2 && o.y >= y1 - 20 && o.y <= y2
+                        );
+                        selectionBox = null;
+                    }
+                }
+            }
+
+            // Mouse/touch controls player A only.
+            manualInputA = start;
+            inputA = manualInputA;
+            if (start && gameState === 'PLAYING') handleJumpPress(player, true);
+        }
+
+        function handleMouseMove(e) {
+            if (gameState === 'EDITING' && isDragging) {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+                const mouseY = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+                selectionBox = {
+                    x: Math.min(dragStart.x, mouseX + cameraX),
+                    y: Math.min(dragStart.y, mouseY),
+                    w: Math.abs(dragStart.x - (mouseX + cameraX)),
+                    h: Math.abs(dragStart.y - mouseY)
+                };
+            }
+        }
+
+	        function isTypingTarget(t) {
+	            const el = t || document.activeElement;
+	            if (!el) return false;
+	            if (el.isContentEditable) return true;
+	            const tag = (el.tagName || '').toUpperCase();
+	            return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+	        }
+
+	        function focusCanvasForGameplay() {
+	            try { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } catch { }
+	            try {
+	                if (canvas) {
+	                    if (!canvas.hasAttribute('tabindex')) canvas.tabIndex = 0;
+	                    canvas.focus({ preventScroll: true });
+	                }
+	            } catch { }
+	        }
+
+	        window.addEventListener('keydown', e => {
+	            if (isTypingTarget(e.target)) return;
+            const key = e.key.toLowerCase();
+	            if (e.code === 'Space') {
+	                e.preventDefault();
+	                if (gameState === 'PLAYING') {
+	                    manualInputA = true;
+	                    inputA = true;
+	                    handleJumpPress(player, true);
+                } else if (gameState === 'EDITING') {
+                    startPlayMode(true);
+                } else if (gameState === 'MENU') {
+                    // Menu shortcut: Space toggles Play Select / starts selected level.
+                    const playOpen = playSelect && !playSelect.classList.contains('hidden');
+                    if (!playOpen) openPlaySelect();
+                    else startPlayFromSelection();
+                }
+            }
+
+            if (e.code === 'ArrowUp' && gameState === 'PLAYING') {
+                e.preventDefault();
+                if (dualEnabled && player2) {
+                    manualInputB = true;
+                    inputB = true;
+                    handleJumpPress(player2, false);
+                }
+            }
+
+            if (e.code === 'Enter' && gameState === 'MENU') {
+                e.preventDefault();
+                const playOpen = playSelect && !playSelect.classList.contains('hidden');
+                if (!playOpen) openPlaySelect();
+                else startPlayFromSelection();
+            }
+
+            if (e.code === 'Escape' && gameState === 'MENU') {
+                const playOpen = playSelect && !playSelect.classList.contains('hidden');
+                if (playOpen) closePlaySelect();
+            }
+
+            if (gameState === 'PLAYING') {
+                if (key === 'p') {
+                    e.preventDefault();
+                    togglePracticeMode();
+                }
+                if (key === 'z') {
+                    e.preventDefault();
+                    addPracticeCheckpoint();
+                }
+                if (key === 'x') {
+                    e.preventDefault();
+                    removeLastCheckpoint();
+                }
+            }
+
+            if (gameState === 'EDITING') {
+                const isCtrl = e.ctrlKey || e.metaKey;
+                if (selectedObjects.length > 0) {
+                    const nudgeAmount = e.shiftKey ? 5 : 1;
+                    if (e.key === 'ArrowUp') { e.preventDefault(); selectedObjects.forEach(o => o.y -= nudgeAmount); }
+                    if (e.key === 'ArrowDown') { e.preventDefault(); selectedObjects.forEach(o => o.y += nudgeAmount); }
+                    if (e.key === 'ArrowLeft') { e.preventDefault(); selectedObjects.forEach(o => o.x -= nudgeAmount); }
+                    if (e.key === 'ArrowRight') { e.preventDefault(); selectedObjects.forEach(o => o.x += nudgeAmount); }
+                }
+                if (isCtrl && e.key.toLowerCase() === 'c' && selectedObjects.length > 0) {
+                    const minX = Math.min(...selectedObjects.map(o => o.x));
+                    const minY = Math.min(...selectedObjects.map(o => o.y));
+                    clipboard = selectedObjects.map(o => ({ ...o, offsetX: o.x - minX, offsetY: o.y - minY }));
+                }
+                if (isCtrl && e.key.toLowerCase() === 'v' && clipboard.length > 0) {
+                    const gx = Math.floor((cameraX + 200) / GRID_SIZE) * GRID_SIZE;
+                    const gy = Math.floor((canvas.height / 2) / GRID_SIZE) * GRID_SIZE;
+                    const newBatch = clipboard.map(o => {
+                        const copy = { ...o, x: gx + o.offsetX, y: gy + o.offsetY };
+                        delete copy.offsetX; delete copy.offsetY;
+                        return copy;
+                    });
+                    levelData.push(...newBatch);
+                    selectedObjects = newBatch;
+                }
+                if (e.key === 'Delete' || e.key === 'Backspace') {
+                    levelData = levelData.filter(o => !selectedObjects.includes(o) || o.type === 'end');
+                    selectedObjects = [];
+                }
+            }
+        });
+
+	        window.addEventListener('keyup', e => {
+	            if (isTypingTarget(e.target)) return;
+	            if (e.code === 'Space') {
+	                e.preventDefault();
+	                manualInputA = false;
+	                inputA = false;
+	            }
+	            if (e.code === 'ArrowUp') {
+	                e.preventDefault();
+	                manualInputB = false;
+	                inputB = false;
+	            }
+	        });
+
+        const ORB_RADIUS = 15;
+        const ORB_ACTIVATE_DIST = 34;
+        const ORB_COOLDOWN_FRAMES = 10;
+        const orbPulses = [];
+        const PAD_COOLDOWN_FRAMES = 14;
+        const padPulses = [];
+        const PREDICT_FRAMES = 120;
+        let lastJumpPrediction = null;
+
+        function pushOrbPulse(x, y, color) {
+            orbPulses.push({ x, y, r: 6, life: 24, color });
+            if (orbPulses.length > 120) orbPulses.shift();
+        }
+
+        function pushPadPulse(x, y, color) {
+            padPulses.push({ x, y, r: 10, life: 26, color });
+            if (padPulses.length > 120) padPulses.shift();
+        }
+
+        function handleJumpPress(p, withPrediction = false) {
+            if (!p) return;
+            if (withPrediction) {
+                const pred = computeCubePrediction();
+                if (pred) lastJumpPrediction = { ok: pred.jump.safe, t: globalTimer };
+            }
+            if (!tryActivateOrb(p)) performJump(p);
+        }
+
+        function tryActivateOrb(p) {
+            if (gameState !== 'PLAYING') return false;
+
+            const s = playerSize(p);
+            const px = p.x + s / 2;
+            const py = p.y + s / 2;
+
+            let best = null;
+            let bestD = Infinity;
+
+            for (const o of levelData) {
+                if (o.type !== 'orb') continue;
+                if (Math.abs(p.x - o.x) > 120) continue;
+
+                const ox = o.x + GRID_SIZE / 2;
+                const oy = o.y + GRID_SIZE / 2;
+                const dx = ox - px;
+                const dy = oy - py;
+                const d = Math.hypot(dx, dy);
+
+                if (d < bestD) {
+                    bestD = d;
+                    best = o;
+                }
+            }
+
+            if (!best) return false;
+
+            const useKey = p.id === 'b' ? '_lastUseB' : '_lastUseA';
+            const last = best[useKey] || -99999;
+            if (globalTimer - last < ORB_COOLDOWN_FRAMES) return false;
+
+            const ox = best.x + GRID_SIZE / 2;
+            const oy = best.y + GRID_SIZE / 2;
+            const d = Math.hypot((ox - px), (oy - py));
+            if (d > ORB_ACTIVATE_DIST + ORB_RADIUS) return false;
+
+            best[useKey] = globalTimer;
+            applyOrbEffect(p, best.orb || 'yellow', best);
+            return true;
+        }
+
+        function applyOrbEffect(p, color, orbObj) {
+            const c = String(color || 'yellow').toLowerCase();
+            const jScale = jumpScale(p);
+
+            const doDash = (power = 1) => {
+                // Extra forward travel for a short burst (kept modest to reduce tunneling).
+                p.dashFrames = 10;
+                p.dashBoost = Math.max(2, Math.min(18, 10 * power));
+                // stabilize so dashes feel crisp
+                p.robotJumpTime = 0;
+                p.onGround = false;
+                p.coyote = 0;
+            };
+
+            const setVerticalEffect = (vel) => {
+                const clamped = Math.max(-18, Math.min(18, Number(vel) || 0));
+                if (p.mode === 'wave') {
+                    p.waveKickFrames = 10;
+                    p.waveKickV = clamped;
+                } else {
+                    p.v = clamped;
+                }
+                p.onGround = false;
+                p.coyote = 0;
+                p.robotJumpTime = 0;
+            };
+
+            const impulse = (mult, direction = 'up') => {
+                // direction: 'up' (opposes gravity), 'down' (with gravity)
+                const sign = direction === 'down' ? -1 : 1;
+                setVerticalEffect(JUMP_FORCE_CUBE * jScale * mult * p.gravity * sign);
+            };
+
+            const flipGravityWithKick = (mult) => {
+                p.gravity *= -1;
+                setVerticalEffect(JUMP_FORCE_CUBE * jScale * mult * p.gravity);
+            };
+
+            const mode = p.mode;
+
+            if (c === 'yellow') {
+                impulse(1.05);
+                pushOrbPulse(orbObj.x + 20, orbObj.y + 20, '#fde047');
+                return;
+            }
+            if (c === 'pink') {
+                impulse(1.35);
+                pushOrbPulse(orbObj.x + 20, orbObj.y + 20, '#fb7185');
+                return;
+            }
+            if (c === 'black') {
+                impulse(1.0, 'down');
+                pushOrbPulse(orbObj.x + 20, orbObj.y + 20, '#111827');
+                return;
+            }
+            if (c === 'dash_green') {
+                doDash(1);
+                pushOrbPulse(orbObj.x + 20, orbObj.y + 20, '#22c55e');
+                return;
+            }
+            if (c === 'dash_purple') {
+                doDash(1);
+                // Sudden gravity flip + dash
+                p.gravity *= -1;
+                p.v = 0;
+                p.onGround = false;
+                p.coyote = 0;
+                p.robotJumpTime = 0;
+                pushOrbPulse(orbObj.x + 20, orbObj.y + 20, '#a855f7');
+                return;
+            }
+            if (c === 'blue') {
+                if (mode === 'spider') teleportSpider(p);
+                else {
+                    // Sudden gravity flip (independent of mode)
+                    p.gravity *= -1;
+                    setVerticalEffect(0);
+                }
+                pushOrbPulse(orbObj.x + 20, orbObj.y + 20, '#38bdf8');
+                return;
+            }
+            if (c === 'green') {
+                if (mode === 'spider') teleportSpider(p);
+                else flipGravityWithKick(1.2);
+                pushOrbPulse(orbObj.x + 20, orbObj.y + 20, '#22c55e');
+                return;
+            }
+
+            // fallback
+            impulse(1.1);
+            pushOrbPulse(orbObj.x + 20, orbObj.y + 20, '#ffffff');
+        }
+
+        function applyPadEffect(p, color, padObj) {
+            const c = String(color || 'yellow').toLowerCase();
+            const jScale = jumpScale(p);
+
+            const impulse = (mult, direction = 'up') => {
+                const sign = direction === 'down' ? -1 : 1;
+                p.v = JUMP_FORCE_CUBE * jScale * mult * p.gravity * sign;
+                p.onGround = false;
+                p.coyote = 0;
+                p.robotJumpTime = 0;
+            };
+
+            const flipGravityWithKick = (mult) => {
+                p.gravity *= -1;
+                p.v = JUMP_FORCE_CUBE * jScale * mult * p.gravity;
+                p.onGround = false;
+                p.coyote = 0;
+                p.robotJumpTime = 0;
+            };
+
+            if (c === 'yellow') {
+                impulse(1.05);
+                pushPadPulse(padObj.x + 20, padObj.y + 20, '#fde047');
+                return;
+            }
+            if (c === 'pink') {
+                impulse(1.45);
+                pushPadPulse(padObj.x + 20, padObj.y + 20, '#fb7185');
+                return;
+            }
+            if (c === 'black') {
+                impulse(1.0, 'down');
+                pushPadPulse(padObj.x + 20, padObj.y + 20, '#111827');
+                return;
+            }
+            if (c === 'blue') {
+                flipGravityWithKick(1.05);
+                pushPadPulse(padObj.x + 20, padObj.y + 20, '#38bdf8');
+                return;
+            }
+            if (c === 'green') {
+                flipGravityWithKick(1.25);
+                pushPadPulse(padObj.x + 20, padObj.y + 20, '#22c55e');
+                return;
+            }
+
+            impulse(1.1);
+            pushPadPulse(padObj.x + 20, padObj.y + 20, '#ffffff');
+        }
+
+        function pathRoundRect(ctx, x, y, w, h, r) {
+            const rr = Math.max(0, Math.min(r, Math.min(w, h) / 2));
+            ctx.beginPath();
+            ctx.moveTo(x + rr, y);
+            ctx.arcTo(x + w, y, x + w, y + h, rr);
+            ctx.arcTo(x + w, y + h, x, y + h, rr);
+            ctx.arcTo(x, y + h, x, y, rr);
+            ctx.arcTo(x, y, x + w, y, rr);
+            ctx.closePath();
+        }
+
+        function computeCubePrediction() {
+            if (!showPrediction) return null;
+            if (gameState !== 'PLAYING') return null;
+            if (player.mode !== 'cube') return null;
+
+            const sSize = playerSize(player);
+            const jScale = jumpScale(player);
+            const groundLimit = canvas.height - GROUND_Y_OFFSET - sSize;
+
+            const relevant = levelData.filter(o =>
+                (o.type === 1 || o.type === 'spike' || o.type === 'saw' || o.type === 'gravity' || o.type === 'pad') &&
+                o.x >= player.x - 120 && o.x <= player.x + 680
+            );
+
+            const padLastUse = new Map();
+
+            const mkState = () => ({
+                x: player.x,
+                y: player.y,
+                v: player.v,
+                gravity: player.gravity,
+                onGround: player.onGround,
+                coyote: player.coyote || 0,
+            });
+
+            const spikeHit = (s, o) => {
+                const hb = { x: s.x + HITBOX_BUFFER, y: s.y + HITBOX_BUFFER, w: sSize - HITBOX_BUFFER * 2, h: sSize - HITBOX_BUFFER * 2 };
+                return spikeHitsPlayerAabb(hb, o);
+            };
+
+            const sawHit = (s, o) => {
+                const hb = { x: s.x + HITBOX_BUFFER, y: s.y + HITBOX_BUFFER, w: sSize - HITBOX_BUFFER * 2, h: sSize - HITBOX_BUFFER * 2 };
+                return sawHitsPlayerAabb(hb, o);
+            };
+
+            const blockResolveOrDie = (s, o) => {
+                const bw = o.w || 40;
+                const bh = o.h || 40;
+                if (s.x + sSize <= o.x || s.x >= o.x + bw || s.y + sSize <= o.y || s.y >= o.y + bh) return true;
+                const overlapTop = (s.y + sSize) - o.y;
+                const overlapBot = (o.y + bh) - s.y;
+                const withGravity = (s.v * s.gravity) >= 0;
+                if (s.gravity === 1 && withGravity && overlapTop < 10) {
+                    s.y = o.y - sSize;
+                    s.v = 0;
+                    s.onGround = true;
+                    return true;
+                }
+                if (s.gravity === -1 && withGravity && overlapBot < 10) {
+                    s.y = o.y + bh;
+                    s.v = 0;
+                    s.onGround = true;
+                    return true;
+                }
+                return false;
+            };
+
+            const tryGravityGate = (s, o) => {
+                if (Math.abs(s.x - o.x) >= 60) return;
+                const isHoriz = (o.rotation || 0) % 180 !== 0;
+                let hit = false;
+                if (!isHoriz) {
+                    if (Math.abs(s.x - o.x) < 20 && s.y + sSize > o.y && s.y < o.y + 80) hit = true;
+                } else {
+                    if (s.x + sSize > o.x && s.x < o.x + 80 && Math.abs(s.y - o.y - 20) < 20) hit = true;
+                }
+                if (hit && s.gravity !== o.dir) {
+                    s.gravity = o.dir;
+                    s.v = 0;
+                }
+            };
+
+            const applyPadEffectPred = (s, color) => {
+                const c = String(color || 'yellow').toLowerCase();
+
+                const impulse = (mult, direction = 'up') => {
+                    const sign = direction === 'down' ? -1 : 1;
+                    s.v = JUMP_FORCE_CUBE * jScale * mult * s.gravity * sign;
+                    s.onGround = false;
+                    s.coyote = 0;
+                };
+
+                const flipGravityWithKick = (mult) => {
+                    s.gravity *= -1;
+                    s.v = JUMP_FORCE_CUBE * jScale * mult * s.gravity;
+                    s.onGround = false;
+                    s.coyote = 0;
+                };
+
+                if (c === 'yellow') return impulse(1.05);
+                if (c === 'pink') return impulse(1.45);
+                if (c === 'black') return impulse(1.0, 'down');
+                if (c === 'blue') return flipGravityWithKick(1.05);
+                if (c === 'green') return flipGravityWithKick(1.25);
+                return impulse(1.1);
+            };
+
+            const tryPad = (s, o, frame) => {
+                const last = padLastUse.get(o) ?? -99999;
+                if (frame - last < PAD_COOLDOWN_FRAMES) return;
+
+                const rot = (o.rotation || 0) % 360;
+                const isCeilingPad = rot === 180;
+
+                const overlapX = (s.x + sSize) > o.x + 4 && s.x < (o.x + 40 - 4);
+                if (!overlapX) return;
+
+                const padTop = o.y;
+                const padBottom = o.y + 40;
+
+                if (!isCeilingPad && s.gravity === 1) {
+                    const playerBottom = s.y + sSize;
+                    const nearTop = playerBottom >= padTop && playerBottom <= padTop + 14;
+                    if (nearTop && s.v * s.gravity >= 0) {
+                        padLastUse.set(o, frame);
+                        s.y = padTop - sSize;
+                        applyPadEffectPred(s, o.pad || 'yellow');
+                    }
+                } else if (isCeilingPad && s.gravity === -1) {
+                    const playerTop = s.y;
+                    const nearBottom = playerTop <= padBottom && playerTop >= padBottom - 14;
+                    if (nearBottom && s.v * s.gravity <= 0) {
+                        padLastUse.set(o, frame);
+                        s.y = padBottom;
+                        applyPadEffectPred(s, o.pad || 'yellow');
+                    }
+                }
+            };
+
+            const step = (s, jumpPressed, frame) => {
+                if (jumpPressed && (s.onGround || s.coyote > 0)) {
+                    s.v = JUMP_FORCE_CUBE * jScale * s.gravity;
+                    s.onGround = false;
+                    s.coyote = 0;
+                }
+
+                s.x += SPEED;
+                s.v += GRAVITY_CUBE * s.gravity;
+                if (Math.abs(s.v) > TERMINAL_VELOCITY) s.v = TERMINAL_VELOCITY * Math.sign(s.v);
+                s.y += s.v;
+
+                s.onGround = false;
+                if (s.y >= groundLimit) { s.y = groundLimit; s.v = 0; s.onGround = true; }
+                else if (s.y <= 0) { s.y = 0; s.v = 0; s.onGround = true; }
+
+                for (const o of relevant) {
+                    if (Math.abs(s.x - o.x) > 110) continue;
+                    if (o.type === 'spike') {
+                        if (spikeHit(s, o)) return false;
+                    } else if (o.type === 'saw') {
+                        if (sawHit(s, o)) return false;
+                    } else if (o.type === 1) {
+                        if (!blockResolveOrDie(s, o)) return false;
+                    } else if (o.type === 'gravity') {
+                        tryGravityGate(s, o);
+                    } else if (o.type === 'pad') {
+                        tryPad(s, o, frame);
+                    }
+                }
+
+                if (s.onGround) s.coyote = 4;
+                else if (s.coyote > 0) s.coyote -= 1;
+
+                return true;
+            };
+
+            const simulate = (jumpOnFrame0) => {
+                const s = mkState();
+                const pts = [];
+                let safe = true;
+                for (let i = 0; i < PREDICT_FRAMES; i++) {
+                    const ok = step(s, jumpOnFrame0 && i === 0, i);
+                    pts.push({ x: s.x, y: s.y, ok });
+                    if (!ok) { safe = false; break; }
+                }
+                return { pts, safe };
+            };
+
+            // reset pad cooldown tracking between runs
+            padLastUse.clear();
+            const coast = simulate(false);
+            padLastUse.clear();
+            const jump = simulate(true);
+
+            return { coast, jump };
+        }
+
+        function drawPrediction(pred) {
+            if (!pred) return;
+
+            const drawPath = (pts, baseColor, deadColor) => {
+                ctx.save();
+                const s = playerSize(player);
+                for (let i = 0; i < pts.length; i++) {
+                    const p = pts[i];
+                    const sx = p.x - cameraX;
+                    if (sx < -60 || sx > canvas.width + 60) continue;
+                    const a = Math.max(0.06, 0.7 - i * 0.004);
+                    ctx.globalAlpha = a;
+                    ctx.fillStyle = p.ok ? baseColor : deadColor;
+                    ctx.beginPath();
+                    ctx.arc(sx + s / 2, p.y + s / 2, p.ok ? 3 : 4.8, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            };
+
+            drawPath(pred.coast.pts, 'rgba(34,211,238,0.9)', 'rgba(255,40,40,0.95)');
+            drawPath(pred.jump.pts, pred.jump.safe ? 'rgba(34,197,94,0.95)' : 'rgba(251,113,133,0.95)', 'rgba(255,40,40,0.95)');
+
+            ctx.save();
+            ctx.globalAlpha = 0.95;
+            ctx.font = 'bold 10px sans-serif';
+            const label = pred.jump.safe ? 'JUMP: SAFE' : 'JUMP: FAIL';
+            ctx.fillStyle = pred.jump.safe ? '#22c55e' : '#fb7185';
+            ctx.fillText(label, 14, 18);
+            if (lastJumpPrediction && globalTimer - lastJumpPrediction.t < 30) {
+                ctx.fillStyle = lastJumpPrediction.ok ? '#22c55e' : '#fb7185';
+                ctx.fillText(lastJumpPrediction.ok ? 'PRED: ✓' : 'PRED: ✕', 14, 34);
+            }
+            ctx.restore();
+        }
+
+        function performJump(p) {
+            const jScale = jumpScale(p);
+            if (p.mode === 'cube' && (p.onGround || p.coyote > 0)) {
+                p.v = JUMP_FORCE_CUBE * jScale * p.gravity;
+                p.onGround = false;
+            } else if (p.mode === 'ball' && (p.onGround || p.coyote > 0)) {
+                p.gravity *= -1;
+                p.onGround = false;
+            } else if (p.mode === 'ufo') {
+                p.v = UFO_FORCE * jScale * p.gravity;
+            } else if (p.mode === 'spider' && (p.onGround || p.coyote > 0)) {
+                teleportSpider(p);
+            } else if (p.mode === 'robot' && p.onGround) {
+                p.robotJumpTime = ROBOT_MAX_JUMP;
+                p.onGround = false;
+            }
+        }
+
+        function teleportSpider(p) {
+            const groundY = canvas.height - GROUND_Y_OFFSET;
+            const s = playerSize(p);
+            let targetY = p.gravity === 1 ? 0 : groundY - s;
+            levelData.forEach(o => {
+                if (o.type === 1) {
+                    const bw = o.w || GRID_SIZE;
+                    const bh = o.h || GRID_SIZE;
+                    if (p.gravity === 1 && o.y + bh <= p.y && o.y + bh > targetY && p.x + s > o.x && p.x < o.x + bw) targetY = o.y + bh;
+                    if (p.gravity === -1 && o.y >= p.y + s && o.y < (targetY || groundY) && p.x + s > o.x && p.x < o.x + bw) targetY = o.y - s;
+                }
+            });
+            p.y = targetY; p.gravity *= -1; p.v = 0; p.onGround = true;
+        }
+
+	        function startPlayMode(fromEditor = false) {
+	            // For preset play, start clean and let localized portals enable dual/size/etc.
+	            if (fromEditor) { lastLevelSource = 'editor'; playRunMeta = null; }
+	            else dualEnabled = false;
+            if (!fromEditor) resetPracticeState(false);
+	            gameState = 'PLAYING'; resetPlayers(); cameraX = 0; speedMultiplier = 1.0;
+	            if (showTrail) playerTrail = [];
+	            document.getElementById('menu').classList.add('hidden'); document.getElementById('editor-ui').classList.add('hidden');
+	            document.getElementById('game-ui').classList.remove('hidden'); document.getElementById('game-over').classList.add('hidden');
+
+	            if (levelTitle) {
+	                if (lastLevelSource === 'play' && playRunMeta) levelTitle.textContent = playRunMeta.name;
+	                else levelTitle.textContent = fromEditor ? 'Editor Test' : '';
+	            }
+	            focusCanvasForGameplay();
+	        }
+
+        function onLevelCompleteUI() {
+            const isPlay = (lastLevelSource === 'play' && playRunMeta);
+            if (nextLevelBtn) nextLevelBtn.classList.toggle('hidden', !isPlay);
+        }
+
+        function ensureDualFrom(sourcePlayer) {
+            if (!dualEnabled) { player2 = null; return; }
+            if (!player2) player2 = makePlayer('#38bdf8', 'b');
+
+            player2.scale = sourcePlayer.scale || 1;
+            player2.dashFrames = 0;
+            player2.dashBoost = 0;
+            const groundLimit = canvas.height - GROUND_Y_OFFSET - playerSize(player2);
+            player2.x = sourcePlayer.x;
+            player2.y = Math.max(0, Math.min(groundLimit, sourcePlayer.y - 180));
+            player2.v = sourcePlayer.v;
+            player2.rotation = sourcePlayer.rotation;
+            player2.onGround = sourcePlayer.onGround;
+            player2.mode = sourcePlayer.mode;
+            player2.gravity = -sourcePlayer.gravity;
+            player2.coyote = sourcePlayer.coyote || 0;
+            player2.robotJumpTime = 0;
+        }
+
+        function resetOne(p, yOverride = null) {
+            p.x = 100;
+            p.y = yOverride !== null ? yOverride : (canvas.height - GROUND_Y_OFFSET - PLAYER_SIZE);
+            p.v = 0;
+            p.rotation = 0;
+            p.onGround = true;
+            p.mode = 'cube';
+            p.gravity = 1;
+            p.coyote = 0;
+            p.robotJumpTime = 0;
+            p.scale = 1; // default = big
+            p.dashFrames = 0;
+            p.dashBoost = 0;
+            p.waveKickFrames = 0;
+            p.waveKickV = 0;
+        }
+
+        function capturePlayerState(p) {
+            return {
+                x: p.x, y: p.y, v: p.v, rotation: p.rotation,
+                onGround: p.onGround, mode: p.mode, gravity: p.gravity,
+                coyote: p.coyote, robotJumpTime: p.robotJumpTime,
+                scale: p.scale, dashFrames: p.dashFrames, dashBoost: p.dashBoost,
+                waveKickFrames: p.waveKickFrames, waveKickV: p.waveKickV,
+            };
+        }
+
+        function restorePlayerState(p, state) {
+            if (!p || !state) return;
+            p.x = state.x; p.y = state.y; p.v = state.v; p.rotation = state.rotation;
+            p.onGround = state.onGround; p.mode = state.mode; p.gravity = state.gravity;
+            p.coyote = state.coyote; p.robotJumpTime = state.robotJumpTime;
+            p.scale = state.scale; p.dashFrames = state.dashFrames; p.dashBoost = state.dashBoost;
+            p.waveKickFrames = state.waveKickFrames; p.waveKickV = state.waveKickV;
+        }
+
+        function updatePracticeUI() {
+            if (practiceToggleBtn) {
+                practiceToggleBtn.textContent = practiceMode ? 'PRACTICE: ON' : 'PRACTICE: OFF';
+                practiceToggleBtn.classList.toggle('active', practiceMode);
+            }
+            if (checkpointCount) checkpointCount.textContent = `${practiceCheckpoints.length} CP`;
+            if (checkpointBtn) checkpointBtn.disabled = !practiceMode;
+            if (checkpointClearBtn) checkpointClearBtn.disabled = !practiceMode || practiceCheckpoints.length === 0;
+        }
+
+        function resetPracticeState(keepMode) {
+            practiceCheckpoints = [];
+            if (!keepMode) practiceMode = false;
+            updatePracticeUI();
+        }
+
+        function togglePracticeMode() {
+            if (gameState !== 'PLAYING') return;
+            practiceMode = !practiceMode;
+            practiceCheckpoints = [];
+            updatePracticeUI();
+        }
+
+        function addPracticeCheckpoint() {
+            if (gameState !== 'PLAYING' || !practiceMode) return;
+            const cp = {
+                at: Date.now(),
+                dualEnabled,
+                speedMultiplier,
+                cameraX: Math.max(0, (player?.x || 0) - 180),
+                player: capturePlayerState(player),
+                player2: (dualEnabled && player2) ? capturePlayerState(player2) : null,
+            };
+            practiceCheckpoints.push(cp);
+            updatePracticeUI();
+        }
+
+        function removeLastCheckpoint() {
+            if (!practiceMode) return;
+            if (practiceCheckpoints.length > 0) practiceCheckpoints.pop();
+            updatePracticeUI();
+        }
+
+        function clearPracticeCheckpoints() {
+            practiceCheckpoints = [];
+            updatePracticeUI();
+        }
+
+        function respawnFromCheckpoint() {
+            const cp = practiceCheckpoints[practiceCheckpoints.length - 1];
+            if (!cp) {
+                resetPlayers();
+                cameraX = 0;
+                speedMultiplier = 1.0;
+                return;
+            }
+            dualEnabled = Boolean(cp.dualEnabled);
+            speedMultiplier = Math.max(0.2, Math.min(5, Number(cp.speedMultiplier) || 1));
+            restorePlayerState(player, cp.player);
+            if (dualEnabled) {
+                if (!player2) player2 = makePlayer('#38bdf8', 'b');
+                if (cp.player2) restorePlayerState(player2, cp.player2);
+                else ensureDualFrom(player);
+            } else {
+                player2 = null;
+            }
+            cameraX = Math.max(0, Number(cp.cameraX) || 0);
+            manualInputA = false; manualInputB = false;
+            inputA = false; inputB = false;
+            if (showTrail) playerTrail = [];
+        }
+
+        function playerSize(p) {
+            return PLAYER_SIZE * (p.scale || 1);
+        }
+
+        function jumpScale(p) {
+            // Mini should jump 1.15x less high than big.
+            return (p.scale || 1) < 0.75 ? (1 / 1.15) : 1;
+        }
+
+        function playerAabb(p) {
+            const s = playerSize(p);
+            const buf = Math.max(1, Math.min(HITBOX_BUFFER, s / 6));
+            return { x: p.x + buf, y: p.y + buf, w: s - buf * 2, h: s - buf * 2 };
+        }
+
+        function applyPlayerScale(p, scale) {
+            const oldS = playerSize(p);
+            p.scale = scale;
+            const newS = playerSize(p);
+            if (p.onGround) {
+                if (p.gravity === 1) p.y += (oldS - newS);
+            }
+            const groundLimit = canvas.height - GROUND_Y_OFFSET - newS;
+            p.y = Math.max(0, Math.min(groundLimit, p.y));
+            p.v = 0;
+            p.robotJumpTime = 0;
+        }
+
+        function resetPlayers() {
+            resetOne(player);
+            if (dualEnabled) {
+                if (!player2) player2 = makePlayer('#38bdf8', 'b');
+                resetOne(player2, 40);
+                player2.gravity = -1;
+            } else {
+                player2 = null;
+            }
+        }
+
+	        function rectHit(ax, ay, aw, ah, bx, by, bw, bh) {
+	            return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+	        }
+
+	        function rotatePoint(px, py, rad) {
+	            const c = Math.cos(rad), s = Math.sin(rad);
+	            return { x: px * c - py * s, y: px * s + py * c };
+	        }
+
+	        function orient(ax, ay, bx, by, cx, cy) {
+	            return (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
+	        }
+
+	        function onSeg(ax, ay, bx, by, cx, cy) {
+	            return Math.min(ax, bx) <= cx + 1e-9 && cx <= Math.max(ax, bx) + 1e-9 && Math.min(ay, by) <= cy + 1e-9 && cy <= Math.max(ay, by) + 1e-9;
+	        }
+
+	        function segIntersectsSeg(ax, ay, bx, by, cx, cy, dx, dy) {
+	            const o1 = orient(ax, ay, bx, by, cx, cy);
+	            const o2 = orient(ax, ay, bx, by, dx, dy);
+	            const o3 = orient(cx, cy, dx, dy, ax, ay);
+	            const o4 = orient(cx, cy, dx, dy, bx, by);
+	            if (o1 === 0 && onSeg(ax, ay, bx, by, cx, cy)) return true;
+	            if (o2 === 0 && onSeg(ax, ay, bx, by, dx, dy)) return true;
+	            if (o3 === 0 && onSeg(cx, cy, dx, dy, ax, ay)) return true;
+	            if (o4 === 0 && onSeg(cx, cy, dx, dy, bx, by)) return true;
+	            return (o1 > 0) !== (o2 > 0) && (o3 > 0) !== (o4 > 0);
+	        }
+
+	        function pointInRect(px, py, rx, ry, rw, rh) {
+	            return px >= rx && px <= rx + rw && py >= ry && py <= ry + rh;
+	        }
+
+	        function segIntersectsRect(x1, y1, x2, y2, rx, ry, rw, rh) {
+	            if (pointInRect(x1, y1, rx, ry, rw, rh) || pointInRect(x2, y2, rx, ry, rw, rh)) return true;
+	            const r1x = rx, r1y = ry;
+	            const r2x = rx + rw, r2y = ry;
+	            const r3x = rx + rw, r3y = ry + rh;
+	            const r4x = rx, r4y = ry + rh;
+	            return (
+	                segIntersectsSeg(x1, y1, x2, y2, r1x, r1y, r2x, r2y) ||
+	                segIntersectsSeg(x1, y1, x2, y2, r2x, r2y, r3x, r3y) ||
+	                segIntersectsSeg(x1, y1, x2, y2, r3x, r3y, r4x, r4y) ||
+	                segIntersectsSeg(x1, y1, x2, y2, r4x, r4y, r1x, r1y)
+	            );
+	        }
+
+	        function slopeSurfaceSegmentWorld(slopeObj) {
+	            const w = slopeObj.w || GRID_SIZE;
+	            const h = slopeObj.h || GRID_SIZE;
+	            const ang = Number(slopeObj.angle) || 45;
+	            const rot = ((Number(slopeObj.rotation) || 0) * Math.PI) / 180;
+	            const cx = slopeObj.x + w / 2;
+	            const cy = slopeObj.y + h / 2;
+
+	            let a = { x: -w / 2, y: h / 2 };
+	            let b = null;
+	            if (ang >= 89.9) {
+	                b = { x: 0, y: -h / 2 };
+	                a = { x: 0, y: h / 2 };
+	            } else {
+	                const rise = Math.min(h, Math.max(0, w * Math.tan((ang * Math.PI) / 180)));
+	                b = { x: w / 2, y: h / 2 - rise };
+	            }
+
+	            const ar = rotatePoint(a.x, a.y, rot);
+	            const br = rotatePoint(b.x, b.y, rot);
+	            return { x1: cx + ar.x, y1: cy + ar.y, x2: cx + br.x, y2: cy + br.y };
+	        }
+
+	        function waveHitsSlope(playerHb, slopeObj) {
+	            if (!playerHb || !slopeObj) return false;
+	            const seg = slopeSurfaceSegmentWorld(slopeObj);
+	            // A little padding to feel closer to GD wave "thickness".
+	            const pad = 2.5;
+	            return segIntersectsRect(seg.x1, seg.y1, seg.x2, seg.y2, playerHb.x - pad, playerHb.y - pad, playerHb.w + pad * 2, playerHb.h + pad * 2);
+	        }
+
+        function resetOnDeath() {
+            if (noclipEnabled) return;
+            if (practiceMode && practiceCheckpoints.length > 0) respawnFromCheckpoint();
+            else resetPlayers();
+        }
+
+        function updateOnePlayer(p, inputActive) {
+            try {
+                const dash = (p.dashFrames && p.dashFrames > 0) ? (p.dashBoost || 0) : 0;
+                p.x += SPEED + dash;
+                if (p.dashFrames && p.dashFrames > 0) p.dashFrames--;
+
+                switch (p.mode) {
+                    case 'ship': {
+                        let thrust = (inputActive ? SHIP_THRUST : SHIP_GRAVITY) * p.gravity;
+                        p.v += thrust; p.v *= SHIP_DRAG;
+                        p.v = Math.max(-8, Math.min(8, p.v));
+                        break;
+                    }
+	                case 'wave': {
+	                        const isMini = (p.scale || 1) < 0.75;
+	                        const waveV = isMini ? WAVE_VELOCITY_MINI : WAVE_VELOCITY;
+	                        p.v = (inputActive ? -waveV : waveV) * p.gravity;
+	                        if (p.waveKickFrames && p.waveKickFrames > 0) {
+	                            p.v += p.waveKickV;
+	                            p.waveKickFrames--;
+	                            p.waveKickV *= 0.86;
+	                        }
+	                        p.v = Math.max(-WAVE_VELOCITY_MAX, Math.min(WAVE_VELOCITY_MAX, p.v));
+	                    break;
+	                }
+                    case 'robot':
+                        if (inputActive && p.robotJumpTime > 0) { p.v = -8.5 * jumpScale(p) * p.gravity; p.robotJumpTime--; }
+                        else { p.robotJumpTime = 0; p.v += GRAVITY_CUBE * p.gravity; }
+                        break;
+                    default:
+                        p.v += GRAVITY_CUBE * p.gravity;
+                        break;
+                }
+
+                if (p.mode !== 'ship' && Math.abs(p.v) > TERMINAL_VELOCITY) p.v = TERMINAL_VELOCITY * Math.sign(p.v);
+                p.y += p.v;
+
+                const s = playerSize(p);
+                const groundLimit = canvas.height - GROUND_Y_OFFSET - s;
+                p.onGround = false;
+                if (p.y >= groundLimit) { p.y = groundLimit; p.v = 0; p.onGround = true; if (p.gravity === -1 && !noclipEnabled) resetOnDeath(); }
+                else if (p.y <= 0) { p.y = 0; p.v = 0; p.onGround = true; if (p.gravity === 1 && !noclipEnabled) resetOnDeath(); }
+
+                const hb = playerAabb(p);
+
+                levelData.forEach(o => {
+                    if (!o || !Number.isFinite(o.x)) return;
+                    if (Math.abs(p.x - o.x) > 120) return;
+
+	                    if (o.type === 'slope') {
+	                        if (p.mode === 'wave' && waveHitsSlope(hb, o)) resetOnDeath();
+	                    } else if (o.type === 'spike') {
+	                        if (spikeHitsPlayerAabb(hb, o)) resetOnDeath();
+	                    } else if (o.type === 'saw') {
+	                        if (sawHitsPlayerAabb(hb, o)) resetOnDeath();
+	                    } else if (o.type === 1) {
+                        const bw = o.w || 40;
+                        const bh = o.h || 40;
+                        if (rectHit(p.x, p.y, s, s, o.x, o.y, bw, bh)) {
+                            const overlapTop = (p.y + s) - o.y;
+                            const overlapBot = (o.y + bh) - p.y;
+                            const withGravity = (p.v * p.gravity) >= 0;
+                            // Only allow "landing" on the face that the current gravity points toward.
+                            if (p.gravity === 1 && withGravity && overlapTop < 10) { p.y = o.y - s; p.v = 0; p.onGround = true; }
+                            else if (p.gravity === -1 && withGravity && overlapBot < 10) { p.y = o.y + bh; p.v = 0; p.onGround = true; }
+                            else resetOnDeath();
+                        }
+                    } else if (o.type === 'portal') {
+                        const w = o.w || GRID_SIZE;
+                        const h = o.h || GRID_SIZE * 2;
+                        if (rectHit(hb.x, hb.y, hb.w, hb.h, o.x, o.y, w, h)) {
+                            if (p.mode !== o.mode) { p.mode = o.mode; p.v = 0; p.robotJumpTime = 0; }
+                        }
+                    } else if (o.type === 'size') {
+                        const w = o.w || GRID_SIZE;
+                        const h = o.h || GRID_SIZE * 2;
+                        if (rectHit(hb.x, hb.y, hb.w, hb.h, o.x, o.y, w, h)) {
+                            const target = String(o.size || 'big').toLowerCase() === 'mini' ? 0.5 : 1;
+                            if ((p.scale || 1) !== target) applyPlayerScale(p, target);
+                        }
+                    } else if (o.type === 'speed') {
+                        const w = o.w || GRID_SIZE;
+                        const h = o.h || GRID_SIZE * 2;
+                        if (rectHit(hb.x, hb.y, hb.w, hb.h, o.x, o.y, w, h)) {
+                            const mult = Math.max(0.2, Math.min(5, Number(o.mult) || 1));
+                            speedMultiplier = mult;
+                        }
+                } else if (o.type === 'dual') {
+                        const w = o.w || GRID_SIZE;
+                        const h = o.h || GRID_SIZE * 2;
+                        if (rectHit(hb.x, hb.y, hb.w, hb.h, o.x, o.y, w, h)) {
+                            if (dualEnabled !== Boolean(o.enabled)) {
+                                dualEnabled = Boolean(o.enabled);
+                                if (dualEnabled) {
+                                    if (!player2) ensureDualFrom(p);
+                                } else {
+                                    player2 = null;
+                                }
+                            }
+                        }
+                } else if (o.type === 'gravity') {
+                        const isHoriz = (o.rotation || 0) % 180 !== 0;
+                        let hit = false;
+                        if (!isHoriz) {
+                            if (Math.abs(p.x - o.x) < 20 && p.y + s > o.y && p.y < o.y + 80) hit = true;
+                        } else {
+                            if (p.x + s > o.x && p.x < o.x + 80 && Math.abs(p.y - o.y - 20) < 20) hit = true;
+                        }
+                        if (hit && p.gravity !== o.dir) { p.gravity = o.dir; p.v = 0; }
+                    } else if (o.type === 'orb') {
+                        const px = p.x + s / 2;
+                        const py = p.y + s / 2;
+                        const ox = o.x + GRID_SIZE / 2;
+                        const oy = o.y + GRID_SIZE / 2;
+                        const d = Math.hypot(ox - px, oy - py);
+                        if (!o._hotFor) o._hotFor = {};
+                        o._hotFor[p.id || 'a'] = d < ORB_ACTIVATE_DIST + ORB_RADIUS;
+                    } else if (o.type === 'pad') {
+                        const rot = (o.rotation || 0) % 360;
+                        const isCeilingPad = rot === 180;
+                        const useKey = (p.id || 'a') === 'b' ? '_lastUseB' : '_lastUseA';
+                        const last = o[useKey] || -99999;
+                        if (globalTimer - last < PAD_COOLDOWN_FRAMES) return;
+
+                        const overlapX = (p.x + s) > o.x + 4 && p.x < (o.x + 40 - 4);
+                        if (!overlapX) return;
+
+                        const cx = o.x + GRID_SIZE / 2;
+                        const cy = o.y + GRID_SIZE / 2;
+                        const pxc = p.x + s / 2;
+                        const pyc = p.y + s / 2;
+                        if (!o._hotFor) o._hotFor = {};
+                        o._hotFor[p.id || 'a'] = Math.hypot(cx - pxc, cy - pyc) < 70;
+
+                        if (!isCeilingPad && p.gravity === 1) {
+                            const playerBottom = p.y + s;
+                            const nearTop = playerBottom >= o.y && playerBottom <= o.y + 14;
+                            if (nearTop && p.v * p.gravity >= 0) {
+                                o[useKey] = globalTimer;
+                                p.y = o.y - s;
+                                applyPadEffect(p, o.pad || 'yellow', o);
+                            }
+                        } else if (isCeilingPad && p.gravity === -1) {
+                            const playerTop = p.y;
+                            const nearBottom = playerTop <= (o.y + 40) && playerTop >= (o.y + 40) - 14;
+                            if (nearBottom && p.v * p.gravity <= 0) {
+                                o[useKey] = globalTimer;
+                                p.y = o.y + 40;
+                                applyPadEffect(p, o.pad || 'yellow', o);
+                            }
+                        }
+                    }
+                });
+
+                if (p.onGround) {
+                    p.coyote = 4;
+                    if (['cube', 'robot', 'ufo'].includes(p.mode)) p.rotation = Math.round(p.rotation / (Math.PI / 2)) * (Math.PI / 2);
+                } else {
+                    if (p.coyote > 0) p.coyote--;
+                    if (['cube', 'robot', 'ufo', 'ball'].includes(p.mode)) p.rotation += 0.16 * p.gravity;
+                    else if (p.mode === 'ship') p.rotation = p.v * 0.04;
+                    else if (p.mode === 'wave') p.rotation = (inputActive ? -0.4 : 0.4) * p.gravity;
+                }
+            } catch (err) {
+                showCrash(err, { label: 'updateOnePlayer', player: p?.id, severity: 'P0' });
+                resetPlayers();
+            }
+        }
+
+	        function updatePhysics() {
+	            if (gameState !== 'PLAYING') return;
+
+	            try {
+	                lastPlayingAt = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+	                lastActivityAt = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+
+	                // Autoclicker (game-time based). Pulses input on a cadence, without overriding manual holds.
+	                let autoPulseA = false;
+                let autoPulseB = false;
+                if (autoClickEnabled) {
+                    autoClickTick++;
+                    const cps = Math.max(1, Math.min(120000, Number(autoClickCps) || 12));
+                    autoClickAcc += cps / 60; // clicks per 60fps tick
+                    const clicksThisTick = Math.floor(autoClickAcc);
+                    if (clicksThisTick > 0) {
+                        if (autoClickTarget === 'a' || autoClickTarget === 'both') autoPulseA = true;
+                        if (autoClickTarget === 'b' || autoClickTarget === 'both') autoPulseB = true;
+                        autoClickAcc -= clicksThisTick;
+                    }
+                } else {
+                    autoClickTick = 0;
+                    autoClickAcc = 0;
+                }
+
+                inputA = Boolean(manualInputA || autoPulseA);
+                inputB = Boolean(manualInputB || autoPulseB);
+                if (autoPulseA && !manualInputA) handleJumpPress(player, true);
+                if (autoPulseB && !manualInputB && dualEnabled && player2) handleJumpPress(player2, false);
+
+                const leadX = Math.max(player.x, player2 ? player2.x : 0);
+                for (const o of levelData) {
+                    if (!o || (o.type !== 'orb' && o.type !== 'pad')) continue;
+                    if (!Number.isFinite(o.x) || Math.abs(leadX - o.x) > 900) continue;
+                    if (!o._hotFor) o._hotFor = {};
+                    o._hotFor.a = false;
+                    o._hotFor.b = false;
+                }
+
+                updateOnePlayer(player, inputA);
+                if (dualEnabled) {
+                    if (!player2) ensureDualFrom(player);
+                    if (player2) updateOnePlayer(player2, inputB);
+                } else {
+                    player2 = null;
+                }
+
+                if (!dualEnabled || !player2) {
+                    manualInputB = false;
+                    inputB = false;
+                }
+
+                cameraX = Math.max(player.x, player2 ? player2.x : 0) - 180;
+                if (!Number.isFinite(cameraX)) cameraX = 0;
+
+                if (showTrail) {
+                    const hb1 = playerAabb(player);
+                    playerTrail.push({ x: hb1.x, y: hb1.y, w: hb1.w, h: hb1.h });
+                    if (player2) {
+                        const hb2 = playerAabb(player2);
+                        playerTrail.push({ x: hb2.x, y: hb2.y, w: hb2.w, h: hb2.h });
+                    }
+                    if (playerTrail.length > 1000) playerTrail.splice(0, playerTrail.length - 1000);
+                }
+
+                const endX = levelData.find(o => o && o.type === 'end')?.x || 3000;
+                const prog = Math.min(100, Math.floor((leadX / endX) * 100));
+                progressBar.style.width = prog + '%'; percentText.innerText = prog + '%';
+                if (prog >= 100) {
+                    gameState = 'COMPLETE';
+                    onLevelCompleteUI();
+                    document.getElementById('game-over').classList.remove('hidden');
+                }
+            } catch (err) {
+                showCrash(err, { label: 'updatePhysics', severity: 'P0' });
+                // Best-effort recovery: reset to a known-good state.
+                resetPlayers();
+            }
+        }
+
+        function draw() {
+            try {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const groundY = canvas.height - GROUND_Y_OFFSET;
+
+                if (gameState === 'EDITING') {
+                    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+                    for (let x = -cameraX % GRID_SIZE; x < canvas.width; x += GRID_SIZE) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, groundY); ctx.stroke(); }
+                    for (let y = groundY; y > 0; y -= GRID_SIZE) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke(); }
+                }
+
+                // Draw Hitbox Trail
+                if (showTrail && (gameState === 'PLAYING' || gameState === 'EDITING' || gameState === 'COMPLETE')) {
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = noclipEnabled ? 'rgba(255, 0, 255, 0.4)' : 'rgba(0, 255, 255, 0.4)';
+                    playerTrail.forEach(t => {
+                        ctx.strokeRect(t.x - cameraX, t.y, t.w, t.h);
+                    });
+                }
+
+                levelData.forEach(o => {
+                    try {
+                        if (!o || !Number.isFinite(o.x)) return;
+                        const sx = o.x - cameraX;
+                        if (sx < -200 || sx > canvas.width + 200) return;
+
+                        if (selectedObjects.includes(o)) {
+                            ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
+                            const rot = (o.rotation || 0) % 360;
+                            const isHorizGravity = o.type === 'gravity' && (rot % 180 !== 0);
+                            const w = o.w || (isHorizGravity ? GRID_SIZE * 2 : GRID_SIZE);
+                            const h = o.h || (o.type === 'gravity' ? (isHorizGravity ? GRID_SIZE : GRID_SIZE * 2) : GRID_SIZE);
+                            ctx.fillRect(sx - 2, o.y - 2, w + 4, h + 4);
+                        }
+
+                        if (o.type === 'prop') {
+                            ctx.save(); ctx.translate(sx + 20, o.y + 20); ctx.rotate(globalTimer * 0.02);
+                            ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.strokeRect(-40, -40, 80, 80); ctx.restore();
+                        } else if (o.type === 'spike') {
+                            const c = SPIKE_CFG[o.variant];
+                            if (!c) return;
+                            ctx.save(); ctx.translate(sx + 20, o.y + 20); ctx.rotate((o.rotation || 0) * Math.PI / 180);
+                            ctx.fillStyle = 'white'; ctx.beginPath(); ctx.moveTo(-c.w / 2, -20 + c.o + c.h); ctx.lineTo(0, -20 + c.o); ctx.lineTo(c.w / 2, -20 + c.o + c.h); ctx.fill();
+                            if (showHitboxes) {
+                                const dmg = spikeLocalDamageRect(c, o.variant);
+                                ctx.strokeStyle = '#f00';
+                                ctx.lineWidth = 1.5;
+                                ctx.strokeRect(dmg.x, dmg.y, dmg.w, dmg.h);
+                            }
+                            ctx.restore();
+	                        } else if (o.type === 'saw') {
+	                            const c = SAW_CFG[o.variant];
+	                            if (!c) return;
+	                            ctx.save(); ctx.translate(sx + 20, o.y + 20); ctx.rotate(globalTimer * 0.1);
+	                            ctx.fillStyle = '#eee'; for (let i = 0; i < 8; i++) { ctx.rotate(Math.PI / 4); ctx.beginPath(); ctx.moveTo(0, -c.v); ctx.lineTo(5, -c.v + 10); ctx.lineTo(-5, -c.v + 10); ctx.fill(); }
+	                            ctx.beginPath(); ctx.arc(0, 0, c.v * 0.6, 0, Math.PI * 2); ctx.fillStyle = '#333'; ctx.fill();
+	                            if (showHitboxes) {
+	                                ctx.strokeStyle = '#f00';
+	                                ctx.lineWidth = 1.5;
+	                                ctx.beginPath();
+	                                ctx.arc(0, 0, sawDamageRadius(c), 0, Math.PI * 2);
+	                                ctx.stroke();
+	                            }
+	                            ctx.restore();
+	                        } else if (o.type === 'slope') {
+	                            const w = o.w || GRID_SIZE;
+	                            const h = o.h || GRID_SIZE;
+	                            const ang = Number(o.angle) || 45;
+	                            const rot = (Number(o.rotation) || 0) * Math.PI / 180;
+	                            ctx.save();
+	                            ctx.translate(sx + w / 2, o.y + h / 2);
+	                            ctx.rotate(rot);
+	                            ctx.lineWidth = 2;
+	                            if (ang >= 89.9) {
+	                                ctx.fillStyle = 'rgba(255,255,255,0.18)';
+	                                ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+	                                ctx.fillRect(-4, -h / 2, 8, h);
+	                                ctx.strokeRect(-4, -h / 2, 8, h);
+	                                if (showHitboxes) { ctx.strokeStyle = '#f00'; ctx.beginPath(); ctx.moveTo(0, -h / 2); ctx.lineTo(0, h / 2); ctx.stroke(); }
+	                            } else {
+	                                const rise = Math.min(h, Math.max(0, w * Math.tan((ang * Math.PI) / 180)));
+	                                ctx.fillStyle = 'rgba(255,255,255,0.18)';
+	                                ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+	                                ctx.beginPath();
+	                                ctx.moveTo(-w / 2, h / 2);
+	                                ctx.lineTo(w / 2, h / 2);
+	                                ctx.lineTo(w / 2, h / 2 - rise);
+	                                ctx.closePath();
+	                                ctx.fill();
+	                                ctx.stroke();
+	                                if (showHitboxes) { ctx.strokeStyle = '#f00'; ctx.beginPath(); ctx.moveTo(-w / 2, h / 2); ctx.lineTo(w / 2, h / 2 - rise); ctx.stroke(); }
+	                            }
+	                            ctx.restore();
+	                        } else if (o.type === 1) {
+	                            const bw = o.w || 40;
+	                            const bh = o.h || 40;
+	                            ctx.fillStyle = '#0cf'; ctx.fillRect(sx, o.y, bw, bh); ctx.strokeStyle = 'white'; ctx.strokeRect(sx, o.y, bw, bh);
+	                            if (showHitboxes) { ctx.strokeStyle = '#0f0'; ctx.strokeRect(sx, o.y, bw, bh); }
+                        }
+                        else if (o.type === 'portal') {
+                            const w = o.w || GRID_SIZE;
+                            const h = o.h || GRID_SIZE * 2;
+                            ctx.save();
+                            ctx.strokeStyle = 'white';
+                            ctx.lineWidth = 2;
+                            ctx.setLineDash([6, 6]);
+                            ctx.strokeRect(sx, o.y, w, h);
+                            ctx.setLineDash([]);
+                            ctx.fillStyle = 'white';
+                            ctx.font = 'bold 9px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(String(o.mode || 'cube').toUpperCase(), sx + w / 2, o.y + h / 2);
+                            ctx.restore();
+                        }
+                        else if (o.type === 'size') {
+                            const w = o.w || GRID_SIZE;
+                            const h = o.h || GRID_SIZE * 2;
+                            const isMini = String(o.size || 'big').toLowerCase() === 'mini';
+                            ctx.save();
+                            ctx.strokeStyle = isMini ? '#a855f7' : '#e5e7eb';
+                            ctx.lineWidth = 2;
+                            ctx.setLineDash([6, 6]);
+                            ctx.strokeRect(sx, o.y, w, h);
+                            ctx.setLineDash([]);
+                            ctx.fillStyle = 'white';
+                            ctx.font = 'bold 9px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(isMini ? 'MINI' : 'BIG', sx + w / 2, o.y + h / 2);
+                            ctx.restore();
+                        }
+                        else if (o.type === 'speed') {
+                            const w = o.w || GRID_SIZE;
+                            const h = o.h || GRID_SIZE * 2;
+                            const mult = Math.max(0.2, Math.min(5, Number(o.mult) || 1));
+                            ctx.save();
+                            ctx.strokeStyle = '#f59e0b';
+                            ctx.lineWidth = 2;
+                            ctx.setLineDash([6, 6]);
+                            ctx.strokeRect(sx, o.y, w, h);
+                            ctx.setLineDash([]);
+                            ctx.fillStyle = 'white';
+                            ctx.font = 'bold 9px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(`SPD ${mult}x`, sx + w / 2, o.y + h / 2);
+                            ctx.restore();
+                        }
+                        else if (o.type === 'dual') {
+                            const w = o.w || GRID_SIZE;
+                            const h = o.h || GRID_SIZE * 2;
+                            const enabled = Boolean(o.enabled);
+                            ctx.save();
+                            ctx.strokeStyle = enabled ? '#22c55e' : '#ef4444';
+                            ctx.lineWidth = 2;
+                            ctx.setLineDash([6, 6]);
+                            ctx.strokeRect(sx, o.y, w, h);
+                            ctx.setLineDash([]);
+                            ctx.fillStyle = 'white';
+                            ctx.font = 'bold 9px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(enabled ? 'DUAL ON' : 'DUAL OFF', sx + w / 2, o.y + h / 2);
+                            ctx.restore();
+                        }
+                        else if (o.type === 'gravity') {
+                            ctx.save(); ctx.translate(sx + 20, o.y + 40); ctx.rotate((o.rotation || 0) * Math.PI / 180);
+                            ctx.fillStyle = o.dir === -1 ? '#eab308' : '#3b82f6';
+                            ctx.fillRect(-5, -40, 10, 80); ctx.strokeStyle = 'white'; ctx.strokeRect(-5, -40, 10, 80);
+                            ctx.fillStyle = "white"; ctx.font = "bold 8px sans-serif"; ctx.textAlign = "center";
+                            ctx.fillText(o.dir === -1 ? "UP" : "DN", 0, 4); ctx.restore();
+                } else if (o.type === 'orb') {
+                    const orb = String(o.orb || 'yellow').toLowerCase();
+                    const palette = {
+                        yellow: { fill: '#fde047', stroke: '#facc15', glow: 'rgba(250,204,21,0.45)' },
+                        pink: { fill: '#fb7185', stroke: '#f43f5e', glow: 'rgba(244,63,94,0.45)' },
+                        green: { fill: '#22c55e', stroke: '#16a34a', glow: 'rgba(34,197,94,0.45)' },
+                        blue: { fill: '#38bdf8', stroke: '#0ea5e9', glow: 'rgba(56,189,248,0.45)' },
+                        black: { fill: '#111827', stroke: '#94a3b8', glow: 'rgba(148,163,184,0.25)' },
+                        dash_green: { fill: '#16a34a', stroke: '#22c55e', glow: 'rgba(34,197,94,0.38)' },
+                        dash_purple: { fill: '#a855f7', stroke: '#7c3aed', glow: 'rgba(168,85,247,0.40)' },
+                    }[orb] || { fill: '#ffffff', stroke: '#e5e7eb', glow: 'rgba(255,255,255,0.35)' };
+
+                    const cx = sx + 20;
+                    const cy = o.y + 20;
+                    const pulse = 1 + Math.sin((globalTimer + o.x * 0.02) * 0.12) * 0.06;
+                    const hf = o._hotFor || {};
+                    const hot = Boolean(hf.a || hf.b);
+
+                    ctx.save();
+                    ctx.globalAlpha = hot ? 1 : 0.9;
+                    ctx.shadowColor = palette.glow;
+                    ctx.shadowBlur = hot ? 18 : 12;
+
+                    // outer ring
+                    ctx.beginPath();
+                    ctx.lineWidth = hot ? 4 : 3;
+                    ctx.strokeStyle = palette.stroke;
+                    ctx.arc(cx, cy, ORB_RADIUS * pulse + (hot ? 1.5 : 0), 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // inner core
+                    ctx.beginPath();
+                    ctx.fillStyle = palette.fill;
+                    ctx.arc(cx, cy, (ORB_RADIUS - 6) * pulse, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    if (orb.startsWith('dash_')) {
+                        // dash arrow
+                        ctx.shadowBlur = 0;
+                        ctx.fillStyle = 'rgba(255,255,255,0.88)';
+                        ctx.beginPath();
+                        ctx.moveTo(cx - 6, cy);
+                        ctx.lineTo(cx + 7, cy - 5);
+                        ctx.lineTo(cx + 7, cy - 2);
+                        ctx.lineTo(cx + 12, cy - 2);
+                        ctx.lineTo(cx + 12, cy + 2);
+                        ctx.lineTo(cx + 7, cy + 2);
+                        ctx.lineTo(cx + 7, cy + 5);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+
+                    // center dot
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 2.4, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    if (showHitboxes) {
+                        ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, ORB_ACTIVATE_DIST, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+                } else if (o.type === 'pad') {
+                    const pad = String(o.pad || 'yellow').toLowerCase();
+                    const palette = {
+                        yellow: { fill: '#facc15', stroke: '#fde047', glow: 'rgba(250,204,21,0.45)' },
+                        pink: { fill: '#f43f5e', stroke: '#fb7185', glow: 'rgba(244,63,94,0.45)' },
+                        green: { fill: '#16a34a', stroke: '#22c55e', glow: 'rgba(34,197,94,0.45)' },
+                        blue: { fill: '#0ea5e9', stroke: '#38bdf8', glow: 'rgba(56,189,248,0.45)' },
+                        black: { fill: '#0b1220', stroke: '#94a3b8', glow: 'rgba(148,163,184,0.25)' },
+                    }[pad] || { fill: '#ffffff', stroke: '#e5e7eb', glow: 'rgba(255,255,255,0.35)' };
+
+                    const cx = sx + 20;
+                    const cy = o.y + 20;
+                    const hf = o._hotFor || {};
+                    const hot = Boolean(hf.a || hf.b);
+                    const pulse = 1 + Math.sin((globalTimer + o.x * 0.02) * 0.14) * 0.04;
+
+                    ctx.save();
+                    ctx.translate(cx, cy);
+                    ctx.rotate((o.rotation || 0) * Math.PI / 180);
+                    ctx.shadowColor = palette.glow;
+                    ctx.shadowBlur = hot ? 16 : 10;
+
+                    // base
+                    ctx.fillStyle = palette.fill;
+                    ctx.strokeStyle = palette.stroke;
+                    ctx.lineWidth = 3;
+                    if (typeof ctx.roundRect === 'function') {
+                        ctx.beginPath();
+                        ctx.roundRect(-18, -18, 36, 36, 8);
+                    } else {
+                        pathRoundRect(ctx, -18, -18, 36, 36, 8);
+                    }
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // arrow/chevron
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                    ctx.beginPath();
+                    ctx.moveTo(0, -10 * pulse);
+                    ctx.lineTo(9, 4 * pulse);
+                    ctx.lineTo(4, 4 * pulse);
+                    ctx.lineTo(4, 12 * pulse);
+                    ctx.lineTo(-4, 12 * pulse);
+                    ctx.lineTo(-4, 4 * pulse);
+                    ctx.lineTo(-9, 4 * pulse);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    if (showHitboxes) {
+                        ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(-20, -20, 40, 40);
+                    }
+                    ctx.restore();
+                        } else if (o.type === 'end') { ctx.fillStyle = 'yellow'; ctx.fillRect(sx, 0, 4, groundY); }
+                    } catch (err) {
+                        showCrash(err, { label: 'drawObject', objType: o?.type });
+                    }
+                });
+
+                if (practiceMode && practiceCheckpoints.length > 0) {
+                    ctx.save();
+                    ctx.strokeStyle = 'rgba(0, 255, 255, 0.8)';
+                    ctx.lineWidth = 2;
+                    practiceCheckpoints.forEach(cp => {
+                        const cx = (cp?.player?.x || 0) - cameraX;
+                        if (cx < -40 || cx > canvas.width + 40) return;
+                        ctx.beginPath();
+                        ctx.moveTo(cx, 0);
+                        ctx.lineTo(cx, groundY);
+                        ctx.stroke();
+                        ctx.fillStyle = 'rgba(0, 255, 255, 0.9)';
+                        ctx.fillRect(cx - 4, groundY - 24, 8, 8);
+                    });
+                    ctx.restore();
+                }
+
+            // Orb pulses (activation FX)
+            for (let i = orbPulses.length - 1; i >= 0; i--) {
+                const p = orbPulses[i];
+                p.life -= 1;
+                p.r += 1.4;
+                const a = Math.max(0, p.life / 24);
+                ctx.save();
+                ctx.globalAlpha = a;
+                ctx.strokeStyle = p.color;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(p.x - cameraX, p.y, p.r, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+                if (p.life <= 0) orbPulses.splice(i, 1);
+            }
+
+            // Pad pulses (activation FX)
+            for (let i = padPulses.length - 1; i >= 0; i--) {
+                const p = padPulses[i];
+                p.life -= 1;
+                p.r += 1.8;
+                const a = Math.max(0, p.life / 26);
+                ctx.save();
+                ctx.globalAlpha = a;
+                ctx.strokeStyle = p.color;
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(p.x - cameraX, p.y, p.r, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+                if (p.life <= 0) padPulses.splice(i, 1);
+            }
+
+            if (selectionBox) { ctx.strokeStyle = '#00ff00'; ctx.lineWidth = 2; ctx.strokeRect(selectionBox.x - cameraX, selectionBox.y, selectionBox.w, selectionBox.h); ctx.fillStyle = 'rgba(0, 255, 0, 0.1)'; ctx.fillRect(selectionBox.x - cameraX, selectionBox.y, selectionBox.w, selectionBox.h); }
+
+            ctx.fillStyle = '#002288'; ctx.fillRect(0, groundY, canvas.width, GROUND_Y_OFFSET);
+            ctx.strokeStyle = 'white'; ctx.strokeRect(0, groundY, canvas.width, 2);
+
+            if (gameState === 'PLAYING' || gameState === 'COMPLETE') {
+                if (gameState === 'PLAYING') {
+                    const pred = computeCubePrediction();
+                    drawPrediction(pred);
+                }
+
+	                if (!suppressPhysicsInDraw) {
+	                    const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+	                    const dtFrames = Math.min(3, Math.max(0, (now - lastFrameAt) / (1000 / 60)));
+	                    frameAccumulator += dtFrames * gameSpeedFactor * Math.max(0.2, Math.min(5, speedMultiplier || 1));
+	                    // Safety cap so very high speed can't spiral into huge loops on a slow frame.
+	                    let stepsThisFrame = 0;
+	                    const maxSteps = 12;
+	                    while (frameAccumulator >= 1.0 && stepsThisFrame < maxSteps) {
+	                        updatePhysics();
+	                        frameAccumulator -= 1.0;
+	                        stepsThisFrame++;
+	                    }
+	                    if (stepsThisFrame >= maxSteps) frameAccumulator = 0;
+	                }
+
+                const drawPlayerIcon = (p) => {
+                    const s = playerSize(p);
+                    const k = s / PLAYER_SIZE;
+                    ctx.save(); ctx.translate(p.x - cameraX + s / 2, p.y + s / 2);
+                    if (p.gravity === -1) ctx.scale(1, -1);
+                    ctx.rotate(p.rotation);
+                    if (noclipEnabled) ctx.globalAlpha = 0.6;
+
+                    if (p.mode === 'ship') {
+                        ctx.fillStyle = p.tint || '#555';
+                        ctx.beginPath(); ctx.moveTo(-20 * k, 0); ctx.lineTo(15 * k, -10 * k); ctx.lineTo(15 * k, 10 * k); ctx.fill();
+                    } else if (p.mode === 'wave') {
+                        ctx.fillStyle = p.tint || '#0ff';
+                        ctx.beginPath(); ctx.moveTo(-15 * k, -10 * k); ctx.lineTo(15 * k, 0); ctx.lineTo(-15 * k, 10 * k); ctx.fill();
+                    } else {
+                        ctx.fillStyle = p.tint || '#0f0';
+                        ctx.fillRect(-s / 2, -s / 2, s, s);
+                        ctx.strokeStyle = 'black';
+                        ctx.strokeRect(-s / 2, -s / 2, s, s);
+                    }
+                    ctx.restore();
+
+                    if (showHitboxes) {
+                        ctx.strokeStyle = p.id === 'b' ? '#38bdf8' : '#22c55e';
+                        ctx.lineWidth = 1;
+                        const hb = playerAabb(p);
+                        ctx.strokeRect(hb.x - cameraX, hb.y, hb.w, hb.h);
+                    }
+                };
+
+                drawPlayerIcon(player);
+                if (dualEnabled && player2) drawPlayerIcon(player2);
+            }
+            } catch (err) {
+                showCrash(err, { label: 'draw', severity: 'P0' });
+            } finally {
+                globalTimer++;
+                const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+                lastFrameAt = now;
+                lastActivityAt = now;
+                if (rafHandle === null) {
+                    rafHandle = requestAnimationFrame((t) => {
+                        rafHandle = null;
+                        draw(t);
+                    });
+                }
+            }
+        }
+
+        // Testing hooks (used by Playwright skill)
+        window.render_game_to_text = () => {
+            const payload = {
+                mode: gameState,
+                cameraX,
+                dualEnabled,
+                speedMultiplier,
+                play: (lastLevelSource === 'play' && playRunMeta) ? { name: playRunMeta.name, difficulty: playRunMeta.difficulty, focus: playRunMeta.focus } : null,
+                autoclick: { enabled: autoClickEnabled, cps: autoClickCps, target: autoClickTarget },
+                player: { x: player.x, y: player.y, v: player.v, gravity: player.gravity, onGround: player.onGround, mode: player.mode },
+                player2: player2 ? { x: player2.x, y: player2.y, v: player2.v, gravity: player2.gravity, onGround: player2.onGround, mode: player2.mode } : null,
+	                counts: {
+	                    blocks: levelData.filter(o => o.type === 1).length,
+	                    spikes: levelData.filter(o => o.type === 'spike').length,
+	                    slopes: levelData.filter(o => o.type === 'slope').length,
+	                    orbs: levelData.filter(o => o.type === 'orb').length,
+	                    pads: levelData.filter(o => o.type === 'pad').length,
+	                    portals: levelData.filter(o => o.type === 'portal').length,
+	                    sizePortals: levelData.filter(o => o.type === 'size').length,
+                    speedPortals: levelData.filter(o => o.type === 'speed').length,
+                    dual: levelData.filter(o => o.type === 'dual').length,
+                },
+                note: "Origin top-left; +x right; +y down. Gravity=1 pulls down, -1 pulls up."
+            };
+            return JSON.stringify(payload);
+        };
+
+	        window.advanceTime = (ms) => {
+	            const steps = Math.max(1, Math.round(ms / (1000 / 60)));
+	            lastActivityAt = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+	            for (let i = 0; i < steps; i++) updatePhysics();
+	            // Render once so headless automation can "see" the game even when rAF is throttled.
+	            try {
+	                suppressPhysicsInDraw = true;
+	                const origRaf = window.requestAnimationFrame;
+	                window.requestAnimationFrame = () => 0;
+	                draw();
+	                window.requestAnimationFrame = origRaf;
+	            } catch { }
+	            finally { suppressPhysicsInDraw = false; }
+	        };
+
+	        function setForceLoopForever(on = true) {
+	            forceLoopForever = Boolean(on);
+	            return forceLoopForever;
+	        }
+	        window.setForceLoopForever = setForceLoopForever;
+
+	        // Loop guardian: keeps the render loop alive and "re-opens" play if it unexpectedly returns to MENU.
+	        // Note: browsers will not allow re-opening a closed tab/window; this only self-heals inside the page.
+	        setInterval(() => {
+	            if (!forceLoopForever) return;
+	            if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+	            const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+
+	            // If rAF stalls, poke it.
+            if (now - lastFrameAt > 1600) {
+                try {
+                    if (rafHandle === null) {
+                        rafHandle = requestAnimationFrame((t) => {
+                            rafHandle = null;
+                            draw(t);
+                        });
+                    }
+                } catch { }
+                lastActivityAt = now;
+                lastFrameAt = now;
+            }
+
+	            // If we were playing very recently and ended up back in MENU, force a restart.
+	            if (gameState === 'MENU' && now - lastPlayingAt < 9000) {
+	                try { restartCurrentLevel(); } catch { }
+	            }
+	        }, 600);
+
+        canvas.addEventListener('mousedown', safeHandler('mousedown', (e) => handleInput(e, true)));
+        window.addEventListener('mouseup', safeHandler('mouseup', (e) => handleInput(e, false)));
+        canvas.addEventListener('mousemove', safeHandler('mousemove', handleMouseMove));
+        canvas.addEventListener('touchstart', safeHandler('touchstart', (e) => { e.preventDefault(); handleInput(e, true); }), { passive: false });
+        canvas.addEventListener('touchend', safeHandler('touchend', (e) => handleInput(e, false)));
+
+        function setTool(t) { selectedTool = t; document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active')); document.getElementById('tool-' + t)?.classList.add('active'); }
+	    function startEditMode(levelName = null) {
+                if (levelName) {
+                    currentLevelName = levelName;
+                } else {
+                    const levels = getSavedLevels();
+                    const autoSaveData = levels.find(l => l.name === '__autosave__');
+                    // Check if autosave has more than just the end marker
+                    if (autoSaveData && autoSaveData.data && autoSaveData.data.length > 1) {
+                        if (confirm("Restore unsaved work from the last session?")) {
+                            levelData = autoSaveData.data;
+                            currentLevelName = null; // It's still an "unsaved" level
+                        } else {
+                            // User chose not to restore, so clear the autosave and the level.
+                            deleteLevelFromSlot('__autosave__', true);
+                            clearLevel();
+                        }
+                    } else {
+                        clearLevel();
+                    }
+                }
+                lastLevelSource = 'editor';
+                playRunMeta = null;
+                gameState = 'EDITING';
+                document.getElementById('menu').classList.add('hidden');
+                document.getElementById('editor-ui').classList.remove('hidden');
+                const editorTitle = document.getElementById('editor-level-title');
+                if (editorTitle) editorTitle.textContent = currentLevelName ? `Editing: ${currentLevelName}` : 'Editing: New Level';
+                focusCanvasForGameplay();
+            }
+        function saveCurrentLevel() {
+            const name = prompt("Enter a name for your level:", currentLevelName || "My Level");
+            if (name && name !== '__autosave__') {
+                if (saveLevelToSlot(name, levelData)) {
+                    currentLevelName = name;
+                    const editorTitle = document.getElementById('editor-level-title');
+                    if (editorTitle) editorTitle.textContent = `Editing: ${currentLevelName}`;
+                    alert(`Level "${name}" saved!`);
+                    // After a successful manual save, the __autosave__ is no longer needed.
+                    deleteLevelFromSlot('__autosave__', true);
+                }
+            }
+        }
+        function clearLevel() {
+            levelData = [{ type: 'end', x: 4000 }];
+            levelScrollbar.max = 4000;
+            levelScrollbar.value = 0;
+            cameraX = 0;
+            selectedObjects = [];
+            currentLevelName = null;
+            const editorTitle = document.getElementById('editor-level-title'); if (editorTitle) editorTitle.textContent = 'Editing: New Level';
+            deleteLevelFromSlot('__autosave__', true);
+        }
+        function showMenu() {
+            gameState = 'MENU';
+            resetPracticeState(false);
+            document.getElementById('menu').classList.remove('hidden');
+            document.getElementById('game-ui').classList.add('hidden');
+            document.getElementById('editor-ui').classList.add('hidden');
+            document.getElementById('game-over').classList.add('hidden');
+            if (levelTitle) levelTitle.textContent = '';
+            if (nextLevelBtn) nextLevelBtn.classList.add('hidden');
+            closePlaySelect();
+            closeMyLevels();
+        }
+
+        // Make inline onclick handlers resilient too.
+        try {
+	            const wrapNames = [
+	                'openPlaySelect', 'closePlaySelect', 'startPlayFromSelection', 'rerollPlayCandidate',
+	                'startPlayMode', 'startEditMode', 'showMenu', 'clearLevel', 'setTool',
+	                'toggleHitboxes', 'toggleTrail', 'toggleNoclip', 'togglePrediction', 'toggleTiltStep', 'clearTrail', 'saveCurrentLevel',
+	                'updateSlomo', 'updateEditorCamera', 'playNextLevel', 'restartCurrentLevel',
+	                'toggleAutoClick', 'setAutoClickCps', 'setAutoClickTarget',
+                    'openMyLevels', 'closeMyLevels', 'loadLevelFromSlot', 'deleteLevelFromSlot',
+                    'togglePracticeMode', 'addPracticeCheckpoint', 'clearPracticeCheckpoints',
+	            ];
+            for (const name of wrapNames) {
+                if (typeof window[name] === 'function') window[name] = safeHandler(name, window[name]);
+            }
+        } catch { }
+
+        updateAutoClickUI();
+        updatePracticeUI();
+        setInterval(autoSave, 15000);
+        draw();
+    </script>
+    <script src="js/app-guardian.js"></script>
+</body>
+
+</html>

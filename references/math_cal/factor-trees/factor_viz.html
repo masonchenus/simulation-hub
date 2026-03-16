@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Factor Visualization</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .viz-container {
+            width: 80%;
+            height: 80%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="viz-container">
+            <h1>Factor Visualization</h1>
+            <!-- Add your visualization here -->
+        </div>
+    </div>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        // Add your visualization code here
+        const data = [
+            {
+                type: 'scatter',
+                mode: 'lines+markers',
+                x: [1, 2, 3, 4],
+                y: [10, 15, 13, 17],
+                name: 'Series 1',
+                marker: { color: 'red' },
+                line: { color: 'red' }
+            },
+            {
+                type: 'scatter',
+                mode: 'lines+markers',
+                x: [1, 2, 3, 4],
+                y: [6, 9, 11, 15],
+                name: 'Series 2',
+                marker: { color: 'blue' },
+                line: { color: 'blue' }
+            }
+        ];
+
+        const layout = {
+            title: 'Factor Visualization',
+            xaxis: { title: 'X Axis' },
+            yaxis: { title: 'Y Axis' }
+        };
+
+        Plotly.newPlot('viz-container', data, layout);
+    </script>
+
+</body>
+
+</html>

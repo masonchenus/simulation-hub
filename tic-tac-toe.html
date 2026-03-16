@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEON_STRIKE // MULTIVERSE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff00ff;
+            --dark-bg: #0a0a0c;
+            --grid-line: #1a1a24;
+            --restricted-red: #ff3131;
+            --restricted-heavy: #ffb431;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--neon-cyan);
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 100;
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .cyber-border {
+            border: 2px solid var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+            position: relative;
+            background: black;
+        }
+
+        .scroll-container {
+            max-width: 95vw;
+            max-height: 55vh;
+            overflow: auto;
+            padding: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--neon-cyan) transparent;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: var(--neon-cyan);
+        }
+
+        .macro-grid {
+            display: grid;
+            gap: 8px;
+            padding: 8px;
+            background: var(--grid-line);
+        }
+
+        .macro-cell {
+            position: relative;
+            background: var(--dark-bg);
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .micro-grid {
+            display: grid;
+            width: 100%;
+            height: 100%;
+            gap: 2px;
+            background: #111;
+        }
+
+        .cell {
+            background: var(--dark-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .cell:hover {
+            background: rgba(0, 243, 255, 0.1);
+        }
+
+        .cell.x,
+        .macro-winner-x {
+            background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 400% 400%;
+            animation: rainbow-glow 3s linear infinite;
+        }
+
+        .cell.o,
+        .macro-winner-o {
+            color: #ffffff;
+            text-shadow: 0 0 8px #ffffff;
+        }
+
+        .cell.restricted {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .cell.restricted-standard {
+            background: rgba(255, 49, 49, 0.15);
+        }
+
+        .cell.restricted-heavy {
+            background: rgba(255, 180, 49, 0.2);
+        }
+
+        .restriction-timer {
+            position: absolute;
+            font-size: 8px;
+            font-weight: bold;
+            bottom: 2px;
+            right: 2px;
+            z-index: 5;
+            text-shadow: 0 0 5px black;
+        }
+
+        .timer-standard {
+            color: var(--restricted-red);
+        }
+
+        .timer-heavy {
+            color: var(--restricted-heavy);
+        }
+
+        .restriction-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            animation: flicker 0.2s infinite;
+        }
+
+        .overlay-standard {
+            border: 1px inset var(--restricted-red);
+        }
+
+        .overlay-heavy {
+            border: 2px dashed var(--restricted-heavy);
+        }
+
+        @keyframes flicker {
+            0% {
+                opacity: 0.1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+
+            100% {
+                opacity: 0.1;
+            }
+        }
+
+        @keyframes rainbow-glow {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .capture-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            font-family: 'Orbitron';
+            z-index: 10;
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.85);
+            animation: glitch 0.3s ease-out;
+        }
+
+        .macro-cell.active-macro {
+            box-shadow: 0 0 15px var(--neon-cyan);
+            border: 1px solid var(--neon-cyan);
+        }
+
+        .macro-grid.restricted-move > .macro-cell:not(.active-macro) {
+            opacity: 0.4;
+        }
+
+        @keyframes glitch {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .btn-cyber {
+            background: transparent;
+            border: 1px solid var(--neon-pink);
+            color: var(--neon-pink);
+            padding: 4px 10px;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            font-weight: bold;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0% 30%);
+            transition: 0.2s;
+        }
+
+        .btn-cyber:hover {
+            background: var(--neon-pink);
+            color: white;
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        .btn-cyber.active {
+            background: var(--neon-pink);
+            color: white;
+            border-color: white;
+        }
+
+        .cyber-select {
+            background: black;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 2px 5px;
+            font-size: 0.65rem;
+            outline: none;
+        }
+
+        .stat-box {
+            border: 1px solid #333;
+            padding: 5px 15px;
+            background: rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .notepad-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 250px;
+            display: flex;
+            flex-direction: column;
+            z-index: 50;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .notepad-container:hover {
+            opacity: 1;
+        }
+
+        #player-notepad {
+            flex-grow: 1;
+            background: rgba(10, 10, 12, 0.9);
+            border: 1px solid var(--neon-pink);
+            color: var(--neon-pink);
+            padding: 10px;
+            font-size: 11px;
+            resize: none;
+            outline: none;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .notepad-header {
+            background: var(--neon-pink);
+            color: black;
+            font-size: 9px;
+            padding: 2px 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="z-20 flex flex-col items-center w-full max-w-4xl px-4">
+        <header class="mb-4 text-center w-full">
+            <h1 class="text-3xl font-bold tracking-tighter mb-2" style="font-family: 'Orbitron';">NEON_STRIKE</h1>
+
+            <div class="flex flex-wrap justify-center gap-3 text-[9px] uppercase mb-4">
+                <div class="flex items-center gap-1">
+                    <span>Mode:</span>
+                    <select id="game-mode" class="cyber-select">
+                        <option value="classic">Classic</option>
+                        <option value="scavenger">Scavenger</option>
+                        <option value="super">Super TicTacToe</option>
+                        <option value="restricted" selected>Restricted</option>
+                        <option value="gravity">Gravity</option>
+                        <option value="decay">Decay</option>
+                        <option value="infection">Infection</option>
+                        <option value="territory">Territory</option>
+                        <option value="blind">Blind</option>
+                        <option value="restrictive_super">Restrictive Super</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-1">
+                    <span>Diff:</span>
+                    <select id="difficulty" class="cyber-select">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                        <option value="insane">Insane</option>
+                        <option value="impossible">Impossible</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-1">
+                    <span>Grid:</span>
+                    <input type="number" id="grid-size" value="3" min="3" max="5" class="cyber-select w-10">
+                </div>
+                <div class="flex items-center gap-1 scavenger-only hidden">
+                    <span>Win_Req:</span>
+                    <input type="number" id="win-len" value="3" min="3" max="6" class="cyber-select w-10">
+                </div>
+                <div class="flex items-center gap-1 scavenger-only hidden">
+                    <span>Rounds:</span>
+                    <input type="number" id="max-rounds" value="1" min="1" max="10" class="cyber-select w-10">
+                </div>
+            </div>
+
+            <div class="flex justify-center gap-4 mb-4">
+                <div class="stat-box">
+                    <div class="text-[10px] opacity-60">USER_X</div>
+                    <div id="score-x" class="text-xl font-bold text-pink-500">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="text-[10px] opacity-60">BOT_O</div>
+                    <div id="score-o" class="text-xl font-bold text-white">0</div>
+                </div>
+                <div class="stat-box scavenger-only hidden">
+                    <div class="text-[10px] opacity-60">ROUND</div>
+                    <div id="round-display" class="text-xl font-bold">1/1</div>
+                </div>
+            </div>
+
+            <div class="flex justify-center gap-2 mb-2">
+                <button id="hire-x" class="btn-cyber">Player_X_Active</button>
+                <button id="hire-o" class="btn-cyber active">Bot_O_Active</button>
+            </div>
+        </header>
+
+        <div id="status-display" class="mb-4 text-xs uppercase tracking-widest text-white h-4 text-center">
+            SYSTEM_IDLE...
+        </div>
+
+        <div class="scroll-container">
+            <div id="game-board" class="cyber-border"></div>
+        </div>
+
+        <div class="mt-6 flex gap-4">
+            <button id="bot-game-btn" class="btn-cyber" style="border-color: var(--neon-cyan); color: var(--neon-cyan);">Play with Bot</button>
+            <button id="multiplayer-btn" class="btn-cyber" style="border-color: var(--neon-pink); color: var(--neon-pink);">Play with a Friend</button>
+        </div>
+
+        <footer class="mt-4 text-[8px] opacity-30 text-center uppercase">
+            [RESTRICTED_PROTOCOL: EMP_HEAVY_JAM_ACTIVE]
+        </footer>
+    </div>
+
+    <div class="notepad-container">
+        <div class="notepad-header">Field_Notepad_v1.0</div>
+        <textarea id="player-notepad" placeholder="INPUT STRATEGY DATA..."></textarea>
+    </div>
+
+    <!-- Multiplayer Modal -->
+    <div id="multiplayer-modal" class="hidden" style="position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.85);">
+        <div class="cyber-border" style="width: min(400px, 90vw); padding: 20px; display: grid; gap: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 class="text-xl" style="font-family: 'Orbitron';">PLAY WITH A FRIEND</h2>
+                <button id="multiplayer-close-btn" class="btn-cyber" style="clip-path: none; border-radius: 4px; padding: 4px 8px;">X</button>
+            </div>
+
+            <div id="multiplayer-menu">
+                <button id="host-game-btn" class="btn-cyber" style="width: 100%; margin-bottom: 10px;">Host Game (Online)</button>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="game-code-input" class="cyber-select" placeholder="ENTER GAME CODE" style="flex-grow: 1; text-align: center; text-transform: uppercase;">
+                    <button id="join-game-btn" class="btn-cyber">Join</button>
+                </div>
+                <div style="text-align: center; color: var(--muted); font-size: 0.8rem; margin: 1rem 0;">OR</div>
+                <button id="local-multiplayer-btn" class="btn-cyber" style="width: 100%;">Play Locally (2 Players)</button>
+            </div>
+
+            <div id="hosting-info" class="hidden" style="text-align: center;">
+                <div class="text-xs opacity-60">GAME CODE:</div>
+                <div id="game-code-display" class="text-2xl font-bold tracking-widest my-2" style="font-family: 'Orbitron'; background: #111; padding: 8px; border-radius: 4px;"></div>
+                <div id="hosting-status" class="text-xs opacity-80"></div>
+                <button id="cancel-host-btn" class="btn-cyber mt-4">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gridSize = 3;
+        let winLength = 3;
+        let gameState = [];
+        let macroState = [];
+        let restrictionState = []; // Tracks turns remaining
+        let scoredLines = new Set();
+        let scores = { X: 0, O: 0 };
+        let currentRound = 1;
+        let maxRounds = 1;
+        let currentPlayer = 'X';
+        let gameActive = false;
+        let autoX = false;
+        let autoO = true;
+        let botInterval = null;
+        let gameMode = 'restricted';
+        let turnCounter = 0; // For Decay and Blind modes
+        let nextMacroBoardIndex = null;
+
+        const boardEl = document.getElementById('game-board');
+        const statusDisplay = document.getElementById('status-display');
+        const botGameBtn = document.getElementById('bot-game-btn');
+        const hireXBtn = document.getElementById('hire-x');
+        const hireOBtn = document.getElementById('hire-o');
+        const modeSelect = document.getElementById('game-mode');
+        const diffSelect = document.getElementById('difficulty');
+        const multiplayerBtn = document.getElementById('multiplayer-btn');
+        const multiplayerModal = document.getElementById('multiplayer-modal');
+        const multiplayerCloseBtn = document.getElementById('multiplayer-close-btn');
+        const multiplayerMenu = document.getElementById('multiplayer-menu');
+        const hostGameBtn = document.getElementById('host-game-btn');
+        const joinGameBtn = document.getElementById('join-game-btn');
+        const gameCodeInput = document.getElementById('game-code-input');
+        const hostingInfo = document.getElementById('hosting-info');
+        const gameCodeDisplay = document.getElementById('game-code-display');
+        const hostingStatus = document.getElementById('hosting-status');
+        const cancelHostBtn = document.getElementById('cancel-host-btn');
+        const localMultiplayerBtn = document.getElementById('local-multiplayer-btn');
+
+        function initGame(resetScores = true, isBotGame = true) {
+            gameMode = modeSelect.value;
+            gridSize = parseInt(document.getElementById('grid-size').value) || 3;
+            turnCounter = 0; // Reset turn counter
+
+            if (resetScores) {
+                scores = { X: 0, O: 0 };
+                currentRound = 1;
+                updateScoreboard();
+            }
+
+            if (gameMode === 'territory') {
+                scoredLines = { X: new Set(), O: new Set() };
+            } else {
+                scoredLines = new Set();
+            }
+            
+            currentPlayer = 'X';
+            gameActive = true;
+            nextMacroBoardIndex = null;
+
+            if (gameMode === 'super' || gameMode === 'restrictive_super') {
+                macroState = Array(gridSize * gridSize).fill("");
+                gameState = Array.from({ length: gridSize * gridSize }, () => Array(gridSize * gridSize).fill(""));
+                restrictionState = Array.from({ length: gridSize * gridSize }, () => Array(gridSize * gridSize).fill(0));
+                winLength = gridSize;
+                nextMacroBoardIndex = null;
+                document.querySelectorAll('.scavenger-only').forEach(el => el.classList.add('hidden'));
+            } else {
+                // Handle new modes that need object states
+                if (gameMode === 'decay' || gameMode === 'blind') {
+                    gameState = Array(gridSize * gridSize).fill(null);
+                } else {
+                    gameState = Array(gridSize * gridSize).fill("");
+                }
+                restrictionState = Array(gridSize * gridSize).fill(0);
+
+                if (gameMode === 'classic' || gameMode === 'restricted' || gameMode === 'gravity' || gameMode === 'infection' || gameMode === 'decay' || gameMode === 'blind') {
+                    winLength = gridSize === 3 ? 3 : (gridSize === 4 ? 4 : 5);
+                    document.querySelectorAll('.scavenger-only').forEach(el => el.classList.add('hidden'));
+                } else { // scavenger or territory
+                    winLength = parseInt(document.getElementById('win-len').value) || 3;
+                    maxRounds = parseInt(document.getElementById('max-rounds').value) || 1;
+                    document.querySelectorAll('.scavenger-only').forEach(el => el.classList.remove('hidden'));
+                    document.getElementById('round-display').innerText = `${currentRound}/${maxRounds}`;
+                }
+            }
+
+            if (isBotGame) {
+                if (autoX) {
+                    statusDisplay.innerText = "Bot's Turn (X)";
+                } else {
+                    statusDisplay.innerText = "Player X's Turn";
+                }
+            }
+            // For multiplayer, status is set by WebSocket logic.
+
+            renderBoard();
+            startAutoLoop();
+        }
+
+        function renderBoard() {
+            boardEl.innerHTML = '';
+            if (gameMode === 'super' || gameMode === 'restrictive_super') {
+                if (gameMode === 'restrictive_super' && nextMacroBoardIndex !== null) {
+                    boardEl.classList.add('restricted-move');
+                } else {
+                    boardEl.classList.remove('restricted-move');
+                }
+                renderSuperBoard();
+            } else {
+                renderStandardBoard();
+            }
+        }
+
+        function renderStandardBoard() {
+            const cellSize = gridSize > 15 ? 25 : (gridSize > 8 ? 35 : 60);
+            boardEl.style.display = 'grid';
+            boardEl.style.gridTemplateColumns = `repeat(${gridSize}, ${cellSize}px)`;
+            boardEl.className = 'cyber-border';
+
+            for (let i = 0; i < gridSize * gridSize; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.style.width = `${cellSize}px`; cell.style.height = `${cellSize}px`;
+                cell.style.fontSize = `${cellSize * 0.5}px`;
+                
+                const cellState = gameState[i];
+                let player = "";
+                let isVisible = true;
+
+                if (typeof cellState === 'object' && cellState !== null) {
+                    player = cellState.player;
+                    if (gameMode === 'blind' && turnCounter >= cellState.visibleUntil) {
+                        isVisible = false;
+                    }
+                } else {
+                    player = cellState;
+                }
+
+                if (isVisible) {
+                    cell.innerText = player;
+                }
+
+
+                if (isVisible && player) {
+                    cell.classList.add(player.toLowerCase());
+                } else if (restrictionState[i] > 0) {
+                    const isHeavy = restrictionState[i] > 3; // Now defined as > 3
+                    cell.classList.add('restricted');
+                    cell.classList.add(isHeavy ? 'restricted-heavy' : 'restricted-standard');
+
+                    const timer = document.createElement('div');
+                    timer.classList.add('restriction-timer');
+                    timer.classList.add(isHeavy ? 'timer-heavy' : 'timer-standard');
+                    timer.innerText = restrictionState[i];
+                    cell.appendChild(timer);
+
+                    const overlay = document.createElement('div');
+                    overlay.classList.add('restriction-overlay');
+                    overlay.classList.add(isHeavy ? 'overlay-heavy' : 'overlay-standard');
+                    cell.appendChild(overlay);
+                }
+
+                cell.onclick = () => handleCellClick(i);
+                boardEl.appendChild(cell);
+            }
+        }
+
+        function renderSuperBoard() {
+            const containerSize = Math.min(window.innerHeight * 0.6, window.innerWidth * 0.85);
+            const macroCellSize = Math.floor(containerSize / gridSize);
+
+            boardEl.style.display = 'grid';
+            boardEl.style.gridTemplateColumns = `repeat(${gridSize}, ${macroCellSize}px)`;
+            boardEl.className = 'macro-grid';
+
+            const isRestrictedMove = gameMode === 'restrictive_super' && nextMacroBoardIndex !== null;
+
+            for (let m = 0; m < gridSize * gridSize; m++) {
+                const macroCell = document.createElement('div');
+                macroCell.classList.add('macro-cell');
+
+                if (gameMode === 'restrictive_super') {
+                    if (isRestrictedMove) {
+                        if (m === nextMacroBoardIndex) macroCell.classList.add('active-macro');
+                    } else if (macroState[m] === "") {
+                        macroCell.classList.add('active-macro'); // Highlight all available on free move
+                    }
+                }
+
+                const microGrid = document.createElement('div');
+                microGrid.classList.add('micro-grid');
+                microGrid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+
+                for (let i = 0; i < gridSize * gridSize; i++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.style.fontSize = `${(macroCellSize / gridSize) * 0.5}px`;
+                    cell.innerText = gameState[m][i];
+
+                    if (gameState[m][i]) {
+                        cell.classList.add(gameState[m][i].toLowerCase());
+                    } else if (restrictionState[m][i] > 0) {
+                        const isHeavy = restrictionState[m][i] > 3;
+                        cell.classList.add('restricted');
+                        cell.classList.add(isHeavy ? 'restricted-heavy' : 'restricted-standard');
+
+                        const timer = document.createElement('div');
+                        timer.classList.add('restriction-timer');
+                        timer.classList.add(isHeavy ? 'timer-heavy' : 'timer-standard');
+                        timer.innerText = restrictionState[m][i];
+                        cell.appendChild(timer);
+                    }
+
+                    cell.onclick = () => handleSuperClick(m, i);
+                    microGrid.appendChild(cell);
+                }
+
+                macroCell.appendChild(microGrid);
+
+                if (macroState[m]) {
+                    const overlay = document.createElement('div');
+                    overlay.classList.add('capture-overlay');
+                    if (macroState[m] !== "DRAW") {
+                        overlay.classList.add(`macro-winner-${macroState[m].toLowerCase()}`);
+                        overlay.innerText = macroState[m];
+                    }
+                    macroCell.appendChild(overlay);
+                }
+                boardEl.appendChild(macroCell);
+            }
+        }
+
+        function handleCellClick(idx) {
+            if (multiplayerState.isMultiplayer) {
+                if (!gameActive || multiplayerState.player !== currentPlayer) return;
+                multiplayerState.ws.send(JSON.stringify({ type: 'move', index: idx }));
+                return;
+            }
+
+            if (!gameActive || (currentPlayer === 'X' && autoX)) return;
+
+            if (gameMode === 'gravity') {
+                const c = idx % gridSize;
+                let landingIdx = -1;
+                for (let r = gridSize - 1; r >= 0; r--) {
+                    const i = r * gridSize + c;
+                    if (!gameState[i] && restrictionState[i] === 0) {
+                        landingIdx = i;
+                        break;
+                    }
+                }
+                if (landingIdx !== -1) {
+                    executeMove(landingIdx);
+                }
+            } else {
+                if (gameState[idx] || restrictionState[idx] > 0) return;
+                executeMove(idx);
+            }
+        }
+
+        function handleSuperClick(mIdx, iIdx) {
+            if (gameMode === 'restrictive_super') {
+                if (!gameActive || (currentPlayer === 'X' && autoX) ||
+                    (nextMacroBoardIndex !== null && mIdx !== nextMacroBoardIndex) ||
+                    macroState[mIdx] !== "" || gameState[mIdx][iIdx] !== "" || restrictionState[mIdx][iIdx] > 0) {
+                    return;
+                }
+            } else { // 'super' mode
+                if (!gameActive || (currentPlayer === 'X' && autoX) || macroState[mIdx] !== "" || gameState[mIdx][iIdx] !== "" || restrictionState[mIdx][iIdx] > 0) return;
+            }
+            executeSuperMove(mIdx, iIdx);
+        }
+
+        function processRestrictions() {
+            const getPlayer = (cell) => (typeof cell === 'object' && cell !== null) ? cell.player : cell;
+            if (gameMode === 'super') {
+                for (let m = 0; m < gridSize * gridSize; m++) {
+                    for (let i = 0; i < gridSize * gridSize; i++) {
+                        if (restrictionState[m][i] > 0) restrictionState[m][i]--;
+                    }
+                }
+                // Randomly trigger new restriction
+                if (Math.random() < 0.15) {
+                    let m = Math.floor(Math.random() * (gridSize * gridSize));
+                    let i = Math.floor(Math.random() * (gridSize * gridSize));
+                    if (getPlayer(gameState[m][i]) === "" && macroState[m] === "") {
+                        // 10% chance of heavy restriction (uncommon)
+                        const isHeavy = Math.random() < 0.10;
+                        if (isHeavy) {
+                            restrictionState[m][i] = Math.floor(Math.random() * 6) + 5; // 5-10
+                            statusDisplay.innerText = "HEAVY_JAM_IN_SECTOR_" + m;
+                        } else {
+                            restrictionState[m][i] = Math.floor(Math.random() * 3) + 1; // 1-3 (common)
+                        }
+                    }
+                }
+            } else {
+                for (let i = 0; i < gridSize * gridSize; i++) {
+                    if (restrictionState[i] > 0) restrictionState[i]--;
+                }
+                // Randomly trigger new restriction in Restricted mode
+                if (gameMode === 'restricted' && Math.random() < 0.20) {
+                    let idx = Math.floor(Math.random() * (gridSize * gridSize));
+                    if (getPlayer(gameState[idx]) === "") {
+                        // 10% chance of heavy (uncommon)
+                        const isHeavy = Math.random() < 0.10;
+                        if (isHeavy) {
+                            restrictionState[idx] = Math.floor(Math.random() * 6) + 5; // 5-10
+                            statusDisplay.innerText = "CORE_HEAVY_JAM_DETECTION";
+                        } else {
+                            restrictionState[idx] = Math.floor(Math.random() * 3) + 1; // 1-3 (common)
+                        }
+                    }
+                }
+            }
+        }
+
+        function executeMove(idx) {
+            if (gameMode === 'decay' || gameMode === 'blind') {
+                const visibleTurns = gameMode === 'blind' ? 2 : Infinity;
+                gameState[idx] = { player: currentPlayer, turn: turnCounter, visibleUntil: turnCounter + visibleTurns };
+            } else {
+                gameState[idx] = currentPlayer;
+            }
+
+            if (gameMode === 'infection') {
+                const r = Math.floor(idx / gridSize);
+                const c = idx % gridSize;
+                const opponent = currentPlayer === 'X' ? 'O' : 'X';
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        if (dr === 0 && dc === 0) continue;
+                        const nr = r + dr;
+                        const nc = c + dc;
+                        if (isValid(nr, nc)) {
+                            const neighborIdx = nr * gridSize + nc;
+                            const neighborCell = gameState[neighborIdx];
+                            const neighborPlayer = (typeof neighborCell === 'object' && neighborCell !== null) ? neighborCell.player : neighborCell;
+                            if (neighborPlayer === opponent) {
+                                if (typeof neighborCell === 'object' && neighborCell !== null) {
+                                    neighborCell.player = currentPlayer;
+                                } else {
+                                    gameState[neighborIdx] = currentPlayer;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            const checkBoard = (gameMode === 'decay' || gameMode === 'blind') ? gameState.map(c => c ? c.player : "") : gameState;
+            const winResult = checkWinLogic(checkBoard, idx, currentPlayer);
+
+            if ((gameMode === 'classic' || gameMode === 'restricted' || gameMode === 'gravity' || gameMode === 'infection' || gameMode === 'decay' || gameMode === 'blind') && winResult) {
+                scores[currentPlayer]++;
+                updateScoreboard();
+                statusDisplay.innerText = `VICTORY: ${currentPlayer}`;
+                gameActive = false;
+            } else if (gameMode === 'territory' && scoredLines[currentPlayer].size >= 5) {
+                scores[currentPlayer]++;
+                updateScoreboard();
+                statusDisplay.innerText = `TERRITORY_CLAIMED: ${currentPlayer}`;
+                gameActive = false;
+            } else if (!checkBoard.includes("")) {
+                if (gameMode === 'scavenger' || gameMode === 'territory') endScavengerRound();
+                else { statusDisplay.innerText = "DRAW DETECTED"; gameActive = false; }
+            }
+
+            turnCounter++;
+
+            if (gameMode === 'decay') {
+                const decayTime = gridSize * 2;
+                gameState.forEach((cell, i) => {
+                    if (cell && turnCounter - cell.turn >= decayTime) {
+                        gameState[i] = null;
+                    }
+                });
+            }
+
+            processRestrictions();
+            renderBoard();
+            if (gameActive) switchPlayer();
+        }
+
+        function executeSuperMove(mIdx, iIdx) {
+            gameState[mIdx][iIdx] = currentPlayer;
+
+            // Check for a win in the micro-grid
+            if (macroState[mIdx] === "") {
+                if (checkWinResult(gameState[mIdx], currentPlayer)) {
+                    macroState[mIdx] = currentPlayer;
+                    if (gameMode === 'super') {
+                        scores[currentPlayer]++;
+                        updateScoreboard();
+                    }
+                } else if (!gameState[mIdx].includes("")) {
+                    macroState[mIdx] = "DRAW";
+                    statusDisplay.innerText = `SECTOR_${mIdx}_TIED`;
+                }
+            }
+
+            // Check for a win in the macro-grid
+            if (checkWinResult(macroState, currentPlayer)) {
+                scores[currentPlayer] += (gameMode === 'super' ? 60 : 1);
+                updateScoreboard();
+                statusDisplay.innerText = `GRAND_VICTORY: ${currentPlayer}`;
+                gameActive = false;
+            } else if (!macroState.includes("")) {
+                statusDisplay.innerText = "MACRO_GRID_DRAW";
+                gameActive = false;
+            }
+
+            // Set next move for restrictive mode
+            if (gameMode === 'restrictive_super') {
+                if (macroState[iIdx] !== "") nextMacroBoardIndex = null; // Free move
+                else nextMacroBoardIndex = iIdx;
+            }
+
+            processRestrictions();
+            renderBoard();
+            if (gameActive) switchPlayer();
+        }
+
+        function switchPlayer() {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            if (multiplayerState.isMultiplayer) {
+                statusDisplay.textContent = `Turn: ${currentPlayer}. You are ${multiplayerState.player}.`;
+                return;
+            }
+
+            const isBotTurn = (currentPlayer === 'X' && autoX) || (currentPlayer === 'O' && autoO);
+            if (isBotTurn) {
+                statusDisplay.innerText = `Bot's Turn (${currentPlayer})`;
+            } else {
+                statusDisplay.innerText = `Player ${currentPlayer}'s Turn`;
+            }
+        }
+
+        function checkWinLogic(board, idx, player) {
+            const getPlayer = (cell) => (typeof cell === 'object' && cell !== null) ? cell.player : cell;
+            const r = Math.floor(idx / gridSize);
+            const c = idx % gridSize;
+            const dirs = [[0, 1], [1, 0], [1, 1], [1, -1]];
+            let found = null;
+
+            dirs.forEach(([dr, dc]) => {
+                let segment = [idx];
+                [[dr, dc], [-dr, -dc]].forEach(([curDr, curDc]) => {
+                    let nr = r + curDr, nc = c + curDc;
+                    while (isValid(nr, nc) && getPlayer(board[nr * gridSize + nc]) === player) {
+                        segment.push(nr * gridSize + nc);
+                        nr += curDr; nc += curDc;
+                    }
+                });
+
+                if (segment.length >= winLength) {
+                    if (gameMode === 'scavenger' || gameMode === 'territory') {
+                        const key = segment.sort((a, b) => a - b).join('|');
+                        if (!scoredLines[player].has(key)) {
+                            scoredLines[player].add(key);
+                            scores[player]++;
+                            updateScoreboard();
+                        }
+                    } else found = segment;
+                }
+            });
+            return found;
+        }
+
+        function isValid(r, c) { return r >= 0 && r < gridSize && c >= 0 && c < gridSize; }
+
+        function startAutoLoop() {
+            if (botInterval) clearInterval(botInterval);
+            botInterval = setInterval(() => {
+                if (!gameActive) return;
+                const difficulty = diffSelect.value;
+                if ((currentPlayer === 'X' && autoX) || (currentPlayer === 'O' && autoO)) {
+                    if (gameMode === 'super') {
+                        const move = getSuperBotMove(currentPlayer, difficulty);
+                        if (move) executeSuperMove(move.m, move.i);
+                    } else {
+                        const moveIdx = getStandardBotMove(gameState, restrictionState, currentPlayer, difficulty);
+                        if (moveIdx !== null) executeMove(moveIdx);
+                    }
+                }
+            }, 800);
+        }
+
+        function getStandardBotMove(board, restrictions, p, diff) {
+            const newModes = ['gravity', 'decay', 'infection', 'territory', 'blind'];
+            const getPlayer = (cell) => (typeof cell === 'object' && cell !== null) ? cell.player : cell;
+
+            if (newModes.includes(gameMode)) {
+                const avail = [];
+                if (gameMode === 'gravity') {
+                    for (let c = 0; c < gridSize; c++) {
+                        if (!getPlayer(board[c])) { // Check top row
+                            avail.push(c);
+                        }
+                    }
+                    if (avail.length > 0) return avail[Math.floor(Math.random() * avail.length)];
+                } else {
+                    board.forEach((v, i) => {
+                        if (!getPlayer(v) && (restrictions[i] || 0) === 0) {
+                            avail.push(i);
+                        }
+                    });
+                    if (avail.length > 0) return avail[Math.floor(Math.random() * avail.length)];
+                }
+                return null;
+            }
+
+            const avail = board.map((v, i) => (!getPlayer(v) && (restrictions[i] || 0) === 0) ? i : null).filter(v => v !== null);
+            if (avail.length === 0) return null;
+
+            if (diff === 'easy') return avail[Math.floor(Math.random() * avail.length)];
+
+            const opponent = p === 'X' ? 'O' : 'X';
+
+            for (let idx of avail) {
+                board[idx] = p; // Temporarily make move
+                if (checkWinResult(board, p)) { board[idx] = ""; return idx; }
+                board[idx] = "";
+            }
+            for (let idx of avail) {
+                board[idx] = opponent; // Temporarily block
+                if (checkWinResult(board, opponent)) { board[idx] = ""; return idx; }
+                board[idx] = "";
+            }
+
+            if (diff === 'hard' || diff === 'insane' || diff === 'impossible') {
+                const center = Math.floor((gridSize * gridSize) / 2);
+                if (avail.includes(center)) return center;
+
+                const corners = [0, gridSize - 1, gridSize * (gridSize - 1), gridSize * gridSize - 1];
+                const availCorners = corners.filter(c => avail.includes(c));
+                if (availCorners.length > 0) return availCorners[Math.floor(Math.random() * availCorners.length)];
+            }
+
+            return avail[Math.floor(Math.random() * avail.length)];
+        }
+
+        function getSuperBotMove(p, diff) {
+            let openMacro;
+            if (gameMode === 'restrictive_super' && nextMacroBoardIndex !== null) {
+                openMacro = [nextMacroBoardIndex];
+            } else {
+                openMacro = macroState.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+            }
+
+            if (openMacro.length === 0) return null;
+
+            const opponent = p === 'X' ? 'O' : 'X';
+
+            if (diff !== 'easy') {
+                for (let m of openMacro) {
+                    const availMicro = gameState[m].map((v, i) => (v === "" && restrictionState[m][i] === 0) ? i : null).filter(v => v !== null);
+                    for (let i of availMicro) {
+                        gameState[m][i] = p;
+                        if (checkWinResult(gameState[m], p)) {
+                            macroState[m] = p;
+                            const gameWon = checkWinResult(macroState, p);
+                            macroState[m] = ""; gameState[m][i] = "";
+                            if (gameWon) return { m, i };
+                        }
+                        gameState[m][i] = "";
+                    }
+                }
+
+                if (diff === 'insane' || diff === 'impossible') {
+                    for (let m of openMacro) {
+                        const availMicro = gameState[m].map((v, i) => (v === "" && restrictionState[m][i] === 0) ? i : null).filter(v => v !== null);
+                        for (let i of availMicro) {
+                            gameState[m][i] = opponent;
+                            if (checkWinResult(gameState[m], opponent)) {
+                                macroState[m] = opponent;
+                                const gameLost = checkWinResult(macroState, opponent);
+                                macroState[m] = ""; gameState[m][i] = "";
+                                if (gameLost) return { m, i };
+                            }
+                            gameState[m][i] = "";
+                        }
+                    }
+                }
+
+                for (let m of openMacro) {
+                    const bestMicro = getStandardBotMove(gameState[m], restrictionState[m], p, diff);
+                    if (bestMicro !== null) {
+                        gameState[m][bestMicro] = p;
+                        const winsMacro = checkWinResult(gameState[m], p);
+                        gameState[m][bestMicro] = "";
+                        if (winsMacro) return { m, i: bestMicro };
+                    }
+                }
+            }
+
+            const m = openMacro[Math.floor(Math.random() * openMacro.length)];
+            const i = getStandardBotMove(gameState[m], restrictionState[m], p, diff);
+            if (i !== null) return { m, i };
+
+            for (let altM of openMacro) {
+                const altI = getStandardBotMove(gameState[altM], restrictionState[altM], p, diff);
+                if (altI !== null) return { m: altM, i: altI };
+            }
+            return null;
+        }
+
+        function checkWinResult(board, player) {
+            const getPlayer = (cell) => (typeof cell === 'object' && cell !== null) ? cell.player : cell;
+            for (let i = 0; i < board.length; i++) {
+                if (getPlayer(board[i]) === player) {
+                    const r = Math.floor(i / gridSize);
+                    const c = i % gridSize;
+                    const dirs = [[0, 1], [1, 0], [1, 1], [1, -1]];
+                    for (let [dr, dc] of dirs) {
+                        let count = 1;
+                        for (let s = 1; s < winLength; s++) {
+                            if (isValid(r + dr * s, c + dc * s) && getPlayer(board[(r + dr * s) * gridSize + (c + dc * s)]) === player) count++;
+                            else break;
+                        }
+                        if (count >= winLength) return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function updateScoreboard() {
+            document.getElementById('score-x').innerText = scores.X;
+            document.getElementById('score-o').innerText = scores.O;
+        }
+
+        function endScavengerRound() {
+            gameActive = false;
+            if (currentRound < maxRounds) {
+                setTimeout(() => { currentRound++; initGame(false); }, 1500);
+            }
+        }
+
+        hireXBtn.onclick = () => {
+            if (multiplayerState.isMultiplayer) return;
+            autoX = !autoX;
+            hireXBtn.classList.toggle('active', autoX);
+            hireXBtn.innerText = autoX ? "Bot_X_Active" : "Player_X_Active";
+        };
+
+        hireOBtn.onclick = () => {
+            if (multiplayerState.isMultiplayer) return;
+            autoO = !autoO;
+            hireOBtn.classList.toggle('active', autoO);
+            hireOBtn.innerText = autoO ? "Bot_O_Active" : "Player_O_Active";
+        };
+
+        // --- Multiplayer Logic ---
+        let multiplayerState = {
+            ws: null,
+            code: null,
+            player: null, // 'X' or 'O'
+            isMultiplayer: false,
+        };
+        const WS_URL = 'ws://localhost:8080';
+
+        function connectWebSocket(onOpen) {
+            if (multiplayerState.ws) {
+                multiplayerState.ws.close();
+            }
+            
+            const ws = new WebSocket(WS_URL);
+            multiplayerState.ws = ws;
+
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                onOpen();
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log('Received from server:', data);
+
+                switch (data.type) {
+                    case 'game_created':
+                        multiplayerState.code = data.code;
+                        multiplayerState.player = data.player;
+                        multiplayerState.isMultiplayer = true;
+                        gameCodeDisplay.textContent = data.code;
+                        multiplayerMenu.classList.add('hidden');
+                        hostingInfo.classList.remove('hidden');
+                        hostingStatus.textContent = 'Waiting for opponent...';
+                        initGame(true, false); // Reset board for multiplayer game
+                        break;
+                    
+                    case 'game_joined':
+                        multiplayerState.code = data.code;
+                        multiplayerState.player = data.player;
+                        multiplayerState.isMultiplayer = true;
+                        multiplayerModal.classList.add('hidden');
+                        updateGameStateFromServer(data.state);
+                        statusDisplay.textContent = 'Game started! You are Player ' + data.player;
+                        break;
+
+                    case 'opponent_joined':
+                        hostingStatus.textContent = 'Opponent joined! Starting game...';
+                        setTimeout(() => {
+                            multiplayerModal.classList.add('hidden');
+                            updateGameStateFromServer(data.state);
+                            statusDisplay.textContent = 'Game started! You are Player X';
+                        }, 1000);
+                        break;
+
+                    case 'update_state':
+                        updateGameStateFromServer(data.state);
+                        break;
+
+                    case 'opponent_left':
+                        gameActive = false;
+                        statusDisplay.textContent = 'Opponent has disconnected. Game over.';
+                        if (multiplayerState.ws) {
+                            multiplayerState.ws.close();
+                            multiplayerState.ws = null;
+                        }
+                        multiplayerState.isMultiplayer = false;
+                        break;
+
+                    case 'error':
+                        alert('Multiplayer Error: ' + data.message);
+                        hostingStatus.textContent = 'Error. Please try again.';
+                        multiplayerMenu.classList.remove('hidden');
+                        hostingInfo.classList.add('hidden');
+                        if (multiplayerState.ws) {
+                            multiplayerState.ws.close();
+                        }
+                        multiplayerState.isMultiplayer = false;
+                        break;
+                }
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket disconnected');
+                if (gameActive && multiplayerState.isMultiplayer) {
+                    statusDisplay.textContent = 'Connection lost to server.';
+                }
+                multiplayerState.ws = null;
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                alert('Could not connect to the multiplayer server. Make sure it is running.');
+                multiplayerMenu.classList.remove('hidden');
+                hostingInfo.classList.add('hidden');
+            };
+        }
+
+        function updateGameStateFromServer(serverState) {
+            gameState = serverState.gameState;
+            currentPlayer = serverState.currentPlayer;
+            gameActive = serverState.gameActive;
+            gridSize = serverState.gridSize;
+            winLength = serverState.winLength;
+            gameMode = serverState.gameMode;
+            
+            if (!gameActive) {
+                statusDisplay.textContent = serverState.winner === 'Draw' ? 'DRAW DETECTED' : `VICTORY: ${serverState.winner}`;
+            } else {
+                statusDisplay.textContent = `Turn: ${currentPlayer}. You are ${multiplayerState.player}.`;
+            }
+
+            renderBoard();
+        }
+
+        multiplayerBtn.addEventListener('click', () => {
+            multiplayerModal.classList.remove('hidden');
+            multiplayerMenu.classList.remove('hidden');
+            hostingInfo.classList.add('hidden');
+        });
+
+        multiplayerCloseBtn.addEventListener('click', () => {
+            multiplayerModal.classList.add('hidden');
+            if (multiplayerState.ws) {
+                multiplayerState.ws.close();
+            }
+            multiplayerState = { ws: null, code: null, player: null, isMultiplayer: false };
+            initGame(true);
+        });
+
+        hostGameBtn.addEventListener('click', () => {
+            hostingStatus.textContent = 'Connecting to server...';
+            multiplayerMenu.classList.add('hidden');
+            hostingInfo.classList.remove('hidden');
+            connectWebSocket(() => {
+                const settings = {
+                    gameMode: modeSelect.value,
+                    gridSize: parseInt(document.getElementById('grid-size').value) || 3,
+                    winLength: parseInt(document.getElementById('win-len').value) || 3,
+                };
+                multiplayerState.ws.send(JSON.stringify({ type: 'host', settings }));
+            });
+        });
+
+        cancelHostBtn.addEventListener('click', () => {
+            multiplayerMenu.classList.remove('hidden');
+            hostingInfo.classList.add('hidden');
+            if (multiplayerState.ws) {
+                multiplayerState.ws.close();
+            }
+            multiplayerState = { ws: null, code: null, player: null, isMultiplayer: false };
+            initGame(true);
+        });
+
+        joinGameBtn.addEventListener('click', () => {
+            const code = gameCodeInput.value.trim().toUpperCase();
+            if (code) connectWebSocket(() => multiplayerState.ws.send(JSON.stringify({ type: 'join', code: code })));
+            else alert("Please enter a game code.");
+        });
+
+        localMultiplayerBtn.addEventListener('click', () => {
+            multiplayerModal.classList.add('hidden');
+            
+            // Disable both bots for local 2-player
+            autoX = false;
+            autoO = false;
+            
+            // Update UI for bot toggles
+            hireXBtn.classList.remove('active');
+            hireXBtn.innerText = "Player_X_Active";
+            hireOBtn.classList.remove('active');
+            hireOBtn.innerText = "Player_O_Active";
+
+            // Start a new game for local multiplayer
+            initGame(true, false); 
+            statusDisplay.textContent = "Player X's Turn";
+        });
+
+        modeSelect.onchange = () => initGame(true);
+        botGameBtn.onclick = () => {
+            if (multiplayerState.isMultiplayer) multiplayerCloseBtn.click();
+            initGame(true);
+        };
+        window.addEventListener('resize', renderBoard);
+        initGame();
+    </script>
+</body>
+
+</html>

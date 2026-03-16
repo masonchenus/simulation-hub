@@ -1,0 +1,674 @@
+[
+  {
+    "layout": "radial",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/radial.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "tree",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/tree.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "lattice",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/lattice.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "spiral",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/spiral.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "h-tree",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/h-tree.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "v-tree",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/v-tree.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "sierpinski",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/sierpinski.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "linear",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/linear.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "sine",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/sine.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "cross",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/cross.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "honeycomb",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/honeycomb.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "rain",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/rain.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "chaos",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/chaos.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "star",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/star.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "vertical",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/vertical.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "binary",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/binary.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "block",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/block.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "fountain",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/fountain.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "staircase",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/staircase.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "snowflake",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/snowflake.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "phyllotaxis",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/phyllotaxis.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "pythagorean",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/pythagorean.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "galaxy",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/galaxy.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "city",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/city.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "hex",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/hex.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "triangle",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/triangle.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "diamond",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/diamond.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "zigzag",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/zigzag.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "bracket",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/bracket.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "atom",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/atom.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "lissajous",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/lissajous.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "globe",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/globe.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "dna",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/dna.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "hilbert",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/hilbert.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "circuit",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/circuit.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "ulam",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/ulam.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "grid",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/grid.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "fan",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/fan.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "wall",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/wall.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "rose",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/rose.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "helix",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/helix.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "vortex",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/vortex.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "solar",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/solar.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "ring",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/ring.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "braid",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/braid.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "wave",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/wave.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "scatter",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/scatter.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "tunnel",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/tunnel.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "box",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/box.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "crosshatch",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/crosshatch.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "pendulum",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/pendulum.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "daisy",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/daisy.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "burst",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/burst.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "gear",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/gear.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "corner",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/corner.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "moire",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/moire.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "arc",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/arc.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "semicircle",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/semicircle.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "quarter",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/quarter.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "xcross",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/xcross.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "pluscross",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/pluscross.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "compass8",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/compass8.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "compass16",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/compass16.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "trident",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/trident.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "fork",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/fork.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "ladder",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/ladder.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "zipper",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/zipper.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "braid2",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/braid2.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "corkscrew",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/corkscrew.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "ripple",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/ripple.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "pinwheel",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/pinwheel.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "orbit",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/orbit.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "comet",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/comet.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "rings",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/rings.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "concentric",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/concentric.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "spiral3",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/spiral3.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "spiral5",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/spiral5.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "rose5",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/rose5.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "rose7",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/rose7.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "rose9",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/rose9.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "cardioid",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/cardioid.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "lemniscate",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/lemniscate.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "astroid",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/astroid.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "deltoid",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/deltoid.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "nephroid",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/nephroid.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "hypotrochoid",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/hypotrochoid.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "epitrochoid",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/epitrochoid.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "lituus",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/lituus.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "logspiral",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/logspiral.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "clover",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/clover.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "wavefront",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/wavefront.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "gridwarp",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/gridwarp.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "hexwarp",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/hexwarp.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "diamondwarp",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/diamondwarp.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "randomwalk",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/randomwalk.png",
+    "ok": true,
+    "errors": 0
+  },
+  {
+    "layout": "jitterfan",
+    "url": "http://127.0.0.1:5173/simulations/fractal-sim.html#seed=12&depth=10&scale=120",
+    "screenshot": "output/fractal-layout-smoke-run15/jitterfan.png",
+    "ok": true,
+    "errors": 0
+  }
+]
