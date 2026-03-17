@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Factorization Fractal</title>
+    <title>Factorization Fractal & Fractal Therapy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -384,6 +384,7 @@
                                 <option value="h-tree">H-Tree</option>
                                 <option value="v-tree">V-Tree</option>
                                 <option value="sierpinski">Sierpinski</option>
+                                <option value="sierpinski-carpet">Sierpinski Carpet</option>
                                 <option value="linear">Linear</option>
                                 <option value="sine">Sine Wave</option>
                                 <option value="cross">Cross</option>
@@ -4748,6 +4749,25 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
                 node.children.forEach((child, i) => {
                     const a = (i / count) * Math.PI * 2;
                     drawNode(child, endX, endY, a, size * decay, depth + 1, size * decay);
+                });
+            } else if (layout === 'sierpinski-carpet') {
+                const childScale = len / 3.0;
+                const offset = len / 3.0;
+
+                const positions = [
+                    {x: -1, y: -1}, {x: 0, y: -1}, {x: 1, y: -1},
+                    {x: -1, y: 0},  /* center */   {x: 1, y: 0},
+                    {x: -1, y: 1},  {x: 0, y: 1},  {x: 1, y: 1}
+                ];
+
+                node.children.forEach((child, i) => {
+                    if (i >= 8) return; // Max 8 children for this layout
+                    const pos = positions[i];
+                    const dx = pos.x * offset;
+                    const dy = pos.y * offset;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    const childAngle = Math.atan2(dy, dx);
+                    drawNode(child, endX, endY, childAngle, dist, depth + 1, childScale);
                 });
             } else if (layout === 'linear' || layout === 'sine' || layout === 'rain') {
                 node.children.forEach(child => drawNode(child, endX, endY, 0, size * decay, depth + 1, size * decay));

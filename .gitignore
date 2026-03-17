@@ -5,3 +5,4 @@ node_modules/
 dist-webpack/
 .devcontainer
 .venv
+.DS_Store
