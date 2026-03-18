@@ -9,6 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/PLYExporter.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
@@ -180,7 +181,7 @@
                         </div>
                         <div>
                             <div class="flex justify-between mb-2"><label class="text-xs font-semibold text-slate-400">Number Label Size</label><span id="val-font" class="text-xs text-slate-400 font-mono">14pt</span></div>
-                            <input id="font-input" type="range" min="8" max="48" step="1" value="14" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            <input id="font-input" type="range" min="2" max="48" step="1" value="14" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer">
                         </div>
                         <div>
                             <div class="flex justify-between mb-2"><label class="text-xs font-semibold text-slate-400">Branch Spread</label><span id="val-spread" class="text-xs text-slate-400 font-mono">120°</span></div>
@@ -233,6 +234,10 @@
                         <div class="flex items-center justify-between">
                             <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Background Color</label>
                             <input id="bg-color-picker" type="color" value="#0f172a" class="w-6 h-6 bg-transparent border-0 cursor-pointer rounded overflow-hidden">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Number label is fixed size</label>
+                            <input id="fixed-label-check" type="checkbox" class="accent-blue-500 w-4 h-4 cursor-pointer">
                         </div>
                         <div class="flex items-center justify-between">
                             <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Node Brightness</label>
@@ -477,6 +482,8 @@
                                 <option value="diamondwarp">Diamond Warp</option>
                                 <option value="randomwalk">Random Walk</option>
                                 <option value="jitterfan">Jitter Fan</option>
+                                <option value="mandelbrot">Mandelbrot Set</option>
+                                <option value="julia">Julia Set</option>
                                 <option value="projected">Projected Factors</option>
                             </select>
                         </div>
@@ -638,9 +645,35 @@
                             <button id="btn-export-hires" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors">Export 4K PNG</button>
                             <button id="btn-export-url" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-blue-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-blue-700 transition-colors">Open Export URL</button>
                             <div class="flex gap-1">
+                                 <input id="video-width" type="number" placeholder="W" value="1920" class="bg-slate-800 text-[10px] text-slate-200 border border-slate-700 rounded px-1 w-1/2">
+                                <input id="video-height" type="number" placeholder="H" value="1080" class="bg-slate-800 text-[10px] text-slate-200 border border-slate-700 rounded px-1 w-1/2">
+                            </div>
+                            <div class="flex gap-1">
                                 <select id="video-fps" class="bg-slate-800 text-[10px] text-slate-200 border border-slate-700 rounded px-1 w-1/2">
+                                    <option value="5">5 FPS</option>
+                                    <option value="10">10 FPS</option>
+                                    <option value="12">12 FPS</option>
+                                    <option value="15">15 FPS</option>
+                                    <option value="20">20 FPS</option>
+                                    <option value="24">24 FPS</option>
+                                    <option value="25">25 FPS</option>
                                     <option value="30">30 FPS</option>
+                                    <option value="48">48 FPS</option>
+                                    <option value="50">50 FPS</option>
                                     <option value="60">60 FPS</option>
+                                    <option value="72">72 FPS</option>
+                                    <option value="75">75 FPS</option>
+                                    <option value="90">90 FPS</option>
+                                    <option value="100">100 FPS</option>
+                                    <option value="120">120 FPS</option>
+                                    <option value="144">144 FPS</option>
+                                    <option value="165">165 FPS</option>
+                                    <option value="200">200 FPS</option>
+                                    <option value="240">240 FPS</option>
+                                    <option value="360">360 FPS</option>
+                                    <option value="480">480 FPS</option>
+                                    <option value="960">960 FPS</option>
+                                    <option value="1080">1080 FPS</option>
                                 </select>
                                 <select id="video-bitrate" class="bg-slate-800 text-[10px] text-slate-200 border border-slate-700 rounded px-1 w-1/2">
                                     <option value="2500000">2.5 Mbps</option>
@@ -988,6 +1021,7 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
         const linesCheck = document.getElementById('lines-check');
         const gridCheck = document.getElementById('grid-check');
         const bgColorPicker = document.getElementById('bg-color-picker');
+        const fixedLabelCheck = document.getElementById('fixed-label-check');
         const customGradientPicker = document.getElementById('custom-gradient-picker');
         const gradStops = document.getElementById('grad-stops');
         const moduloControl = document.getElementById('modulo-control');
@@ -2966,6 +3000,7 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
                 watermark: watermarkInput.value,
                 waveform: waveformSelect.value,
                 transparent: transparentCheck.checked,
+                fixedLabel: fixedLabelCheck.checked,
                 svgOpt: svgOptCheck.checked,
                 dynamicAngles: dynamicAnglesCheck.checked,
                 perfMode: perfModeCheck.checked,
@@ -3045,6 +3080,7 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             if (state.watermark !== undefined) watermarkInput.value = state.watermark;
             if (state.waveform) waveformSelect.value = state.waveform;
             if (state.transparent !== undefined) transparentCheck.checked = !!state.transparent;
+            if (state.fixedLabel !== undefined) fixedLabelCheck.checked = !!state.fixedLabel;
             if (state.svgOpt !== undefined) svgOptCheck.checked = !!state.svgOpt;
             if (state.dynamicAngles !== undefined) dynamicAnglesCheck.checked = !!state.dynamicAngles;
             if (state.perfMode !== undefined) perfModeCheck.checked = !!state.perfMode;
@@ -3708,7 +3744,7 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             'ripple', 'rings', 'rose', 'rose5', 'rose7', 'rose9', 'semicircle',
             'spiral', 'spiral3', 'spiral5',
             'trident', 'ulam', 'vortex', 'wave', 'wavefront', 'zigzag', 'zipper',
-            'hex-grid', 'triangle-grid'
+            'hex-grid', 'triangle-grid', 'mandelbrot', 'julia'
         ]);
 
         function isGlobalLayout(layout) {
@@ -3730,6 +3766,53 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
                 nodes.forEach((node, i) => {
                     const coords = getUlamCoords(node.val);
                     setPos(i, coords.x * scale, coords.y * scale);
+                });
+                return positions;
+            }
+
+            if (layout === 'mandelbrot') {
+                const scale = opts.size * 3.5;
+                nodes.forEach((node, i) => {
+                    const t = tFor(i);
+                    const theta = t * tau;
+                    let x, y;
+                    if (i % 4 !== 0) {
+                        const mx = (Math.cos(theta) / 2) - (Math.cos(2 * theta) / 4);
+                        const my = (Math.sin(theta) / 2) - (Math.sin(2 * theta) / 4);
+                        x = mx * scale - (scale * 0.5);
+                        y = my * scale;
+                    } else {
+                        const bx = -1 + 0.25 * Math.cos(theta);
+                        const by = 0.25 * Math.sin(theta);
+                        x = bx * scale - (scale * 0.5);
+                        y = by * scale;
+                    }
+                    setPos(i, x, y);
+                });
+                return positions;
+            }
+
+            if (layout === 'julia') {
+                const scale = opts.size * 3.0;
+                let cr = -0.8, ci = 0.156;
+                if (opts.seed) {
+                    let hash = 0;
+                    const str = String(opts.seed);
+                    for (let i = 0; i < str.length; i++) {
+                        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                        hash |= 0;
+                    }
+                    cr = ((Math.abs(hash) % 1000) / 1000) * 2.0 - 1.0;
+                    ci = ((Math.abs(hash * 13) % 1000) / 1000) * 2.0 - 1.0;
+                }
+                nodes.forEach((node, i) => {
+                    let zx = 1.0, zy = 0.0, bits = i;
+                    for(let k=0; k<12; k++) {
+                        const r = Math.sqrt((zx - cr)**2 + (zy - ci)**2);
+                        const th = Math.atan2(zy - ci, zx - cr), rtR = Math.sqrt(r), rtTh = th / 2, s = (bits & 1) ? 1 : -1;
+                        zx = s * rtR * Math.cos(rtTh); zy = s * rtR * Math.sin(rtTh); bits >>= 1;
+                    }
+                    setPos(i, zx * scale, zy * scale);
                 });
                 return positions;
             }
@@ -4327,7 +4410,7 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             // Text logic (always on canvas for readability)
             if (!perfModeCheck.checked || !isDragging) {
                 const baseFontSize = parseInt(fontInput.value);
-                const responsiveFontSize = Math.max(2, baseFontSize - depth) / app.transform.k;
+                const responsiveFontSize = (fixedLabelCheck.checked ? baseFontSize : Math.max(2, baseFontSize - depth)) / app.transform.k;
                 ctx.font = `bold ${isTarget ? responsiveFontSize * 1.5 : responsiveFontSize}px sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -5978,7 +6061,7 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
 
                 // Text
                 const baseFontSize = parseInt(fontInput.value);
-                const fontSize = Math.max(2, baseFontSize - depth) / app.transform.k;
+                const fontSize = (fixedLabelCheck.checked ? baseFontSize : Math.max(2, baseFontSize - depth)) / app.transform.k;
                 if (fontSize > 4) { // Don't export tiny text
                     svgContent += `<text x="${endX}" y="${endY}" font-family="sans-serif" font-size="${isTarget ? fontSize * 1.5 : fontSize}" fill="${style.text}" text-anchor="middle" dominant-baseline="middle" font-weight="bold">${node.val}</text>`;
                 }
@@ -7019,7 +7102,7 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
                     let radius = Math.max(0.5, (4 - node.depth * 0.3)) / app.transform.k;
                     if (logSizeCheck.checked) radius = Math.max(1, Math.log(node.val) * 2) / app.transform.k;
                     svgContent += `<circle cx="${node.x}" cy="${node.y}" r="${radius}" fill="${style.fill}" stroke="${style.stroke}" stroke-width="${Math.max(0.1, radius * 0.2)}" />`;
-                    const fontSize = Math.max(2, baseFontSize - node.depth) / app.transform.k;
+                    const fontSize = (fixedLabelCheck.checked ? baseFontSize : Math.max(2, baseFontSize - node.depth)) / app.transform.k;
                     if (fontSize > 4) {
                         svgContent += `<text x="${node.x}" y="${node.y}" font-family="sans-serif" font-size="${fontSize}" fill="${style.text}" text-anchor="middle" dominant-baseline="middle" font-weight="bold">${node.val}</text>`;
                     }
@@ -7064,7 +7147,7 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
                     let radius = Math.max(0.5, (4 - node.depth * 0.3)) / app.transform.k;
                     if (logSizeCheck.checked) radius = Math.max(1, Math.log(node.val) * 2) / app.transform.k;
                     svgContent += `<circle cx="${node.x}" cy="${node.y}" r="${radius}" fill="${style.fill}" stroke="${style.stroke}" stroke-width="${Math.max(0.1, radius * 0.2)}" />`;
-                    const fontSize = Math.max(2, baseFontSize - node.depth) / app.transform.k;
+                    const fontSize = (fixedLabelCheck.checked ? baseFontSize : Math.max(2, baseFontSize - node.depth)) / app.transform.k;
                     if (fontSize > 4) {
                         svgContent += `<text x="${node.x}" y="${node.y}" font-family="sans-serif" font-size="${fontSize}" fill="${style.text}" text-anchor="middle" dominant-baseline="middle" font-weight="bold">${node.val}</text>`;
                     }
@@ -7086,7 +7169,8 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
                     size: parseInt(scaleInput.value),
                     decay: parseFloat(decayInput.value),
                     distribution: parseFloat(distributionInput.value),
-                    spacing: parseInt(spacingInput.value)
+                    spacing: parseInt(spacingInput.value),
+                    seed: seedInput.value
                 });
                 let themeFn = themes[themeSelect.value] || themes.default;
                 if (golCheck.checked) themeFn = themes.gol;
@@ -7116,7 +7200,7 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
                     let radius = Math.max(0.5, (4 - node.depth * 0.3)) / app.transform.k;
                     if (logSizeCheck.checked) radius = Math.max(1, Math.log(node.val) * 2) / app.transform.k;
                     svgContent += `<circle cx="${node.x}" cy="${node.y}" r="${radius}" fill="${style.fill}" stroke="${style.stroke}" stroke-width="${Math.max(0.1, radius * 0.2)}" />`;
-                    const fontSize = Math.max(2, baseFontSize - node.depth) / app.transform.k;
+                    const fontSize = (fixedLabelCheck.checked ? baseFontSize : Math.max(2, baseFontSize - node.depth)) / app.transform.k;
                     if (fontSize > 4) {
                         svgContent += `<text x="${node.x}" y="${node.y}" font-family="sans-serif" font-size="${fontSize}" fill="${style.text}" text-anchor="middle" dominant-baseline="middle" font-weight="bold">${node.val}</text>`;
                     }
@@ -7286,12 +7370,87 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             draw();
         });
 
+        function createExportableScene() {
+            const exportScene = new THREE.Scene();
+            const fractalGroup = threeScene.getObjectByName('fractalGroup');
+            if (!fractalGroup) return exportScene;
+
+            fractalGroup.children.forEach(child => {
+                if (child.isInstancedMesh) {
+                    const instanceCount = child.count;
+                    const geom = child.geometry;
+                    const vertCount = geom.attributes.position.count;
+                    const indexCount = geom.index ? geom.index.count : 0;
+                    
+                    const totalVerts = vertCount * instanceCount;
+                    const totalIndices = indexCount * instanceCount;
+                    
+                    const positions = new Float32Array(totalVerts * 3);
+                    const normals = new Float32Array(totalVerts * 3);
+                    const colors = new Float32Array(totalVerts * 3);
+                    const indices = indexCount > 0 ? (totalVerts > 65535 ? new Uint32Array(totalIndices) : new Uint16Array(totalIndices)) : null;
+                    
+                    const basePos = geom.attributes.position.array;
+                    const baseNorm = geom.attributes.normal.array;
+                    const baseIdx = geom.index ? geom.index.array : null;
+                    
+                    const matrix = new THREE.Matrix4();
+                    const color = new THREE.Color();
+                    
+                    for (let i = 0; i < instanceCount; i++) {
+                        child.getMatrixAt(i, matrix);
+                        child.getColorAt(i, color);
+                        
+                        for (let v = 0; v < vertCount; v++) {
+                            const offset = i * vertCount + v;
+                            
+                            // Position
+                            const x = basePos[v*3], y = basePos[v*3+1], z = basePos[v*3+2];
+                            const e = matrix.elements;
+                            positions[offset*3] = x * e[0] + y * e[4] + z * e[8] + e[12];
+                            positions[offset*3+1] = x * e[1] + y * e[5] + z * e[9] + e[13];
+                            positions[offset*3+2] = x * e[2] + y * e[6] + z * e[10] + e[14];
+                            
+                            // Normal (Approximation without inverse transpose for uniform scale)
+                            // For non-uniform scale, this is incorrect but sufficient for spheres
+                            const nx = baseNorm[v*3], ny = baseNorm[v*3+1], nz = baseNorm[v*3+2];
+                            normals[offset*3] = nx; normals[offset*3+1] = ny; normals[offset*3+2] = nz;
+                            
+                            // Color
+                            colors[offset*3] = color.r; colors[offset*3+1] = color.g; colors[offset*3+2] = color.b;
+                        }
+                        
+                        if (indices && baseIdx) {
+                            for (let j = 0; j < indexCount; j++) {
+                                indices[i * indexCount + j] = baseIdx[j] + i * vertCount;
+                            }
+                        }
+                    }
+                    
+                    const mergedGeo = new THREE.BufferGeometry();
+                    mergedGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                    mergedGeo.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+                    mergedGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+                    if (indices) mergedGeo.setIndex(new THREE.BufferAttribute(indices, 1));
+                    
+                    const mergedMat = new THREE.MeshStandardMaterial({ roughness: 0.5, metalness: 0.1, vertexColors: true });
+                    exportScene.add(new THREE.Mesh(mergedGeo, mergedMat));
+                } else if (child.type === 'LineSegments') {
+                    // Clone lines for context
+                    const lines = new THREE.LineSegments(child.geometry.clone(), new THREE.LineBasicMaterial({ vertexColors: true }));
+                    exportScene.add(lines);
+                }
+            });
+            return exportScene;
+        }
+
         function exportGLTF() {
             if (!threeScene) { init3D(); } // Ensure 3D scene exists
             // Wait a frame for it to build
             setTimeout(() => {
+                const exportScene = createExportableScene();
                 const exporter = new THREE.GLTFExporter();
-                exporter.parse(threeScene, (gltf) => {
+                exporter.parse(exportScene, (gltf) => {
                     const blob = new Blob([JSON.stringify(gltf)], { type: 'application/json' });
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
@@ -7305,8 +7464,9 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             if (!threeScene) { init3D(); }
             setTimeout(() => {
                 try {
+                    const exportScene = createExportableScene();
                     const exporter = new THREE.STLExporter();
-                    const data = exporter.parse(threeScene, { binary: true });
+                    const data = exporter.parse(exportScene, { binary: true });
                     const blob = new Blob([data], { type: 'application/octet-stream' });
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
@@ -7315,6 +7475,21 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
                 } catch (e) {
                     alert('STL export failed.');
                 }
+            }, 100);
+        }
+
+        function exportPLY() {
+            if (!threeScene) { init3D(); }
+            setTimeout(() => {
+                const exportScene = createExportableScene();
+                const exporter = new THREE.PLYExporter();
+                exporter.parse(exportScene, (data) => {
+                    const blob = new Blob([data], { type: 'application/octet-stream' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = 'fractal-model.ply';
+                    link.click();
+                }, { binary: true });
             }, 100);
         }
 
@@ -7425,20 +7600,47 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
         function initMandelbrot() {
             if (!bgCtx) return;
             const vs = `attribute vec2 position; void main() { gl_Position = vec4(position, 0.0, 1.0); }`;
-            const fs = `precision highp float; uniform vec2 res; uniform vec2 center; uniform float zoom;
+            const fs = `precision highp float;
+                uniform vec2 res;
+                uniform vec2 center;
+                uniform float zoom;
+                uniform int type; // 0=Mandelbrot, 1=Julia
+                uniform float detail;
+                uniform float time;
+                uniform vec2 seedC;
+                uniform float colorShift;
+
+                vec3 hsv2rgb(vec3 c) {
+                    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+                    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+                    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+                }
+
                 void main() {
                     vec2 uv = (gl_FragCoord.xy - res * 0.5) / min(res.x, res.y);
-                    vec2 c = center + uv * (4.0 / zoom);
-                    vec2 z = vec2(0.0);
+                    vec2 c;
+                    vec2 z;
+                    if (type == 0) {
+                        c = center + uv * (4.0 / zoom);
+                        z = vec2(0.0);
+                    } else {
+                        z = center + uv * (4.0 / zoom);
+                        c = seedC + vec2(sin(time * 0.0001), cos(time * 0.0002)) * 0.02;
+                    }
                     float iter = 0.0;
-                    for(float i=0.0; i<100.0; i++) {
+                    for(float i=0.0; i<1000.0; i++) {
+                        if (i >= detail) break;
                         z = vec2(z.x*z.x - z.y*z.y, 2.0*z.x*z.y) + c;
                         if(length(z) > 2.0) break;
                         iter++;
                     }
-                    float t = iter / 100.0;
-                    gl_FragColor = vec4(t*0.2, t*0.4, t*0.8, 1.0);
-                    if (iter == 100.0) gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+                    float t = iter / detail;
+                    if (iter >= detail) {
+                        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+                    } else {
+                        vec3 col = hsv2rgb(vec3(t + colorShift + time * 0.00005, 0.8, 1.0));
+                        gl_FragColor = vec4(col, 1.0);
+                    }
                 }`;
             
             function createShader(type, src) {
@@ -7458,7 +7660,7 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             bgCtx.bufferData(bgCtx.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), bgCtx.STATIC_DRAW);
         }
 
-        function drawMandelbrot() {
+        function drawMandelbrot(time = 0) {
             if (!bgCtx || !mandelProgram || !mandelbrotCheck.checked) {
                 if (bgCtx) bgCtx.clear(bgCtx.COLOR_BUFFER_BIT);
                 return;
@@ -7479,6 +7681,22 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             bgCtx.uniform2f(bgCtx.getUniformLocation(mandelProgram, "center"), cx/200, cy/200); 
             bgCtx.uniform1f(bgCtx.getUniformLocation(mandelProgram, "zoom"), app.transform.k);
             
+            // New uniforms
+            const seedVal = parseInt(seedInput.value) || 1;
+            const hash = (n) => Math.sin(n) * 43758.5453123;
+            const r1 = hash(seedVal);
+            const r2 = hash(seedVal + 123.45);
+            const r3 = hash(seedVal + 678.90);
+            const seedCx = (r1 - Math.floor(r1)) * 2.0 - 1.0;
+            const seedCy = (r2 - Math.floor(r2)) * 2.0 - 1.0;
+            const shift = (r3 - Math.floor(r3));
+
+            bgCtx.uniform1i(bgCtx.getUniformLocation(mandelProgram, "type"), 0);
+            bgCtx.uniform1f(bgCtx.getUniformLocation(mandelProgram, "detail"), 100.0);
+            bgCtx.uniform1f(bgCtx.getUniformLocation(mandelProgram, "time"), time);
+            bgCtx.uniform2f(bgCtx.getUniformLocation(mandelProgram, "seedC"), seedCx, seedCy);
+            bgCtx.uniform1f(bgCtx.getUniformLocation(mandelProgram, "colorShift"), shift);
+
             bgCtx.drawArrays(bgCtx.TRIANGLE_STRIP, 0, 4);
         }
 
@@ -7931,7 +8149,15 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
                 instancedMesh.setMatrixAt(index, dummy.matrix);
                 indexToNode[index] = node;
                 
-                color.setHSL((node.depth * 30 % 360)/360, 1, 0.5);
+                const isTarget = node.val === app.findTarget;
+                const isPath = app.activePathSet.has(node);
+                const isPrimeNode = primeCheck.checked && isPrime(node.val);
+                
+                let themeFn = themes[themeSelect.value] || themes.default;
+                if (golCheck.checked) themeFn = themes.gol;
+                const style = themeFn(node.depth, isTarget, isPath, isPrimeNode, node.val, node);
+
+                color.set(style.fill);
                 instancedMesh.setColorAt(index, color);
                 index++;
                 
@@ -7941,7 +8167,8 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
                     const pz = (node.parent.depth * zStep) - centerZ;
                     
                     linePositions.push(px, py, pz, x, y, z);
-                    lineColors.push(1,1,1, 1,1,1); // White
+                    const lc = new THREE.Color(style.stroke);
+                    lineColors.push(lc.r, lc.g, lc.b, lc.r, lc.g, lc.b);
                 }
                 
                 if (node.children) node.children.forEach(build3D);
@@ -7954,8 +8181,8 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             // Batch lines
             const lineGeo = new THREE.BufferGeometry();
             lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
-            // lineGeo.setAttribute('color', new THREE.Float32BufferAttribute(lineColors, 3));
-            const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.3 });
+            lineGeo.setAttribute('color', new THREE.Float32BufferAttribute(lineColors, 3));
+            const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5, vertexColors: true });
             const lines = new THREE.LineSegments(lineGeo, lineMat);
             fractalGroup.add(lines);
 
@@ -8204,6 +8431,7 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
         }
 
         let lastDrawTransform = { x: 0, y: 0, k: 0 };
+        let recordingSize = null;
 
         function draw(time, isTransparent = false) {
             if (!Number.isFinite(app.transform.k) || app.transform.k <= 0 || !Number.isFinite(app.transform.x) || !Number.isFinite(app.transform.y)) {
@@ -8241,22 +8469,24 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             const transformChanged = app.transform.x !== lastDrawTransform.x || app.transform.y !== lastDrawTransform.y || app.transform.k !== lastDrawTransform.k;
             
             if (transformChanged || mandelbrotCheck.checked) {
-                drawMandelbrot();
+                drawMandelbrot(animationTime);
                 lastDrawTransform = { ...app.transform };
             }
 
             const rect = canvas.parentNode.getBoundingClientRect();
+            const viewW = recordingSize ? recordingSize.width : rect.width;
+            const viewH = recordingSize ? recordingSize.height : rect.height;
 
-            if (textureModeCheck.checked) {
+            if (textureModeCheck.checked && !recordingSize) {
                 // Draw on 1024x1024 canvas, no background clear needed if we fill
                 ctx.fillStyle = bgColorPicker.value;
                 ctx.fillRect(0, 0, 1024, 1024);
             } else {
                 if (isTransparent) {
-                    ctx.clearRect(0, 0, rect.width, rect.height);
+                    ctx.clearRect(0, 0, viewW, viewH);
                 } else {
                     ctx.fillStyle = bgColorPicker.value;
-                    ctx.fillRect(0, 0, rect.width, rect.height);
+                    ctx.fillRect(0, 0, viewW, viewH);
                 }
             }
             
@@ -8266,22 +8496,20 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             const isCompare = compareCheck.checked && app.referenceTreeData;
             
             if (isCompare) {
-                // Draw Reference (Left Side)
-                updateViewParams(rect, app.transform.x - rect.width/4, app.transform.y, 0, rect.width/2, 0, rect.height);
+                updateViewParams({ width: viewW, height: viewH }, app.transform.x - viewW/4, app.transform.y, 0, viewW/2, 0, viewH);
                 ctx.save();
-                ctx.beginPath(); ctx.rect(0, 0, rect.width/2, rect.height); ctx.clip();
-                ctx.translate(app.transform.x - rect.width/4, app.transform.y);
+                ctx.beginPath(); ctx.rect(0, 0, viewW/2, viewH); ctx.clip();
+                ctx.translate(app.transform.x - viewW/4, app.transform.y);
                 ctx.scale(app.transform.k, app.transform.k);
                 ctx.rotate((parseInt(rotationInput.value) * Math.PI) / 180);
                 app.vTreeLaneSegments = [];
                 drawRoot(app.referenceTreeData);
                 ctx.restore();
                 
-                // Draw Live (Right Side)
-                updateViewParams(rect, app.transform.x + rect.width/4, app.transform.y, rect.width/2, rect.width, 0, rect.height);
+                updateViewParams({ width: viewW, height: viewH }, app.transform.x + viewW/4, app.transform.y, viewW/2, viewW, 0, viewH);
                 ctx.save();
-                ctx.beginPath(); ctx.rect(rect.width/2, 0, rect.width/2, rect.height); ctx.clip();
-                ctx.translate(app.transform.x + rect.width/4, app.transform.y);
+                ctx.beginPath(); ctx.rect(viewW/2, 0, viewW/2, viewH); ctx.clip();
+                ctx.translate(app.transform.x + viewW/4, app.transform.y);
                 ctx.scale(app.transform.k, app.transform.k);
                 ctx.rotate((parseInt(rotationInput.value) * Math.PI) / 180);
                 app.vTreeLaneSegments = [];
@@ -8289,11 +8517,11 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
                 ctx.restore();
                 
                 // Divider
-                ctx.beginPath(); ctx.moveTo(rect.width/2, 0); ctx.lineTo(rect.width/2, rect.height);
+                ctx.beginPath(); ctx.moveTo(viewW/2, 0); ctx.lineTo(viewW/2, viewH);
                 ctx.strokeStyle = '#334155'; ctx.lineWidth = 2; ctx.stroke();
             } else {
                 // Normal Draw
-            updateViewParams(rect, app.transform.x, app.transform.y, 0, rect.width, 0, rect.height);
+            updateViewParams({ width: viewW, height: viewH }, app.transform.x, app.transform.y, 0, viewW, 0, viewH);
             ctx.save();
             ctx.translate(app.transform.x, app.transform.y);
             ctx.scale(app.transform.k, app.transform.k);
@@ -8342,7 +8570,7 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
 
             // Playwright/smoke-test hook: increment after a successful render so automation can wait for a redraw.
             // Units overlay (show when zoomed out)
-            drawUnitsOverlay(ctx, rect, app.transform);
+            drawUnitsOverlay(ctx, { width: viewW, height: viewH }, app.transform);
             renderGL();
 
             window.__drawCount = (window.__drawCount || 0) + 1;
@@ -8702,7 +8930,8 @@ void main(){ outColor = vColor; }`;
                     size: parseInt(scaleInput.value),
                     decay: parseFloat(decayInput.value),
                     distribution: parseFloat(distributionInput.value),
-                    spacing: parseInt(spacingInput.value)
+                    spacing: parseInt(spacingInput.value),
+                    seed: seedInput.value
                 });
 
                 nodes.forEach((node, i) => {
@@ -9126,14 +9355,41 @@ void main(){ outColor = vColor; }`;
         });
 
         // Video Recording
+        let originalCanvasState = null;
         btnRecord.addEventListener('click', () => {
             if (mediaRecorder && mediaRecorder.state === 'recording') {
                 mediaRecorder.stop();
                 btnRecord.textContent = "Record Video";
                 btnRecord.classList.remove('bg-red-600', 'text-white');
+                
+                if (originalCanvasState) {
+                    canvas.width = originalCanvasState.width;
+                    canvas.height = originalCanvasState.height;
+                    bgCanvas.width = originalCanvasState.width;
+                    bgCanvas.height = originalCanvasState.height;
+                    if (glCanvas) { glCanvas.width = originalCanvasState.width; glCanvas.height = originalCanvasState.height; }
+                    app.transform = originalCanvasState.transform;
+                    recordingSize = null;
+                    resize(); // Restore context scale
+                    originalCanvasState = null;
+                }
             } else {
                 const fps = parseInt(videoFps.value);
                 const bitrate = parseInt(videoBitrate.value);
+                const width = parseInt(document.getElementById('video-width').value) || 1920;
+                const height = parseInt(document.getElementById('video-height').value) || 1080;
+
+                originalCanvasState = { width: canvas.width, height: canvas.height, transform: { ...app.transform } };
+                const scaleFactor = width / canvas.width;
+                
+                canvas.width = width; canvas.height = height;
+                bgCanvas.width = width; bgCanvas.height = height;
+                if (glCanvas) { glCanvas.width = width; glCanvas.height = height; }
+                recordingSize = { width, height };
+                app.transform.x *= scaleFactor; app.transform.y *= scaleFactor; app.transform.k *= scaleFactor;
+                if (useWebGL && gl) gl.viewport(0, 0, width, height);
+                draw(); // Force draw with new size
+
                 const stream = canvas.captureStream(fps);
                 mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm', videoBitsPerSecond: bitrate });
                 recordedChunks = [];
@@ -9254,6 +9510,7 @@ void main(){ outColor = vColor; }`;
             rotationInput.addEventListener('input', debounce((e) => { valRotation.textContent = e.target.value + '°'; draw(); }, 10));
             leafCheck.addEventListener('change', draw);
             linesCheck.addEventListener('change', draw);
+        fixedLabelCheck.addEventListener('change', draw);
             golCheck.addEventListener('change', () => {
                 golControls.classList.toggle('hidden', !golCheck.checked);
                 golChartContainer.classList.toggle('hidden', !golCheck.checked);
@@ -9349,6 +9606,8 @@ void main(){ outColor = vColor; }`;
             document.getElementById('btn-export-midi').addEventListener('click', exportMIDI);
             document.getElementById('btn-export-gltf').addEventListener('click', exportGLTF);
             if (btnExportStl) btnExportStl.addEventListener('click', exportSTL);
+        const btnExportPly = document.getElementById('btn-export-ply');
+        if (btnExportPly) btnExportPly.addEventListener('click', exportPLY);
             document.getElementById('btn-export-fs').addEventListener('click', exportFileSystem);
             document.getElementById('btn-3d').addEventListener('click', init3D);
             if (threeHeightSelect) threeHeightSelect.addEventListener('input', debounce(() => {

@@ -46,18 +46,42 @@
                     <option value="peano">Peano Curve</option>
                     <option value="hilbert">Hilbert Curve</option>
                     <option value="dragon">Dragon Curve</option>
+                    <option value="twindragon">Twindragon Curve</option>
+                    <option value="terdragon">Terdragon Curve</option>
                     <option value="levy">Levy C Curve</option>
                     <option value="koch">Koch Snowflake</option>
-                    <option value="fern">Barnsley Fern</option>
+                    <option value="quadratic_koch">Quadratic Koch</option>
+                    <option value="cesaro">Cesaro Fractal</option>
+                    <option value="minkowski">Minkowski Sausage</option>
+                    <option value="gosper">Gosper Curve</option>
+                    <option value="flowsnake">Flowsnake</option>
                 </optgroup>
                 <optgroup label="Recursive Shapes" class="bg-slate-900">
                     <option value="sierpinski_t">Sierpinski Triangle</option>
                     <option value="sierpinski_c">Sierpinski Carpet</option>
                     <option value="vicsek">Vicsek Fractal</option>
+                    <option value="box">Box Fractal</option>
+                    <option value="t_square">T-Square</option>
+                    <option value="h_fractal">H-Fractal</option>
+                    <option value="dendrite">Dendrite Fractal</option>
+                    <option value="pythagorean">Pythagorean Tree</option>
+                    <option value="apollonian">Apollonian Gasket</option>
+                </optgroup>
+                <optgroup label="L-Systems" class="bg-slate-900">
+                    <option value="fern">Barnsley Fern</option>
+                    <option value="bush">Bush</option>
+                    <option value="fudgeflake">Fudgeflake</option>
                 </optgroup>
                 <optgroup label="Complex Dynamics" class="bg-slate-900">
                     <option value="mandelbrot">Mandelbrot Set</option>
                     <option value="julia">Julia Set</option>
+                    <option value="burning_ship">Burning Ship</option>
+                    <option value="newton">Newton Fractal</option>
+                    <option value="phoenix">Phoenix Fractal</option>
+                    <option value="mandelbox">Mandelbox (2D)</option>
+                </optgroup>
+                <optgroup label="1D Fractals" class="bg-slate-900">
+                    <option value="cantor">Cantor Set</option>
                 </optgroup>
             </select>
         </div>
@@ -119,10 +143,26 @@
             else if (mode === 'dragon') scale = (Math.min(width, height) * 0.5) / Math.pow(1.414, iterations);
             else if (mode === 'levy') scale = (Math.min(width, height) * 0.4);
             else if (mode === 'koch') scale = (Math.min(width, height) * 0.8);
+            else if (mode === 'quadratic_koch') scale = (Math.min(width, height) * 0.8);
             else if (mode === 'fern') scale = height / 11;
             else if (mode === 'sierpinski_t' || mode === 'sierpinski_c' || mode === 'vicsek') 
                 scale = (Math.min(width, height) * 0.8) / Math.pow(mode === 'sierpinski_t' ? 2 : 3, iterations);
-            else if (mode === 'mandelbrot' || mode === 'julia') scale = Math.min(width, height) / 4;
+            else if (['mandelbrot', 'julia', 'burning_ship', 'newton', 'phoenix', 'mandelbox'].includes(mode)) scale = Math.min(width, height) / 4;
+            else if (mode === 'pythagorean') scale = height / 12;
+            else if (mode === 't_square') scale = Math.min(width, height) * 0.4;
+            else if (mode === 'box') scale = Math.min(width, height) * 0.3;
+            else if (mode === 'h_fractal') scale = Math.min(width, height) * 0.4;
+            else if (mode === 'dendrite') scale = height / 4;
+            else if (mode === 'cantor') scale = width * 0.8;
+            else if (mode === 'apollonian') scale = Math.min(width, height) * 0.45;
+            else if (mode === 'gosper') scale = Math.min(width, height) * 0.5;
+            else if (mode === 'terdragon') scale = Math.min(width, height) * 0.8;
+            else if (mode === 'twindragon') scale = (Math.min(width, height) * 0.5) / Math.pow(1.414, iterations);
+            else if (mode === 'cesaro') scale = Math.min(width, height) * 0.4;
+            else if (mode === 'minkowski') scale = Math.min(width, height) * 0.8;
+            else if (mode === 'fudgeflake') scale = Math.min(width, height) * 0.4;
+            else if (mode === 'flowsnake') scale = Math.min(width, height) * 0.8;
+            else if (mode === 'bush') scale = height / 2.5;
 
             if (mode === 'peano' || mode === 'sierpinski_c' || mode === 'vicsek' || mode === 'hilbert') {
                 const b = (mode === 'hilbert' ? Math.pow(2, iterations) : Math.pow(3, iterations));
@@ -131,7 +171,11 @@
             } else if (mode === 'sierpinski_t') {
                 const s = Math.pow(2, iterations) * scale;
                 offsetX -= s/2; offsetY += (s * 0.866)/2;
-            } else if (mode === 'koch') {
+            } else if (mode === 'pythagorean') {
+                offsetY += height * 0.4;
+            } else if (mode === 'dendrite' || mode === 'bush') {
+                offsetY += height * 0.4;
+            } else if (mode === 'koch' || mode === 'quadratic_koch') {
                 offsetX -= scale/2; offsetY += scale/4;
             } else if (mode === 'fern') {
                 offsetY += height/2.2;
@@ -314,6 +358,272 @@
             ctx.putImageData(imgData, 0, 0);
         }
 
+        function drawGosper() {
+            let x = offsetX, y = offsetY;
+            let angle = 0;
+            const len = scale / Math.pow(2.645, iterations);
+            ctx.lineWidth = 1.5;
+            function gosperA(n) {
+                if (n > 0) {
+                    gosperA(n - 1); angle += Math.PI / 3;
+                    gosperB(n - 1); angle -= 2 * Math.PI / 3;
+                    gosperB(n - 1); angle += Math.PI / 3;
+                    gosperA(n - 1);
+                } else {
+                    const nx = x + Math.cos(angle) * len;
+                    const ny = y + Math.sin(angle) * len;
+                    drawLine(x, y, nx, ny, '#f43f5e');
+                    x = nx; y = ny;
+                }
+            }
+            function gosperB(n) {
+                if (n > 0) {
+                    gosperB(n - 1); angle -= Math.PI / 3;
+                    gosperA(n - 1); angle += 2 * Math.PI / 3;
+                    gosperA(n - 1); angle -= Math.PI / 3;
+                    gosperB(n - 1);
+                } else {
+                    const nx = x + Math.cos(angle) * len;
+                    const ny = y + Math.sin(angle) * len;
+                    drawLine(x, y, nx, ny, '#f43f5e');
+                    x = nx; y = ny;
+                }
+            }
+            gosperA(iterations);
+        }
+
+        function drawTerdragon() {
+            let x = offsetX, y = offsetY;
+            let angle = 0;
+            const len = scale / Math.pow(1.732, iterations);
+            ctx.lineWidth = 1.5;
+            function ter(n) {
+                if (n > 0) {
+                    ter(n - 1); angle += 2 * Math.PI / 3;
+                    ter(n - 1); angle -= 2 * Math.PI / 3;
+                    ter(n - 1);
+                } else {
+                    const nx = x + Math.cos(angle) * len;
+                    const ny = y + Math.sin(angle) * len;
+                    drawLine(x, y, nx, ny, '#a78bfa');
+                    x = nx; y = ny;
+                }
+            }
+            ter(iterations);
+        }
+
+        function drawTwindragon() {
+            let x = offsetX, y = offsetY;
+            let angle = 0;
+            const len = scale;
+            ctx.lineWidth = 1.5;
+            function dragon(n, sign) {
+                if (n > 0) {
+                    dragon(n - 1, 1);
+                    angle += sign * Math.PI / 2;
+                    dragon(n - 1, -1);
+                } else {
+                    const nx = x + Math.cos(angle) * len;
+                    const ny = y + Math.sin(angle) * len;
+                    drawLine(x, y, nx, ny, '#34d399');
+                    x = nx; y = ny;
+                }
+            }
+            dragon(iterations, 1);
+            angle += Math.PI;
+            dragon(iterations, 1);
+        }
+
+        function drawCesaro() {
+            ctx.lineWidth = 1;
+            const angle = (Math.random() - 0.5) * 0.5 + Math.PI / 2.1;
+            function cesaro(x1, y1, x2, y2, n) {
+                if (n === 0) { drawLine(x1, y1, x2, y2, '#fbbf24'); return; }
+                const dx = x2 - x1, dy = y2 - y1;
+                const x3 = x1 + dx / 2 - dy / (2 * Math.tan(angle));
+                const y3 = y1 + dy / 2 + dx / (2 * Math.tan(angle));
+                cesaro(x1, y1, x3, y3, n - 1);
+                cesaro(x3, y3, x2, y2, n - 1);
+            }
+            const size = scale * 2;
+            cesaro(offsetX - size/2, offsetY + size/4, offsetX + size/2, offsetY + size/4, iterations);
+            cesaro(offsetX + size/2, offsetY + size/4, offsetX + size/2, offsetY - size/4, iterations);
+            cesaro(offsetX + size/2, offsetY - size/4, offsetX - size/2, offsetY - size/4, iterations);
+            cesaro(offsetX - size/2, offsetY - size/4, offsetX - size/2, offsetY + size/4, iterations);
+        }
+
+        function drawMinkowski() {
+            ctx.lineWidth = 1;
+            function mink(x1, y1, x2, y2, n) {
+                if (n === 0) { drawLine(x1, y1, x2, y2, '#f472b6'); return; }
+                const dx = (x2 - x1) / 4, dy = (y2 - y1) / 4;
+                const p = [
+                    {x: x1, y: y1}, {x: x1 + dx, y: y1 + dy},
+                    {x: x1 + dx - dy, y: y1 + dy + dx}, {x: x1 + 2*dx - dy, y: y1 + 2*dy + dx},
+                    {x: x1 + 2*dx, y: y1 + 2*dy}, {x: x1 + 3*dx, y: y1 + 3*dy},
+                    {x: x1 + 3*dx + dy, y: y1 + 3*dy - dx}, {x: x1 + 2*dx + dy, y: y1 + 2*dy - dx},
+                    {x: x2, y: y2}
+                ];
+                for (let i = 0; i < p.length - 1; i++) mink(p[i].x, p[i].y, p[i+1].x, p[i+1].y, n - 1);
+            }
+            mink(offsetX - scale, offsetY, offsetX + scale, offsetY, iterations);
+        }
+
+        function drawPythagoreanTree() {
+            ctx.lineWidth = 1;
+            function tree(x1, y1, x2, y2, n) {
+                if (n === 0) return;
+                const dx = x2 - x1, dy = y2 - y1;
+                const x3 = x2 - dy, y3 = y2 + dx;
+                const x4 = x1 - dy, y4 = y1 + dx;
+                const x5 = x4 + 0.5 * (dx - dy);
+                const y5 = y4 + 0.5 * (dy + dx);
+                drawLine(x1, y1, x2, y2, '#84cc16'); drawLine(x2, y2, x3, y3, '#84cc16');
+                drawLine(x3, y3, x4, y4, '#84cc16'); drawLine(x4, y4, x1, y1, '#84cc16');
+                tree(x4, y4, x5, y5, n - 1); tree(x5, y5, x3, y3, n - 1);
+            }
+            tree(offsetX - scale/2, offsetY, offsetX + scale/2, offsetY, iterations);
+        }
+
+        function drawTSquare() {
+            const size = scale;
+            function tsquare(x, y, s, n) {
+                if (n === 0 || s < 1) return;
+                const hs = s / 2, qs = s / 4;
+                ctx.fillStyle = '#22d3ee';
+                ctx.fillRect(x - hs, y - hs, s, s);
+                tsquare(x - qs, y - qs, hs, n - 1); tsquare(x + qs, y - qs, hs, n - 1);
+                tsquare(x - qs, y + qs, hs, n - 1); tsquare(x + qs, y + qs, hs, n - 1);
+            }
+            tsquare(offsetX, offsetY, size, iterations);
+        }
+
+        function drawBoxFractal() {
+            const size = scale;
+            function box(x, y, s, n) {
+                if (n === 0 || s < 1) return;
+                const ns = s / 3;
+                ctx.fillStyle = '#60a5fa';
+                ctx.fillRect(x + ns, y + ns, ns, ns);
+                if (n > 1) {
+                    for (let i=0; i<3; i++) for (let j=0; j<3; j++) if (i!==1 || j!==1) box(x+i*ns, y+j*ns, ns, n-1);
+                }
+            }
+            box(offsetX - size/2, offsetY - size/2, size, iterations);
+        }
+
+        function drawHFractal() {
+            ctx.lineWidth = 1.5;
+            function h(x, y, s, n) {
+                if (n === 0) return;
+                const hs = s / 2;
+                drawLine(x - hs, y, x + hs, y, '#f43f5e');
+                drawLine(x - hs, y - hs, x - hs, y + hs, '#f43f5e');
+                drawLine(x + hs, y - hs, x + hs, y + hs, '#f43f5e');
+                h(x - hs, y - hs, hs, n - 1); h(x - hs, y + hs, hs, n - 1);
+                h(x + hs, y - hs, hs, n - 1); h(x + hs, y + hs, hs, n - 1);
+            }
+            h(offsetX, offsetY, scale * 2, iterations);
+        }
+
+        function drawDendrite() {
+            ctx.lineWidth = 1;
+            function dendrite(x, y, len, angle, n) {
+                if (n === 0) return;
+                const x2 = x + len * Math.cos(angle);
+                const y2 = y + len * Math.sin(angle);
+                drawLine(x, y, x2, y2, '#a3e635');
+                dendrite(x2, y2, len * 0.7, angle - Math.PI / 4, n - 1);
+                dendrite(x2, y2, len * 0.7, angle + Math.PI / 4, n - 1);
+            }
+            dendrite(offsetX, offsetY, scale, -Math.PI / 2, iterations);
+        }
+
+        function drawCantor() {
+            ctx.lineWidth = scale;
+            function cantor(x, y, len, n) {
+                if (n === 0) return;
+                drawLine(x, y, x + len, y, '#eab308');
+                cantor(x, y + scale * 2, len / 3, n - 1);
+                cantor(x + len * 2 / 3, y + scale * 2, len / 3, n - 1);
+            }
+            cantor(offsetX - scale * 10, offsetY, scale * 20, iterations);
+        }
+
+        function drawApollonian() {
+            ctx.lineWidth = 1;
+            function apollonian(x, y, r, n) {
+                if (n === 0 || r < 1) return;
+                ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI);
+                ctx.strokeStyle = '#60a5fa'; ctx.stroke();
+                const r2 = r / (1 + Math.sqrt(2));
+                apollonian(x + r - r2, y, r2, n - 1); apollonian(x - r + r2, y, r2, n - 1);
+                apollonian(x, y + r - r2, r2, n - 1); apollonian(x, y - r + r2, r2, n - 1);
+            }
+            apollonian(offsetX, offsetY, scale, iterations);
+        }
+
+        function drawQuadraticKoch() {
+            ctx.lineWidth = 1;
+            function qk(x1, y1, x2, y2, n) {
+                if (n === 0) { drawLine(x1, y1, x2, y2, '#f472b6'); return; }
+                const dx = (x2 - x1) / 3, dy = (y2 - y1) / 3;
+                const p = [
+                    {x: x1, y: y1}, {x: x1 + dx, y: y1 + dy},
+                    {x: x1 + dx - dy, y: y1 + dy + dx}, {x: x1 + 2*dx - dy, y: y1 + 2*dy + dx},
+                    {x: x1 + 2*dx, y: y1 + 2*dy}, {x: x2, y: y2}
+                ];
+                for (let i = 0; i < p.length - 1; i++) qk(p[i].x, p[i].y, p[i+1].x, p[i+1].y, n - 1);
+            }
+            qk(offsetX - scale, offsetY, offsetX + scale, offsetY, iterations);
+        }
+
+        function drawFudgeflake() {
+            ctx.lineWidth = 1;
+            function fudge(x, y, s, n) {
+                if (n === 0) { drawLine(x, y, x + s, y, '#a78bfa'); return; }
+                const ns = s / 3;
+                fudge(x, y, ns, n - 1); fudge(x + 2*ns, y, ns, n - 1);
+                fudge(x + ns, y, ns, n - 1); fudge(x + ns, y - ns, ns, n - 1);
+            }
+            const size = scale;
+            for (let i = 0; i < 6; i++) {
+                ctx.save(); ctx.translate(offsetX, offsetY);
+                ctx.rotate(i * Math.PI / 3); fudge(-size/2, 0, size, iterations);
+                ctx.restore();
+            }
+        }
+
+        function drawFlowsnake() {
+            let x = offsetX, y = offsetY;
+            let angle = 0;
+            const len = scale / Math.pow(Math.sqrt(7), iterations);
+            ctx.lineWidth = 1;
+            function flow(n, turn) {
+                if (n === 0) {
+                    const nx = x + Math.cos(angle) * len; const ny = y + Math.sin(angle) * len;
+                    drawLine(x, y, nx, ny, '#34d399'); x = nx; y = ny; return;
+                }
+                angle += turn; flow(n - 1, -turn); angle -= turn; flow(n - 1, turn);
+                angle -= turn; flow(n - 1, turn); angle += turn; flow(n - 1, -turn);
+            }
+            for (let i = 0; i < 3; i++) { flow(iterations, Math.PI / 3); angle -= 2 * Math.PI / 3; }
+        }
+
+        function drawBush() {
+            ctx.lineWidth = 1;
+            const len = scale;
+            const angle = 25 * Math.PI / 180;
+            function bush(n, l) {
+                if (n === 0) return;
+                drawLine(0, 0, 0, -l, '#84cc16');
+                ctx.translate(0, -l);
+                ctx.save(); ctx.rotate(angle); bush(n - 1, l * 0.6); ctx.restore();
+                ctx.save(); ctx.rotate(-angle); bush(n - 1, l * 0.6); ctx.restore();
+            }
+            ctx.save(); ctx.translate(offsetX, offsetY); bush(iterations, len); ctx.restore();
+        }
+
         function hsvToRgb(h, s, v) {
             let r, g, b, i = Math.floor(h/60), f = h/60-i, p = v*(1-s), q = v*(1-f*s), t = v*(1-(1-f)*s);
             switch (i % 6) { case 0: r=v, g=t, b=p; break; case 1: r=q, g=v, b=p; break; case 2: r=p, g=v, b=t; break; case 3: r=p, g=q, b=v; break; case 4: r=t, g=p, b=v; break; case 5: r=v, g=p, b=q; break; }
@@ -324,7 +634,7 @@
             const start = performance.now();
             ctx.fillStyle = '#000'; ctx.fillRect(0, 0, width, height);
             const m = modeSelect.value;
-            if (m === 'mandelbrot' || m === 'julia') drawComplexSet(m);
+            if (['mandelbrot', 'julia', 'burning_ship', 'newton', 'phoenix', 'mandelbox'].includes(m)) drawComplexSet(m);
             else if (m === 'peano') drawPeano();
             else if (m === 'hilbert') drawHilbert();
             else if (m === 'dragon') drawDragon();
@@ -334,6 +644,22 @@
             else if (m === 'sierpinski_t') drawSierpinskiTriangle(iterations);
             else if (m === 'sierpinski_c') drawSierpinskiCarpet(iterations);
             else if (m === 'vicsek') drawVicsek(iterations);
+            else if (m === 'gosper') drawGosper();
+            else if (m === 'terdragon') drawTerdragon();
+            else if (m === 'twindragon') drawTwindragon();
+            else if (m === 'cesaro') drawCesaro();
+            else if (m === 'minkowski') drawMinkowski();
+            else if (m === 'pythagorean') drawPythagoreanTree();
+            else if (m === 't_square') drawTSquare();
+            else if (m === 'box') drawBoxFractal();
+            else if (m === 'h_fractal') drawHFractal();
+            else if (m === 'dendrite') drawDendrite();
+            else if (m === 'cantor') drawCantor();
+            else if (m === 'apollonian') drawApollonian();
+            else if (m === 'quadratic_koch') drawQuadraticKoch();
+            else if (m === 'fudgeflake') drawFudgeflake();
+            else if (m === 'flowsnake') drawFlowsnake();
+            else if (m === 'bush') drawBush();
             statsInfo.innerText = `${(performance.now() - start).toFixed(1)}ms | High Precision`;
         }
 
@@ -345,8 +671,10 @@
             else if (m === 'levy') { iterSlider.max = 18; iterSlider.value = 12; }
             else if (m === 'koch') { iterSlider.max = 8; iterSlider.value = 4; }
             else if (m === 'fern') { iterSlider.max = 50; iterSlider.value = 20; }
-            else if (m === 'sierpinski_t' || m === 'sierpinski_c') { iterSlider.max = 12; iterSlider.value = 7; }
+            else if (m === 'sierpinski_t' || m === 'sierpinski_c') { iterSlider.max = 8; iterSlider.value = 5; }
             else if (m === 'vicsek') { iterSlider.max = 8; iterSlider.value = 5; }
+            else if (['pythagorean', 'h_fractal', 'dendrite', 'bush', 'apollonian', 'fudgeflake', 'flowsnake'].includes(m)) { iterSlider.max = 12; iterSlider.value = 8; }
+            else if (['gosper', 'terdragon', 'twindragon', 'cesaro', 'minkowski', 'quadratic_koch', 'box', 't_square', 'cantor'].includes(m)) { iterSlider.max = 8; iterSlider.value = 4; }
             else { iterSlider.max = 1000; iterSlider.value = 100; }
             iterations = parseInt(iterSlider.value); iterVal.innerText = iterations; resetView();
         });
