@@ -639,6 +639,7 @@
                             </div>
                             <button id="btn-export-svg" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors">Export SVG</button>
                             <button id="btn-export-midi" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors">Export MIDI</button>
+                             <button id="btn-export-ply" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors">Export PLY (Color)</button>
                             <button id="btn-export-gltf" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors">Export 3D Model</button>
                             <button id="btn-export-stl" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors">Export STL</button>
                             <button id="btn-export-fs" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors">Save factor tree as folder tree</button>
@@ -8029,17 +8030,31 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             threeScene.add(groundGroup);
 
             // Create a group for the fractal to allow easy manipulation
-            let fractalGroup = threeScene.getObjectByName('fractalGroup');
-            if (!fractalGroup) {
-                fractalGroup = new THREE.Group();
-                fractalGroup.name = 'fractalGroup';
-                threeScene.add(fractalGroup);
+            let oldFractalGroup = threeScene.getObjectByName('fractalGroup');
+            let savedRotation = new THREE.Euler();
+            let savedPosition = new THREE.Vector3();
+            let savedScale = new THREE.Vector3(1, 1, 1);
+            
+            if (oldFractalGroup) {
+                savedRotation.copy(oldFractalGroup.rotation);
+                savedPosition.copy(oldFractalGroup.position);
+                savedScale.copy(oldFractalGroup.scale);
+                threeScene.remove(oldFractalGroup);
+                oldFractalGroup.traverse((child) => {
+                    if (child.geometry) child.geometry.dispose();
+                    if (child.material) {
+                        if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
+                        else child.material.dispose();
+                    }
+                });
             }
             
-            // Clear previous
-            for(let i = fractalGroup.children.length - 1; i >= 0; i--) {
-                fractalGroup.remove(fractalGroup.children[i]);
-            }
+            const fractalGroup = new THREE.Group();
+            fractalGroup.name = 'fractalGroup';
+            fractalGroup.rotation.copy(savedRotation);
+            fractalGroup.position.copy(savedPosition);
+            fractalGroup.scale.copy(savedScale);
+            threeScene.add(fractalGroup);
             
             // Rebuild from treeData
             // We need to run the layout logic to get X/Y, then map to 3D
