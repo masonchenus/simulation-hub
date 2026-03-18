@@ -9,7 +9,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/PLYExporter.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
@@ -639,12 +638,12 @@
                             </div>
                             <button id="btn-export-svg" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors">Export SVG</button>
                             <button id="btn-export-midi" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors">Export MIDI</button>
-                             <button id="btn-export-ply" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors">Export PLY (Color)</button>
                             <button id="btn-export-gltf" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors">Export 3D Model</button>
                             <button id="btn-export-stl" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors">Export STL</button>
                             <button id="btn-export-fs" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors">Save factor tree as folder tree</button>
                             <button id="btn-export-hires" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors">Export 4K PNG</button>
                             <button id="btn-export-url" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-blue-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-blue-700 transition-colors">Open Export URL</button>
+                            <button id="btn-export-chunked" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold uppercase tracking-wider border border-slate-700 transition-colors">Bit by bit (Huge)</button>
                             <div class="flex gap-1">
                                  <input id="video-width" type="number" placeholder="W" value="1920" class="bg-slate-800 text-[10px] text-slate-200 border border-slate-700 rounded px-1 w-1/2">
                                 <input id="video-height" type="number" placeholder="H" value="1080" class="bg-slate-800 text-[10px] text-slate-200 border border-slate-700 rounded px-1 w-1/2">
@@ -7314,6 +7313,100 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             link.click();
         }
 
+        async function exportChunked() {
+            const widthStr = prompt("Enter total width (e.g. 8192):", "8192");
+            const heightStr = prompt("Enter total height (e.g. 8192):", "8192");
+            const chunkStr = prompt("Enter chunk size (e.g. 2048):", "2048");
+            
+            const totalW = parseInt(widthStr);
+            const totalH = parseInt(heightStr);
+            const chunkS = parseInt(chunkStr);
+            
+            if (!totalW || !totalH || !chunkS) return;
+
+            const finalCanvas = document.createElement('canvas');
+            finalCanvas.width = totalW;
+            finalCanvas.height = totalH;
+            const finalCtx = finalCanvas.getContext('2d');
+            
+            const originalW = canvas.width;
+            const originalH = canvas.height;
+            const originalTransform = { ...app.transform };
+            const originalRecordingSize = recordingSize;
+
+            const dpr = window.devicePixelRatio || 1;
+            const logicalW = originalW / dpr;
+            const logicalH = originalH / dpr;
+            const scaleFactor = totalW / logicalW;
+            
+            const fullTransform = {
+                k: app.transform.k * scaleFactor,
+                x: (totalW / 2) + (app.transform.x - logicalW / 2) * scaleFactor,
+                y: (totalH / 2) + (app.transform.y - logicalH / 2) * scaleFactor
+            };
+
+            recordingSize = { width: chunkS, height: chunkS };
+            canvas.width = chunkS; canvas.height = chunkS;
+            bgCanvas.width = chunkS; bgCanvas.height = chunkS;
+            if (glCanvas) { glCanvas.width = chunkS; glCanvas.height = chunkS; }
+            if (useWebGL && gl) gl.viewport(0, 0, chunkS, chunkS);
+
+            const cols = Math.ceil(totalW / chunkS);
+            const rows = Math.ceil(totalH / chunkS);
+            const btn = document.getElementById('btn-export-chunked');
+            const originalText = btn.textContent;
+            const fixedTime = performance.now();
+            const isTrans = transparentCheck.checked;
+
+            try {
+                for (let y = 0; y < rows; y++) {
+                    for (let x = 0; x < cols; x++) {
+                        btn.textContent = `Rendering ${x + y * cols + 1}/${cols * rows}`;
+                        const offX = x * chunkS;
+                        const offY = y * chunkS;
+                        
+                        app.transform.k = fullTransform.k;
+                        app.transform.x = fullTransform.x - offX;
+                        app.transform.y = fullTransform.y - offY;
+                        
+                        draw(fixedTime, isTrans);
+                        await new Promise(r => setTimeout(r, 10));
+
+                        if (isTrans) {
+                            finalCtx.drawImage(bgCanvas, offX, offY);
+                            if (glCanvas) finalCtx.drawImage(glCanvas, offX, offY);
+                        }
+                        finalCtx.drawImage(canvas, offX, offY);
+                    }
+                }
+                
+                btn.textContent = "Saving...";
+                await new Promise(r => setTimeout(r, 10));
+                
+                finalCanvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = `fractal-chunked-${seedInput.value}.png`;
+                    link.href = url;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                    btn.textContent = originalText;
+                }, 'image/png');
+            } catch (e) {
+                console.error(e);
+                alert("Error during chunked export");
+                btn.textContent = originalText;
+            } finally {
+                recordingSize = originalRecordingSize;
+                canvas.width = originalW; canvas.height = originalH;
+                bgCanvas.width = originalW; bgCanvas.height = originalH;
+                if (glCanvas) { glCanvas.width = originalW; glCanvas.height = originalH; }
+                if (useWebGL && gl) gl.viewport(0, 0, originalW, originalH);
+                app.transform = originalTransform;
+                resize();
+            }
+        }
+
         // Suggestion #17: High Res Export
         document.getElementById('btn-export-hires').addEventListener('click', () => {
             const dpr = window.devicePixelRatio || 1;
@@ -7345,7 +7438,7 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             canvas.height = targetHeight;
             
             // Adjust transform to maintain center and relative scale
-            const scaleFactor = targetWidth / originalW;
+            const scaleFactor = targetWidth / (originalW / dpr);
             const oldTransform = { ...app.transform };
             app.transform.x *= scaleFactor;
             app.transform.y *= scaleFactor;
@@ -7370,88 +7463,14 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             app.transform.k = oldTransform.k;
             draw();
         });
-
-        function createExportableScene() {
-            const exportScene = new THREE.Scene();
-            const fractalGroup = threeScene.getObjectByName('fractalGroup');
-            if (!fractalGroup) return exportScene;
-
-            fractalGroup.children.forEach(child => {
-                if (child.isInstancedMesh) {
-                    const instanceCount = child.count;
-                    const geom = child.geometry;
-                    const vertCount = geom.attributes.position.count;
-                    const indexCount = geom.index ? geom.index.count : 0;
-                    
-                    const totalVerts = vertCount * instanceCount;
-                    const totalIndices = indexCount * instanceCount;
-                    
-                    const positions = new Float32Array(totalVerts * 3);
-                    const normals = new Float32Array(totalVerts * 3);
-                    const colors = new Float32Array(totalVerts * 3);
-                    const indices = indexCount > 0 ? (totalVerts > 65535 ? new Uint32Array(totalIndices) : new Uint16Array(totalIndices)) : null;
-                    
-                    const basePos = geom.attributes.position.array;
-                    const baseNorm = geom.attributes.normal.array;
-                    const baseIdx = geom.index ? geom.index.array : null;
-                    
-                    const matrix = new THREE.Matrix4();
-                    const color = new THREE.Color();
-                    
-                    for (let i = 0; i < instanceCount; i++) {
-                        child.getMatrixAt(i, matrix);
-                        child.getColorAt(i, color);
-                        
-                        for (let v = 0; v < vertCount; v++) {
-                            const offset = i * vertCount + v;
-                            
-                            // Position
-                            const x = basePos[v*3], y = basePos[v*3+1], z = basePos[v*3+2];
-                            const e = matrix.elements;
-                            positions[offset*3] = x * e[0] + y * e[4] + z * e[8] + e[12];
-                            positions[offset*3+1] = x * e[1] + y * e[5] + z * e[9] + e[13];
-                            positions[offset*3+2] = x * e[2] + y * e[6] + z * e[10] + e[14];
-                            
-                            // Normal (Approximation without inverse transpose for uniform scale)
-                            // For non-uniform scale, this is incorrect but sufficient for spheres
-                            const nx = baseNorm[v*3], ny = baseNorm[v*3+1], nz = baseNorm[v*3+2];
-                            normals[offset*3] = nx; normals[offset*3+1] = ny; normals[offset*3+2] = nz;
-                            
-                            // Color
-                            colors[offset*3] = color.r; colors[offset*3+1] = color.g; colors[offset*3+2] = color.b;
-                        }
-                        
-                        if (indices && baseIdx) {
-                            for (let j = 0; j < indexCount; j++) {
-                                indices[i * indexCount + j] = baseIdx[j] + i * vertCount;
-                            }
-                        }
-                    }
-                    
-                    const mergedGeo = new THREE.BufferGeometry();
-                    mergedGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                    mergedGeo.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
-                    mergedGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-                    if (indices) mergedGeo.setIndex(new THREE.BufferAttribute(indices, 1));
-                    
-                    const mergedMat = new THREE.MeshStandardMaterial({ roughness: 0.5, metalness: 0.1, vertexColors: true });
-                    exportScene.add(new THREE.Mesh(mergedGeo, mergedMat));
-                } else if (child.type === 'LineSegments') {
-                    // Clone lines for context
-                    const lines = new THREE.LineSegments(child.geometry.clone(), new THREE.LineBasicMaterial({ vertexColors: true }));
-                    exportScene.add(lines);
-                }
-            });
-            return exportScene;
-        }
+        document.getElementById('btn-export-chunked').addEventListener('click', exportChunked);
 
         function exportGLTF() {
             if (!threeScene) { init3D(); } // Ensure 3D scene exists
             // Wait a frame for it to build
             setTimeout(() => {
-                const exportScene = createExportableScene();
                 const exporter = new THREE.GLTFExporter();
-                exporter.parse(exportScene, (gltf) => {
+                exporter.parse(threeScene, (gltf) => {
                     const blob = new Blob([JSON.stringify(gltf)], { type: 'application/json' });
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
@@ -7465,9 +7484,8 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             if (!threeScene) { init3D(); }
             setTimeout(() => {
                 try {
-                    const exportScene = createExportableScene();
                     const exporter = new THREE.STLExporter();
-                    const data = exporter.parse(exportScene, { binary: true });
+                    const data = exporter.parse(threeScene, { binary: true });
                     const blob = new Blob([data], { type: 'application/octet-stream' });
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
@@ -7476,21 +7494,6 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
                 } catch (e) {
                     alert('STL export failed.');
                 }
-            }, 100);
-        }
-
-        function exportPLY() {
-            if (!threeScene) { init3D(); }
-            setTimeout(() => {
-                const exportScene = createExportableScene();
-                const exporter = new THREE.PLYExporter();
-                exporter.parse(exportScene, (data) => {
-                    const blob = new Blob([data], { type: 'application/octet-stream' });
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = 'fractal-model.ply';
-                    link.click();
-                }, { binary: true });
             }, 100);
         }
 
@@ -7670,14 +7673,18 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             const posLoc = bgCtx.getAttribLocation(mandelProgram, "position");
             bgCtx.enableVertexAttribArray(posLoc);
             bgCtx.vertexAttribPointer(posLoc, 2, bgCtx.FLOAT, false, 0, 0);
+            bgCtx.viewport(0, 0, bgCanvas.width, bgCanvas.height);
             
             bgCtx.uniform2f(bgCtx.getUniformLocation(mandelProgram, "res"), bgCanvas.width, bgCanvas.height);
             // Map canvas transform to complex plane
-            // Center of screen is transform.x, transform.y
-            // We need to invert transform to find complex center
-            const rect = canvas.parentNode.getBoundingClientRect();
-            const cx = (rect.width / 2 - app.transform.x) / app.transform.k;
-            const cy = (rect.height / 2 - app.transform.y) / app.transform.k;
+            
+            const dpr = recordingSize ? 1 : (window.devicePixelRatio || 1);
+            const w = bgCanvas.width / dpr;
+            const h = bgCanvas.height / dpr;
+            
+            const cx = (w / 2 - app.transform.x) / app.transform.k;
+            const cy = (h / 2 - app.transform.y) / app.transform.k;
+            
             // Scale to complex coords (approx)
             bgCtx.uniform2f(bgCtx.getUniformLocation(mandelProgram, "center"), cx/200, cy/200); 
             bgCtx.uniform1f(bgCtx.getUniformLocation(mandelProgram, "zoom"), app.transform.k);
@@ -8030,31 +8037,17 @@ let glNodeCapacity = 0, glEdgeCapacity = 0, glParticleCapacity = 0;
             threeScene.add(groundGroup);
 
             // Create a group for the fractal to allow easy manipulation
-            let oldFractalGroup = threeScene.getObjectByName('fractalGroup');
-            let savedRotation = new THREE.Euler();
-            let savedPosition = new THREE.Vector3();
-            let savedScale = new THREE.Vector3(1, 1, 1);
-            
-            if (oldFractalGroup) {
-                savedRotation.copy(oldFractalGroup.rotation);
-                savedPosition.copy(oldFractalGroup.position);
-                savedScale.copy(oldFractalGroup.scale);
-                threeScene.remove(oldFractalGroup);
-                oldFractalGroup.traverse((child) => {
-                    if (child.geometry) child.geometry.dispose();
-                    if (child.material) {
-                        if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
-                        else child.material.dispose();
-                    }
-                });
+            let fractalGroup = threeScene.getObjectByName('fractalGroup');
+            if (!fractalGroup) {
+                fractalGroup = new THREE.Group();
+                fractalGroup.name = 'fractalGroup';
+                threeScene.add(fractalGroup);
             }
             
-            const fractalGroup = new THREE.Group();
-            fractalGroup.name = 'fractalGroup';
-            fractalGroup.rotation.copy(savedRotation);
-            fractalGroup.position.copy(savedPosition);
-            fractalGroup.scale.copy(savedScale);
-            threeScene.add(fractalGroup);
+            // Clear previous
+            for(let i = fractalGroup.children.length - 1; i >= 0; i--) {
+                fractalGroup.remove(fractalGroup.children[i]);
+            }
             
             // Rebuild from treeData
             // We need to run the layout logic to get X/Y, then map to 3D
@@ -9621,8 +9614,6 @@ void main(){ outColor = vColor; }`;
             document.getElementById('btn-export-midi').addEventListener('click', exportMIDI);
             document.getElementById('btn-export-gltf').addEventListener('click', exportGLTF);
             if (btnExportStl) btnExportStl.addEventListener('click', exportSTL);
-        const btnExportPly = document.getElementById('btn-export-ply');
-        if (btnExportPly) btnExportPly.addEventListener('click', exportPLY);
             document.getElementById('btn-export-fs').addEventListener('click', exportFileSystem);
             document.getElementById('btn-3d').addEventListener('click', init3D);
             if (threeHeightSelect) threeHeightSelect.addEventListener('input', debounce(() => {
